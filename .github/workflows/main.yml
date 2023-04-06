@@ -14,3 +14,5 @@ jobs:
         server: files.000webhost.com
         username: cs-departement-management
         password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: ./src/
+        server-dir: public_html/
