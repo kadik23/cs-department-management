@@ -47,8 +47,72 @@
                 
                 <div class="card-box-wrapper">
                     <div class="card-box">
-                        <div class="card-title">Collee Year</div>
+                        <div class="card-title">College Year</div>
                         <div class="card-content">2022/2023</div>
+                    </div>
+                </div>
+            </div>
+            <div class="section-wrapper">
+                <div class="section-header">
+                    <div class="section-title">About me</div>
+                </div>
+                <div class="section-content">
+                    <div class="info-wrapper">
+                        <div class="info-icon">
+                            <img src="/icons/email.svg" alt="">
+                        </div>
+                        <div class="info-content">student@univ-medea.dz</div>
+                    </div>
+                    <div class="info-wrapper">
+                        <div class="info-icon">
+                            <img src="/icons/location.svg" alt="">
+                        </div>
+                        <div class="info-content">Medea, Algeria</div>
+                    </div>
+                </div>
+            </div>
+            <div class="section-wrapper">
+                <div class="section-header">
+                    <div class="section-title">My colleagues</div>
+                </div>
+                <div class="section-content">
+                    <div class="friends">
+                    <div class="friend">
+                            <div class="friend-profile-pic">
+                                <img src="/images/student.jpg" alt="">
+                            </div>
+                            <div class="friend-name">Student name</div>
+                        </div>
+                        <div class="friend">
+                            <div class="friend-profile-pic">
+                                <img src="/images/student.jpg" alt="">
+                            </div>
+                            <div class="friend-name">Student name</div>
+                        </div>
+                        <div class="friend">
+                            <div class="friend-profile-pic">
+                                <img src="/images/student.jpg" alt="">
+                            </div>
+                            <div class="friend-name">Student name</div>
+                        </div>
+                        <div class="friend">
+                            <div class="friend-profile-pic">
+                                <img src="/images/student.jpg" alt="">
+                            </div>
+                            <div class="friend-name">Student name</div>
+                        </div>
+                        <div class="friend">
+                            <div class="friend-profile-pic">
+                                <img src="/images/student.jpg" alt="">
+                            </div>
+                            <div class="friend-name">Student name</div>
+                        </div>
+                        <div class="friend">
+                            <div class="friend-profile-pic">
+                                <img src="/images/student.jpg" alt="">
+                            </div>
+                            <div class="friend-name">Student name</div>
+                        </div>
                     </div>
                 </div>
             </div>
