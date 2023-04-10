@@ -10,7 +10,7 @@
 <body>
     <div class="container">
         <div class="banner-wrapper">
-            <img src="/images/cse-banner.jpeg" alt="">
+            <img src="/assets/images/cse-banner.jpeg" alt="">
         </div>
         <div class="wrapper">
             <!--

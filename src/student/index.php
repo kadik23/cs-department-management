@@ -11,7 +11,7 @@
     <div class="container">
         <div class="student-profile">
             <div class="profile-pic">
-                <img src="/images/student.jpg" alt="">
+                <img src="/assets/images/student.jpg" alt="">
             </div>
             <div class="student-name">Student Name</div>
             <nav>
@@ -59,13 +59,13 @@
                 <div class="section-content">
                     <div class="info-wrapper">
                         <div class="info-icon">
-                            <img src="/icons/email.svg" alt="">
+                            <img src="/assets/icons/email.svg" alt="">
                         </div>
                         <div class="info-content">student@univ-medea.dz</div>
                     </div>
                     <div class="info-wrapper">
                         <div class="info-icon">
-                            <img src="/icons/location.svg" alt="">
+                            <img src="/assets/icons/location.svg" alt="">
                         </div>
                         <div class="info-content">Medea, Algeria</div>
                     </div>
@@ -79,37 +79,37 @@
                     <div class="friends">
                     <div class="friend">
                             <div class="friend-profile-pic">
-                                <img src="/images/student.jpg" alt="">
+                                <img src="/assets/images/student.jpg" alt="">
                             </div>
                             <div class="friend-name">Student name</div>
                         </div>
                         <div class="friend">
                             <div class="friend-profile-pic">
-                                <img src="/images/student.jpg" alt="">
+                                <img src="/assets/images/student.jpg" alt="">
                             </div>
                             <div class="friend-name">Student name</div>
                         </div>
                         <div class="friend">
                             <div class="friend-profile-pic">
-                                <img src="/images/student.jpg" alt="">
+                                <img src="/assets/images/student.jpg" alt="">
                             </div>
                             <div class="friend-name">Student name</div>
                         </div>
                         <div class="friend">
                             <div class="friend-profile-pic">
-                                <img src="/images/student.jpg" alt="">
+                                <img src="/assets/images/student.jpg" alt="">
                             </div>
                             <div class="friend-name">Student name</div>
                         </div>
                         <div class="friend">
                             <div class="friend-profile-pic">
-                                <img src="/images/student.jpg" alt="">
+                                <img src="/assets/images/student.jpg" alt="">
                             </div>
                             <div class="friend-name">Student name</div>
                         </div>
                         <div class="friend">
                             <div class="friend-profile-pic">
-                                <img src="/images/student.jpg" alt="">
+                                <img src="/assets/images/student.jpg" alt="">
                             </div>
                             <div class="friend-name">Student name</div>
                         </div>
