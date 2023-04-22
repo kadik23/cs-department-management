@@ -1,0 +1,149 @@
+/* width */
+::-webkit-scrollbar {
+    width: 5px;
+    cursor: pointer;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    border-radius: 5px;
+    background: #f1f1f1; 
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 5px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #555; 
+    cursor: pointer;
+}
+  
+  
+.accounts-header {
+    width: calc(100%);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.total-accounts {
+    font-size: 12px;
+    font-weight: 600;
+    color: #696969;
+}
+
+.user-profile-picture {
+    height: 40px;
+    width: 40px;
+    border-radius: 100%;
+}
+
+.row {
+    width: calc(100%);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.btn {
+    border: none;
+    outline: none;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-radius: 7px;
+    background-color: #2563eb;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background-color: #1e40af;
+}
+
+.create-account {
+    width: calc(100%*1/2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 60px;
+    border-radius: 7px;
+    background-color: #1f2937;
+}
+
+.create-account-header {
+    width: calc(100%*11/12);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.create-account-header {
+    color: #fff;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.create-account-body {
+    width: calc(100%*11/12);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 10px;
+    padding-bottom: 30px;
+}
+
+.create-account-input {
+    width: calc(100%*4/5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.create-account-input label {
+    width: 100%;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    color: #fff;
+    font-size: 14px;
+}
+
+.create-account-input input {
+    width: calc(100%*23/24);
+    border: none;
+    outline: none;
+    background-color: #f3f4f6;
+    border-radius: 7px;
+    font-size: 16px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.create-btn {
+    margin-top: 20px;
+}
+
+.create-account-type {
+    margin-top: 20px;
+    width: calc(4/5*100%);
+}
+
+.create-account-type label {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    color: #fff;
+    font-size: 14px;
+}

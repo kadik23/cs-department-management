@@ -1,3 +1,8 @@
+<?php 
+    include("../../database/db_connection.php");
+    include("../../includes/student/route_protection.php");
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,19 +11,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Computer Science Departement</title>
     <link rel="stylesheet" href="/styles/student.css">
+    <link rel="stylesheet" href="/styles/aside.css">
 </head>
 <body>
     <div class="container">
-        <div class="student-profile">
-            <div class="profile-pic">
-                <img src="/assets/images/student.jpg" alt="">
-            </div>
-            <div class="student-name">Student Name</div>
-            <nav>
-                <a href="#">My Schudeler</a>
-                <a href="#">My Notes</a>
-            </nav>
-        </div>
+
+        <?php
+            $aside_selected_link = "Dashboard";
+            include("../../includes/student/aside.php");
+        ?>
+        
         <div class="page-content">
             <div class="page-header">
                 <div class="page-title">Home</div>

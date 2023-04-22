@@ -1,0 +1,57 @@
+aside {
+    width: calc(1/4*100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #1e293b;
+    padding-top: 80px;
+    padding-bottom: 80px;
+}
+
+.user-profile-pic {
+    height: 100px;
+    width: 100px;
+    border-radius: 100%;
+}
+
+.user-profile-pic img {
+    width: 100%;
+    height: 100%;
+    border-radius: 100%;
+}
+
+.user-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #fff;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+nav {
+    flex-grow: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 40px;
+    padding-bottom: 40px;
+}
+
+nav a {
+    text-decoration: none;
+    color: #fff;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    width: 100%;
+    text-align: center;
+    background-color: #334155;
+    margin-top: 1px;
+    margin-bottom: 1px;
+    cursor: pointer;
+}
+
+.aside-selected-link {
+    background-color: #4b5563;
+    font-weight: 600;
+}
