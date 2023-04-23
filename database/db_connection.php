@@ -6,14 +6,62 @@
     $db_name = "cs_departement";
     $db_port = 3306;
     
-
-    $mysqli = new mysqli($db_server, $db_username, $db_password, $db_name, $db_port);
+    // NOTE: DO_NOT_TOUCH, This is a hack for old php servers, that have a php version below '8.2.0'
+    //       because of 'execute_query' method in mysqli class is available only in '8.2.0' and above.
+    $PHP_VERSION = phpversion(null);
+    if($PHP_VERSION[2] < '2'){
+        class mysqli_for_old_php extends mysqli {
+            public function execute_query($query, $arr){
+                $r = "";
+                foreach($arr as $item){
+                    if(gettype($item) == "string"){
+                        $r .= "s";
+                    }
+                    if(gettype($item) == "integer"){
+                        $r .= "i";
+                    }
+                }
+                $stmt = $this->prepare($query);
+                $stmt->bind_param($r, ...$arr);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                return $result;
+            }
+        }
+        $mysqli = new mysqli_for_old_php($db_server, $db_username, $db_password, $db_name, $db_port);
+    }else{
+        $mysqli = new mysqli($db_server, $db_username, $db_password, $db_name, $db_port);
+    }
     
     if($mysqli->connect_error){
         die("Connection failed: " . $conn->connect_error);
     }
 
     // echo "Database connected successfuly.";
+
+    /*
+
+    // NOTE: Since 000webhost do not support php 8.2 yet, This is the alternative implementation of 'execute_query' method.
+    class Test extends mysqli {
+        public function execute_query($query, $arr){
+            $r = "";
+            foreach($arr as $item){
+                if(gettype($item) == "string"){
+                    $r .= "s";
+                }
+                if(gettype($item) == "integer"){
+                    $r .= "i";
+                }
+            }
+            $stmt = $this->prepare($query);
+            $stmt->bind_param($r, ...$arr);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            return $result;
+        }
+    }
+    
+    */
 
     function is_admin($user_id){
         global $mysqli;
