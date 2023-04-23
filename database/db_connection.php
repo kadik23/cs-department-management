@@ -1,11 +1,11 @@
 <?php
-    
+        
     $db_server = "db4free.net";
     $db_username = "cs_departement";
     $db_password = "csdm2023";
     $db_name = "cs_departement";
     $db_port = 3306;
-    
+
     // NOTE: DO_NOT_TOUCH, This is a hack for old php servers, that have a php version below '8.2.0'
     //       because of 'execute_query' method in mysqli class is available only in '8.2.0' and above.
     $PHP_VERSION = phpversion(null);

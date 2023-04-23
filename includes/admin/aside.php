@@ -25,12 +25,8 @@
             "title" => "Resources",
         ],
         [
-            "path" => "/admin/student_tracker.php",
-            "title" => "Student progress tracker"
-        ],
-        [
-            "path" => "/admin/courses.php",
-            "title" => "Courses",
+            "path" => "/admin/students.php",
+            "title" => "Students"
         ],
     ];
 
