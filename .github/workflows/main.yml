@@ -2,7 +2,7 @@ on: push
 name: 🚀 Deploy website on push
 jobs:
   web-deploy:
-    name: 🎉 Deploy
+    name: 🎉 Deploy src folder
     runs-on: ubuntu-latest
     steps:
     - name: 🚚 Get latest code
@@ -18,7 +18,8 @@ jobs:
         server-dir: public_html/
 
   web-deploy-includes:
-    name: 🎉 Deploy
+    name: 🎉 Deploy includes folder
+    needs: web-deploy
     runs-on: ubuntu-latest
     steps:
     - name: 🚚 Get latest code
@@ -34,7 +35,8 @@ jobs:
         server-dir: includes/
 
   web-deploy-database:
-    name: 🎉 Deploy
+    name: 🎉 Deploy database folder
+    needs: web-deploy-includes
     runs-on: ubuntu-latest
     steps:
     - name: 🚚 Get latest code
