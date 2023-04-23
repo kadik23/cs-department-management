@@ -99,11 +99,19 @@
                     <div class="accounts-header">
                         <div class="custom-select" style="width:200px;">
                             <select id="account-type">
-                                <option value="0">Select Account type:</option>
-                                <option value="all">All</option>
-                                <option value="admin">Admin</option>
-                                <option value="student">Student</option>
-                                <option value="teacher">Teacher</option>
+                                <?php
+                                    if(isset($_GET["account_type"])){
+                                        echo '<option value="0">'.$account_type.'</option>';
+                                    }else{
+                                        echo '<option value="0">Select Account type:</option>';
+                                    }
+                                    $account_types = ["all","admin","student","teacher"];
+                                    foreach($account_types as $t){
+                                        if($account_type != $t){
+                                            echo '<option value="'.$t.'">'.$t.'</option>';
+                                        }
+                                    }
+                                ?>
                             </select>
                         </div>
                         <div class="search">
