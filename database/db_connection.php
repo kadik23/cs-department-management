@@ -1,9 +1,9 @@
 <?php
         
-    $db_server = "db4free.net";
-    $db_username = "cs_departement";
-    $db_password = "csdm2023";
-    $db_name = "cs_departement";
+    $db_server = "localhost";
+    $db_username = "id20569367_csdm";
+    $db_password = "B/EVjF7[L/&VZ76~";
+    $db_name = "id20569367_cs_departement";
     $db_port = 3306;
 
     // NOTE: DO_NOT_TOUCH, This is a hack for old php servers, that have a php version below '8.2.0'
