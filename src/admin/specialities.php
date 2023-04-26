@@ -1,0 +1,102 @@
+<?php 
+    include("../../database/db_connection.php");
+    include("../../includes/admin/route_protection.php");
+
+    $spec_name = $_POST["speciality_name"];
+    $spec_levels = $_POST["speciality_levels"];
+    
+    if(isset($spec_name) && isset($spec_levels)){
+        $result = $mysqli->execute_query("insert into specialities (speciality_name) values (?);", [$spec_name]);
+        $spec_id = $mysqli->insert_id;
+        if($result){
+            // NOTE: For now we dont have a custom selection on levels in the UI.
+            for($i = 1; $i <= (int) $spec_levels; $i++){
+                $result = $mysqli->execute_query("insert into acadimic_levels (speciality_id, level) values (?,?);", [$spec_id, $i]);
+            }
+        }
+    }
+
+    $result = $mysqli->query("select specialities.*,count(acadimic_levels.id) as levels from specialities join acadimic_levels on acadimic_levels.speciality_id = specialities.id;");
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Computer Science Departement</title>
+    <link rel="stylesheet" href="/styles/admin.css">
+    <link rel="stylesheet" href="/styles/aside.css">
+    <link rel="stylesheet" href="/styles/list.css">
+    <link rel="stylesheet" href="/styles/search.css">
+    <link rel="stylesheet" href="/styles/buttons.css">
+    <link rel="stylesheet" href="/styles/forms.css">
+</head>
+<body>
+    <div class="container">
+
+        <?php
+            $aside_selected_link = "Specialities";
+            include("../../includes/admin/aside.php");
+        ?>
+        
+        <div class="page-content">
+            <div class="page-header">
+                <div class="page-title">Specialities</div>
+            </div>
+            <div class="section-wrapper">
+                <div class="section-content">
+                    <div class="row">
+                        <form method="POST" id="create_speciality" class="speciality-create">
+                            <div class="input-wrapper">
+                                <label>Name:</label>
+                                <input type="text" name="speciality_name" id="speciality_name" placeholder="name" />
+                            </div>    
+                            
+                            <div class="input-wrapper">
+                                <label>Levels:</label>
+                                <input type="number" name="speciality_levels" id="speciality_levels" placeholder="levels" />
+                            </div>
+                            <div>
+                                <button id="close_create_spec" class="btn">Cancel</button>
+                                <button type="submit" class="btn">Add</button>
+                            </div>
+                        </form>
+                        <button id="open_create_spec" class="btn">Add New Speciality</button>
+                    </div>
+                    <div class="list-control">
+                        <div class="search">
+                            <input type="text" placeholder="search..." />
+                            <div class="search-icon">
+                                <img src="/assets/icons/search.svg" alt="search-icon" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list">
+                        <div class="list-header">
+                            <div class="list-header-item">Speciality Id</div>
+                            <div class="list-header-item" style="flex: 2;">Speciality Name</div>
+                            <div class="list-header-item">Total Levels</div>
+                        </div>
+                        <div class="list-body">
+                            <?php
+                                if($result){
+                                    while($row = $result->fetch_assoc()){
+                                        echo '<div class="list-row">
+                                                <div class="list-item">'.$row["id"].'</div>
+                                                <div class="list-item" style="flex: 2;">'.$row["speciality_name"].'</div>
+                                                <div class="list-item">'.$row["levels"].'</div>
+                                             </div>';
+                                    }   
+                                }
+                            ?>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/assets/js/forms.js"></script>
+</body>
+</html>

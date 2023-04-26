@@ -1,0 +1,36 @@
+.speciality-create {
+    width: calc(100%*1/2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.input-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: calc(100%*11/12);
+    margin-bottom: 10px;
+}
+
+.input-wrapper label {
+    font-size: 14px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.input-wrapper input {
+    width: calc(100%*11/12);
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 16px;
+    padding-right: 16px;
+    outline: none;
+    border: none;
+    background-color: #ebebeb;
+    border-radius: 7px;
+    font-size: 14px;
+}
+
+#create_speciality {
+    display: none;
+}
