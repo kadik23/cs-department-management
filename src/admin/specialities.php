@@ -10,7 +10,7 @@
         $spec_id = $mysqli->insert_id;
         if($result){
             // NOTE: For now we dont have a custom selection on levels in the UI.
-            for($i = 1; $i <= (int) $spec_levels; $i++){
+            for($i = 1; $i <= intval($spec_levels); $i++){
                 $result = $mysqli->execute_query("insert into acadimic_levels (speciality_id, level) values (?,?);", [$spec_id, $i]);
             }
         }
