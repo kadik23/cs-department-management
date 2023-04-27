@@ -47,7 +47,7 @@
             <div class="section-wrapper">
                 <div class="section-content">
                     <div class="row">
-                        <form method="POST" id="create_speciality" class="speciality-create">
+                        <form method="POST" id="target_form" class="form-wrapper">
                             <div class="input-wrapper">
                                 <label>Name:</label>
                                 <input type="text" name="speciality_name" id="speciality_name" placeholder="name" />
@@ -58,7 +58,7 @@
                                 <input type="number" name="speciality_levels" id="speciality_levels" placeholder="levels" />
                             </div>
                             <div>
-                                <button id="close_create_spec" class="btn">Cancel</button>
+                                <button id="close_create_spec" class="cancel-btn">Cancel</button>
                                 <button type="submit" class="btn">Add</button>
                             </div>
                         </form>

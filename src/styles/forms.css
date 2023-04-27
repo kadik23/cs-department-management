@@ -1,8 +1,11 @@
-.speciality-create {
-    width: calc(100%*1/2);
+.form-wrapper {
+    width: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
+    max-height: 0px;
+    opacity: 0;
+    transition: 1s;
 }
 
 .input-wrapper {
@@ -16,6 +19,8 @@
     font-size: 14px;
     padding-top: 5px;
     padding-bottom: 5px;
+    font-weight: 600;
+    color: #075985;
 }
 
 .input-wrapper input {
@@ -26,11 +31,12 @@
     padding-right: 16px;
     outline: none;
     border: none;
-    background-color: #ebebeb;
+    background-color: #e0f2fe;
+    color: #0c4a6e;
     border-radius: 7px;
     font-size: 14px;
 }
 
-#create_speciality {
-    display: none;
+.input-wrapper input::placeholder {
+    color: #0369a1;
 }

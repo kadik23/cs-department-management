@@ -46,7 +46,7 @@
             <div class="section-wrapper">
                 <div class="section-content">
                     <div class="row">
-                        <form method="POST" id="create_speciality" class="speciality-create">
+                        <form method="POST" id="target_form" class="form-wrapper">
                             <div class="input-wrapper">
                                 <label>Subject Name:</label>
                                 <input type="text" name="subject_name" id="subject_name" placeholder="Subject name" />

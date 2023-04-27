@@ -52,6 +52,7 @@
             <div class="row-wrapper">
                 <div class="card-box-wrapper">
                     <div class="card-box">
+                        <img class="card-box-bg" src="/assets/icons/users.svg" alt="card-box-bg" />
                         <div class="card-title">Total users</div>
                         <div class="card-content"><?= $total_users ?></div>
                     </div>
@@ -59,6 +60,7 @@
 
                 <div class="card-box-wrapper">
                     <div class="card-box">
+                        <img class="card-box-bg" src="/assets/icons/students.svg" alt="card-box-bg" />
                         <div class="card-title">Students</div>
                         <div class="card-content"><?= $total_students ?></div>
                     </div>
@@ -66,6 +68,7 @@
                 
                 <div class="card-box-wrapper">
                     <div class="card-box">
+                        <img class="card-box-bg" src="/assets/icons/teacher.svg" alt="card-box-bg" />
                         <div class="card-title">Teachers</div>
                         <div class="card-content"><?= $total_teachers ?></div>
                     </div>
@@ -73,6 +76,7 @@
                 
                 <div class="card-box-wrapper">
                     <div class="card-box">
+                        <img class="card-box-bg" src="/assets/icons/college.svg" alt="card-box-bg" />
                         <div class="card-title">College Year</div>
                         <div class="card-content">2022/2023</div>
                     </div>

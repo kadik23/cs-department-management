@@ -30,7 +30,7 @@
             <div class="section-wrapper">
                 <div class="section-content">
                     <div class="row">
-                        <button id="open-dialogue-btn" class="btn">Create new lecture</button>
+                        <button id="open-dialogue-btn" class="btn">Create Group</button>
                     </div>
                     <div class="list-control">
                         <div class="search">
