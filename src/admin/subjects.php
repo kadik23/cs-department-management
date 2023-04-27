@@ -60,7 +60,7 @@
                                 <input type="number" name="credit" id="credit" placeholder="credit" />
                             </div>
                             <div>
-                                <button id="close_create_spec" class="btn">Cancel</button>
+                                <button id="close_create_spec" class="cancel-btn">Cancel</button>
                                 <button type="submit" class="btn">Create</button>
                             </div>
                         </form>
