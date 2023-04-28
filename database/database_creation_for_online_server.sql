@@ -9,9 +9,9 @@
           used by the remote server.
 */
 
-create database if not exists `cs_departement`;
+create database if not exists `cs-departement-management`;
 
-use `cs_departement`;
+use `cs-departement-management`;
 
 create table if not exists users (
     id int primary key not null AUTO_INCREMENT,
@@ -24,7 +24,7 @@ create table if not exists users (
 
 create table if not exists specialities (
     id int primary key not null AUTO_INCREMENT,
-    specaility_name varchar(255)
+    speciality_name varchar(255)
 );
 
 create table if not exists acadimic_levels (
@@ -35,7 +35,8 @@ create table if not exists acadimic_levels (
 
 create table if not exists `groups` (
     id int primary key not null AUTO_INCREMENT,
-    group_number int not null
+    group_number int not null,
+    acadimic_level_id int references acadimic_levels(id)
 );
 
 create table if not exists students (
@@ -52,7 +53,9 @@ create table if not exists teachers (
 
 create table if not exists subjects (
     id int primary key not null AUTO_INCREMENT,
-    subject_name varchar(255) not null
+    subject_name varchar(255) not null,
+    coefficient int not null,
+    credit int not null
 );
 
 create table if not exists resources (
@@ -76,3 +79,8 @@ create table if not exists administraters (
     id int primary key not null AUTO_INCREMENT,
     user_id int references users(id)
 );
+
+
+-- NOTE: In the futur we will have a install.php file to initiate the admin users. --
+insert into users (first_name, last_name, email, password) values ('admin','admin','admin@univ-medea.dz','$2y$10$R63bXYMeWgG4/pzJQacOdeVZIthlYSA3P4CNcA1mc3k4f7Ui4ockS');
+insert into administraters (user_id) values (1);

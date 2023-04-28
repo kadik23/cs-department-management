@@ -28,6 +28,18 @@
             "path" => "/admin/students.php",
             "title" => "Students"
         ],
+        [
+            "path" => "/admin/groups.php",
+            "title" => "Groups"
+        ],
+        [
+            "path" => "/admin/subjects.php",
+            "title" => "Subjects"
+        ],
+        [
+            "path" => "/admin/specialities.php",
+            "title" => "Specialities"
+        ]
     ];
 
     include("../../includes/aside.php");

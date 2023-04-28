@@ -19,18 +19,18 @@
     <div class="container">
 
         <?php
-            $aside_selected_link = "Lectures";
+            $aside_selected_link = "Groups";
             include("../../includes/admin/aside.php");
         ?>
         
         <div class="page-content">
             <div class="page-header">
-                <div class="page-title">Lectures</div>
+                <div class="page-title">Groups</div>
             </div>
             <div class="section-wrapper">
                 <div class="section-content">
                     <div class="row">
-                        <button id="open-dialogue-btn" class="btn">Create new lecture</button>
+                        <button id="open-dialogue-btn" class="btn">Create Group</button>
                     </div>
                     <div class="list-control">
                         <div class="search">
@@ -42,11 +42,11 @@
                     </div>
                     <div class="list">
                         <div class="list-header">
-                            <div class="list-header-item">Lecture Id</div>
-                            <div class="list-header-item" style="flex: 2;">Lecture name</div>
-                            <div class="list-header-item">From</div>
-                            <div class="list-header-item">To</div>
-                            <div class="list-header-item" style="flex: 2;">Teacher</div>
+                            <div class="list-header-item">Group Id</div>
+                            <div class="list-header-item">Group Number</div>
+                            <div class="list-header-item">Speciality</div>
+                            <div class="list-header-item">Responsable</div>
+                            <div class="list-header-item">Total Students</div>
                         </div>
                         <div class="list-body">
                             <?php
@@ -54,10 +54,10 @@
                                 foreach($students as $student){
                                     echo '<div class="list-row">
                                             <div class="list-item">'.$student.'</div>
-                                            <div class="list-item" style="flex: 2;">Operating System</div>
-                                            <div class="list-item">08:00</div>
-                                            <div class="list-item">10:00</div>
-                                            <div class="list-item" style="flex: 2;">No one know</div>
+                                            <div class="list-item">04</div>
+                                            <div class="list-item">L1 Computer Science</div>
+                                            <div class="list-item">Abdelfetah Lachenani</div>
+                                            <div class="list-item">24</div>
                                          </div>';
                                 }
                             ?>

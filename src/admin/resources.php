@@ -19,13 +19,13 @@
     <div class="container">
 
         <?php
-            $aside_selected_link = "Lectures";
+            $aside_selected_link = "Resources";
             include("../../includes/admin/aside.php");
         ?>
         
         <div class="page-content">
             <div class="page-header">
-                <div class="page-title">Lectures</div>
+                <div class="page-title">Resources</div>
             </div>
             <div class="section-wrapper">
                 <div class="section-content">
@@ -42,11 +42,9 @@
                     </div>
                     <div class="list">
                         <div class="list-header">
-                            <div class="list-header-item">Lecture Id</div>
-                            <div class="list-header-item" style="flex: 2;">Lecture name</div>
-                            <div class="list-header-item">From</div>
-                            <div class="list-header-item">To</div>
-                            <div class="list-header-item" style="flex: 2;">Teacher</div>
+                            <div class="list-header-item">Resource Id</div>
+                            <div class="list-header-item" style="flex: 2;">Resource Type</div>
+                            <div class="list-header-item">Resource Number/Reference</div>
                         </div>
                         <div class="list-body">
                             <?php
@@ -54,10 +52,8 @@
                                 foreach($students as $student){
                                     echo '<div class="list-row">
                                             <div class="list-item">'.$student.'</div>
-                                            <div class="list-item" style="flex: 2;">Operating System</div>
-                                            <div class="list-item">08:00</div>
-                                            <div class="list-item">10:00</div>
-                                            <div class="list-item" style="flex: 2;">No one know</div>
+                                            <div class="list-item" style="flex: 2;">Laboratory</div>
+                                            <div class="list-item">1656</div>
                                          </div>';
                                 }
                             ?>

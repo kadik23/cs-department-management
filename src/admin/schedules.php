@@ -12,6 +12,8 @@
     <title>Computer Science Departement</title>
     <link rel="stylesheet" href="/styles/admin.css">
     <link rel="stylesheet" href="/styles/aside.css">
+    <link rel="stylesheet" href="/styles/buttons.css">
+    <link rel="stylesheet" href="/styles/dialogue.css">
     <link rel="stylesheet" href="/styles/list.css">
     <link rel="stylesheet" href="/styles/search.css">
 </head>
@@ -29,6 +31,9 @@
             </div>
             <div class="section-wrapper">
                 <div class="section-content">
+                    <div class="row">
+                        <button id="open-dialogue-btn" class="btn">Create</button>
+                    </div>
                     <div class="list-control">
                         <div class="search">
                             <input type="text" placeholder="search..." />
@@ -65,5 +70,63 @@
             </div>
         </div>
     </div>
+
+    <div id="dialogue" class="dialogue">
+        <div class="dialogue-inner">
+            <div class="dialogue-header">
+                <div class="dialogue-title">Create</div>
+                <div class="dialogue-close-btn" id="dialogue-close-btn">Close</div>
+            </div>
+            <div class="dialogue-body">
+                <form>
+                    <div>
+                        <label for="room_number">Room number:</label>
+                        <input type="text" name="room_number" id="room_number" />
+                    </div>
+                    <div>
+                        <label for="group">Group:</label>
+                        <input list="groups" id="group" name="group" />
+                        <datalist id="groups">
+                            <option value="L1 Info"></option>
+                            <option value="L2 Info"></option>
+                            <option value="L3 Info"></option>
+                            <option value="M1 Info"></option>
+                            <option value="M2 Info"></option>
+                        </datalist>
+                    </div>
+                    <div>
+                        <label for="subject">Subject:</label>
+                        <input list="subjects" id="subjects" name="subject" />
+                        <datalist id="subjects">
+                            <option value="Algorithms and data structure"></option>
+                            <option value="System explotation"></option>
+                            <option value="Databases"></option>
+                        </datalist>
+                    </div>
+                    <div>
+                        <div>
+                            <label for="start">Start at:</label>
+                            <input type="time" list="popularHours" />
+                            <datalist id="popularHours">
+                                <option value="12:00"></option>
+                                <option value="13:00"></option>
+                                <option value="14:00"></option>
+                            </datalist>
+                        </div>
+                        <div>
+                            <label for="start">Start at:</label>
+                            <input type="time" list="popularHours" />
+                            <datalist id="popularHours">
+                                <option value="12:00"></option>
+                                <option value="13:00"></option>
+                                <option value="14:00"></option>
+                            </datalist>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="/assets/js/dialogue.js"></script>
 </body>
 </html>

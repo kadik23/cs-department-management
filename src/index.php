@@ -73,24 +73,31 @@
     <link rel="stylesheet" href="/styles/style.css">
 </head>
 <body>
-    <div class="container">
-        <div class="banner-wrapper">
-            <img src="/assets/images/cse-banner.jpeg" alt="">
+    <div class="left-side">
+        <div class="image-wrapper">
+            <img src="/assets/images/left.jpg" alt="">
+        </div>
+        <div class="welcom">
+            <h1>Welcom to Computer Science Departement</h1>
+            <p style="padding-left: 5px; padding-top: 10px; font-size: 14px; line-height: 24px; color: #f0f9ff  ;">
+                Access to this system is restricted to authorized users only.
+                If you do not have an account, please contact the department
+                administrator to request one.   
+            </p>
+        </div>
+    </div>
+    <div class="right-side">
+        <div class="top-image">
+            <img src="/assets/images/top.png" alt="top-image">
         </div>
         <div class="wrapper">
-            <!--
-            <div class="tabs-header">
-                <a active-tab="true" class="selected-tab" href="/?page=teacher">Teacher</a>
-                <a href="/?page=student">Student</a>
-            </div>
-            -->
-            <div class="tabs-content">
-                <form method="POST">
-                    <input type="text" name="username" id="username" placeholder="Username" />
-                    <input type="password" name="password" id="password" placeholder="Password" />
-                    <button class="btn" type="submit">Login</button>
-                </form>
-            </div>
+            <form method="POST">
+                <label for="username">Username:</label>
+                <input type="text" name="username" id="username" placeholder="Username" />
+                <label for="password">Password:</label>
+                <input type="password" name="password" id="password" placeholder="Password" />
+                <button class="btn" type="submit">Login</button>
+            </form>
         </div>
     </div>
 </body>
