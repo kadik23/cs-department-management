@@ -16,7 +16,7 @@
         }
     }
 
-    $result = $mysqli->query("select specialities.*,count(acadimic_levels.id) as levels from specialities join acadimic_levels on acadimic_levels.speciality_id = specialities.id;");
+    $result = $mysqli->query("select specialities.*,count(acadimic_levels.id) as levels from specialities join acadimic_levels on acadimic_levels.speciality_id = specialities.id group by acadimic_levels.speciality_id;");
 ?>
 <!DOCTYPE html>
 <html lang="en">
