@@ -5,6 +5,7 @@
     $subjects_r = $mysqli->query("select id, subject_name from subjects;");
     $teachers_r = $mysqli->query("select teachers.id as id, first_name, last_name from users join teachers on users.id = teachers.user_id;");
     $acadimic_levels_r = $mysqli->query("select acadimic_levels.id as id, specialities.speciality_name as speciality_name, acadimic_levels.level as level from acadimic_levels join specialities on acadimic_levels.speciality_id = specialities.id;");
+    $class_rooms_r = $mysqli->query("select * from resources where resource_type='Amphi';");
 
     $subject_id = $_POST["subject_id"];
     $teacher_id = $_POST["teacher_id"];
@@ -86,6 +87,20 @@
                                         if($acadimic_levels_r){
                                             while($row = $acadimic_levels_r->fetch_assoc()){
                                                 echo '<option value="'.$row["id"].'">L'.$row["level"].' '.$row["speciality_name"].'</option>';
+                                            }
+                                        }
+                                    ?>
+                                </datalist>
+                            </div>
+
+                            <div class="input-wrapper">
+                                <label for="class_room_id">Class Room:</label>
+                                <input list="class-rooms-list" id="class_room_id" name="class_room_id" placeholder="class room" />
+                                <datalist id="class-rooms-list">
+                                    <?php 
+                                        if($class_rooms_r){
+                                            while($row = $class_rooms_r->fetch_assoc()){
+                                                echo '<option value="'.$row["id"].'">Amphi '.$row["resource_number"].'</option>';
                                             }
                                         }
                                     ?>
