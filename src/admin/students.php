@@ -2,7 +2,7 @@
     include("../../database/db_connection.php");
     include("../../includes/admin/route_protection.php");
 
-    $students_r = $mysqli->query('select first_name, last_name, group_number, count(attendance.id) as absence from users join students on users.id = students.user_id join groups on group_id = groups.id left join attendance on students.id = attendance.student_id and attendance.student_state = "absence";');
+    $students_r = $mysqli->query('select students.id as id, first_name, last_name, group_number, count(attendance.id) as absence from students join users on users.id = students.user_id left join groups on group_id = groups.id left join attendance on students.id = attendance.student_id and attendance.student_state = "absence" having students.id is not null;');
     
 ?>
 <!DOCTYPE html>
