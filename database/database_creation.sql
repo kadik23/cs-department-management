@@ -6,6 +6,7 @@ create table if not exists users (
     id int primary key not null AUTO_INCREMENT,
     first_name varchar(255),
     last_name varchar(255),
+    username varchar(255),
     email varchar(255),
     password varchar(255)
 );
@@ -25,6 +26,7 @@ create table if not exists acadimic_levels (
 create table if not exists groups (
     id int primary key not null AUTO_INCREMENT,
     group_number int not null,
+    responsible int references users(id),
     acadimic_level_id int references acadimic_levels(id)
 );
 
@@ -67,6 +69,39 @@ create table if not exists schedules (
 create table if not exists administraters (
     id int primary key not null AUTO_INCREMENT,
     user_id int references users(id)
+);
+
+create table if not exists semesters (
+    id int primary key not null AUTO_INCREMENT,
+    semester_name varchar(255),
+    start date,
+    end date
+);
+
+create table if not exists grades (
+    id int primary key not null AUTO_INCREMENT,
+    student_id int references students(id),
+    semester_id int references semesters(id),
+    subject_id int references subjects(id),
+    control_note float,
+    exam_note float
+);
+
+create table if not exists attendance (
+    id int primary key not null AUTO_INCREMENT,
+    student_id int references students(id),
+    subject_id int references subjects(id),
+    student_state varchar(255),
+    date date
+);
+
+create table if not exists lectures (
+    id int primary key not null AUTO_INCREMENT,
+    subject_id int references subjects(id),
+    teacher_id int references teachers(id),
+    acadimic_level_id int references acadimic_levels(id),
+    start_at time,
+    end_at time
 );
 
 
