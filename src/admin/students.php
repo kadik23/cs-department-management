@@ -1,6 +1,9 @@
 <?php 
     include("../../database/db_connection.php");
     include("../../includes/admin/route_protection.php");
+
+    $students_r = $mysqli->query('select first_name, last_name, group_number, count(attendance.id) as absence from users join students on users.id = students.user_id join groups on group_id = groups.id left join attendance on students.id = attendance.student_id and attendance.student_state = "absence";');
+    
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -14,6 +17,8 @@
     <link rel="stylesheet" href="/styles/list.css">
     <link rel="stylesheet" href="/styles/search.css">
     <link rel="stylesheet" href="/styles/buttons.css">
+    <link rel="stylesheet" href="/styles/card-box.css">
+    <link rel="stylesheet" href="/styles/students.css">
 </head>
 <body>
     <div class="container">
@@ -29,9 +34,6 @@
             </div>
             <div class="section-wrapper">
                 <div class="section-content">
-                    <div class="row">
-                        <button id="open-dialogue-btn" class="btn">Create new lecture</button>
-                    </div>
                     <div class="list-control">
                         <div class="search">
                             <input type="text" placeholder="search..." />
@@ -40,26 +42,31 @@
                             </div>
                         </div>
                     </div>
-                    <div class="list">
-                        <div class="list-header">
-                            <div class="list-header-item">Student Id</div>
-                            <div class="list-header-item" style="flex: 2;">Student Name</div>
-                            <div class="list-header-item">Grade</div>
-                            <div class="list-header-item">Total Absence</div>
-                        </div>
-                        <div class="list-body">
-                            <?php
-                                $students = [0,1,2,3,4,5,6];
-                                foreach($students as $student){
-                                    echo '<div class="list-row">
-                                            <div class="list-item">'.$student.'</div>
-                                            <div class="list-item" style="flex: 2;">Lachenani Abdelfetah</div>
-                                            <div class="list-item">13</div>
-                                            <div class="list-item">3</div>
-                                         </div>';
+                    
+                    <div class="card-boxes-wrapper">
+                        <?php
+                            if($students_r){
+                                while($row = $students_r->fetch_assoc()){
+                                    echo '
+                                        <div class="card-box-outer">
+                                            <div class="card-box">
+                                                <div class="student-profile">
+                                                    <div class="student-image">
+                                                        <img src="/assets/images/student.jpg" alt="profile_image" />
+                                                    </div>
+                                                    <div class="student-info">
+                                                        <div class="student-name">'.$row["first_name"].' '.$row["last_name"].'</div>
+                                                        <div class="student-group">Group '.$row["group_number"].'</div>
+                                                        <div class="student-grade">'.($row["current_grade"] ? $row["current_grade"] : "Grade not yet").'</div>
+                                                        <div class="student-absence">'.$row["absence"].' Absence</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ';
                                 }
-                            ?>
-                        </div>
+                            }
+                        ?>
                     </div>
 
                 </div>
