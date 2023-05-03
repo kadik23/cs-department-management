@@ -3,7 +3,9 @@
     // NOTE: Since include is just placing the code. we will pass data using variables
     //       using names like $<path>_<component>_<target> is the best practice as shown in the following code:
 
-    $aside_username = "Adminstrater Name";
+    $r = $mysqli->execute_query("select first_name, last_name from users where id = ?;",[$_SESSION["user_id"]]);
+    $row = $r->fetch_assoc();
+    $aside_username = $row["first_name"]." ".$row["last_name"];
     $aside_links = [
         [
             "path" => "/admin",

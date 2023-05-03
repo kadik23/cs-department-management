@@ -25,7 +25,7 @@
     $password = $_POST["password"];
 
     if(isset($username) && isset($password)){
-        $query = "SELECT * FROM students JOIN users on students.user_id = users.id where first_name = ?;";
+        $query = "SELECT * FROM students JOIN users on students.user_id = users.id where username = ?;";
         $result = $mysqli->execute_query($query, [$username]);
         if($result && $result->num_rows > 0){
             $row = $result->fetch_assoc();
@@ -37,7 +37,7 @@
             }
         }
 
-        $query = "SELECT * FROM teachers JOIN users on teachers.user_id = users.id where first_name = ?;";
+        $query = "SELECT * FROM teachers JOIN users on teachers.user_id = users.id where username = ?;";
         $result = $mysqli->execute_query($query, [$username]);
         if($result && $result->num_rows > 0){
             $row = $result->fetch_assoc();
@@ -49,7 +49,7 @@
             }
         }
 
-        $query = "SELECT * FROM administraters JOIN users on administraters.user_id = users.id where first_name = ?;";
+        $query = "SELECT * FROM administraters JOIN users on administraters.user_id = users.id where username = ?;";
         $result = $mysqli->execute_query($query, [$username]);
         if($result && $result->num_rows > 0){
             $row = $result->fetch_assoc();

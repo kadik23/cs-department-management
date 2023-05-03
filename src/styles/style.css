@@ -72,8 +72,8 @@ form input {
     width: calc(4/5*100%);
     padding: 10px 20px 10px 20px;
     margin-bottom: 20px;
-    background-color: #93c5fd;
-    color: #1e3a8a;
+    background-color: #e8f0fe;
+    color: #0c4a6e;
     font-weight: 600;
     outline: none;
     border: none;
@@ -81,11 +81,11 @@ form input {
 }
 
 form input::placeholder {
-    color: #3b82f6;
+    color: #0369a1;
 }
 
 form label {
-    color: #2563eb;
+    color: #075985;
     width: calc(4/5*100%);
     padding: 10px 20px 10px 20px;
     margin-left: -40px;

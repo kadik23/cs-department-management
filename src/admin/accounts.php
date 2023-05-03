@@ -4,33 +4,46 @@
 
     $first_name = $_POST["first_name"];
     $last_name = $_POST["last_name"];
+    $username = $_POST["username"];
     $email = $_POST["email"];
     $password = $_POST["password"];
     $account_type = $_POST["account_type"];
+    $acadimic_level_id = $_POST["acadimic_level_id"];
     
     // TODO: Only admin can perform this task.
-    if(isset($first_name) && isset($last_name) && isset($email) && isset($password) && isset($account_type)){
+    if(isset($first_name) && isset($last_name) && isset($username) && isset($email) && isset($password) && isset($account_type)){
         // Check if user exist.
-        $query = "SELECT * FROM users where first_name=? and last_name=? and email=?;";
-        $result = $mysqli->execute_query($query, [$first_name, $last_name, $email]);
+        $query = "SELECT * FROM users where username=?;";
+        $result = $mysqli->execute_query($query, [$username]);
         if($result){
             if($result->num_rows > 0){
                 $alert_message = "User alredy exist.";
             }else{
-                $hashed_password = password_hash($password, null);
-                // Create user.
-                $query = "INSERT INTO users (first_name, last_name, email, password) values (?,?,?,?);";
-                $result = $mysqli->execute_query($query, [$first_name, $last_name, $email, $hashed_password]);
-                $user_id = $mysqli->insert_id;
-                // Switch statemnt on account_type
-                switch($account_type){
-                    case "teacher":
-                        $query = "INSERT INTO teachers (user_id) values (?);";
-                        $result = $mysqli->execute_query($query,[$user_id]);
-                        if($result){
-                            $alert_message = "User created successfuly.";
-                        }
-                        break;
+                if($account_type == "student" && !isset($acadimic_level_id)){
+                    $alert_message = "Acadimic level input not set";
+                }else{
+                    $hashed_password = password_hash($password, null);
+                    // Create user.
+                    $query = "INSERT INTO users (first_name, last_name, username, email, password) values (?,?,?,?,?);";
+                    $result = $mysqli->execute_query($query, [$first_name, $last_name, $username,$email, $hashed_password]);
+                    $user_id = $mysqli->insert_id;
+                    // Switch statemnt on account_type
+                    switch($account_type){
+                        case "teacher":
+                            $query = "INSERT INTO teachers (user_id) values (?);";
+                            $result = $mysqli->execute_query($query,[$user_id]);
+                            if($result){
+                                $alert_message = "User created successfuly.";
+                            }
+                            break;
+                        case "student":
+                            $query = "INSERT INTO students (user_id, acadimic_level_id) values (?,?);";
+                            $result = $mysqli->execute_query($query,[$user_id, $acadimic_level_id]);
+                            if($result){
+                                $alert_message = "User created successfuly.";
+                            }
+                            break;
+                    }
                 }
             }
         }
@@ -54,6 +67,9 @@
         $qeury = "SELECT * FROM users;";
         $result = $mysqli->query($qeury);
     }
+
+    $acadimic_levels_r = $mysqli->query("select acadimic_levels.id as id, specialities.speciality_name as speciality_name, acadimic_levels.level as level from acadimic_levels join specialities on acadimic_levels.speciality_id = specialities.id;");
+
 
 ?>
 <!DOCTYPE html>
@@ -126,9 +142,10 @@
                         <div class="list-header">
                             <div class="list-header-item">Profile Picture</div>
                             <div class="list-header-item">User id</div>
-                            <div class="list-header-item">First name</div>
-                            <div class="list-header-item">Last name</div>
-                            <div class="list-header-item" style="flex: 2;">Email</div>
+                            <div class="list-header-item" style="flex: 2;">username</div>
+                            <div class="list-header-item" style="flex: 2;">First name</div>
+                            <div class="list-header-item" style="flex: 2;">Last name</div>
+                            <div class="list-header-item" style="flex: 3;">Email</div>
                         </div>
                         <div class="list-body">
                             <?php
@@ -139,9 +156,10 @@
                                                 <img class="user-profile-picture" src="/assets/images/student.jpg" alt="">
                                             </div>
                                             <div class="list-item">'.$row["id"].'</div>
-                                            <div class="list-item">'.$row["first_name"].'</div>
-                                            <div class="list-item">'.$row["last_name"].'</div>
-                                            <div class="list-item" style="flex: 2;">'.$row["email"].'</div>
+                                            <div class="list-item" style="flex: 2;">'.$row["username"].'</div>
+                                            <div class="list-item" style="flex: 2;">'.$row["first_name"].'</div>
+                                            <div class="list-item" style="flex: 2;">'.$row["last_name"].'</div>
+                                            <div class="list-item" style="flex: 3;">'.$row["email"].'</div>
                                          </div>';
                                     }
                                 }
@@ -160,111 +178,85 @@
                 <div class="dialogue-close-btn" id="dialogue-close-btn">Close</div>
             </div>
             <div class="dialogue-body">
-                <?php
-                    $tabs = [
-                        [
-                            "title" => "Student",
-                            "content" => '
-                                <form method="POST" class="create-account-body">
-                                    <div class="create-account-input">
-                                        <label>First name:</label>
-                                        <input type="text" name="first_name" id="first_name">
-                                    </div>
-                                    <div class="create-account-input">
-                                        <label>Last name:</label>
-                                        <input type="text" name="last_name" id="last_name">
-                                    </div>
-                                    <div class="create-account-input">
-                                        <label>Email:</label>
-                                        <input type="text" name="email" id="email">
-                                    </div>
-                                    <div class="create-account-input">
-                                        <label>Password:</label>
-                                        <input type="password" name="password" id="password">
-                                    </div>
-                                    <div class="create-account-input">
-                                        <label>Acadimic level:</label>
-                                        <div class="custom-select" style="width:200px;">
-                                            <select name="acadimic_level" id="acadimic_level">
-                                                <option value="0">Select Acadimic level:</option>
-                                                <option value="l1">L1 Informatique</option>
-                                                <option value="admin">L2 Informatique</option>
-                                                <option value="student">L3 Informatique</option>
-                                                <option value="teacher">M1 Software engineer</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <input value="student" type="hidden" name="account_type" id="account_type" disabled />
-                                    <button type="submit" class="btn create-btn">Create</button>
-                                </form>
-                            ',
-                        ],
-                        [
-                            "title" => "Teacher",
-                            "content" => '
-                                <form method="POST" class="create-account-body">
-                                    <div class="create-account-input">
-                                        <label>First name:</label>
-                                        <input type="text" name="first_name" id="first_name">
-                                    </div>
-                                    <div class="create-account-input">
-                                        <label>Last name:</label>
-                                        <input type="text" name="last_name" id="last_name">
-                                    </div>
-                                    <div class="create-account-input">
-                                        <label>Email:</label>
-                                        <input type="text" name="email" id="email">
-                                    </div>
-                                    <div class="create-account-input">
-                                        <label>Password:</label>
-                                        <input type="password" name="password" id="password">
-                                    </div>
-                                    <input value="teacher" type="hidden" name="account_type" id="account_type" disabled />
-                                    <button type="submit" class="btn create-btn">Create</button>
-                                </form>
-                            '
-                        ]
-                    ];
-                    include("../../includes/tabs.php");
-                ?>
+                <div class="create-account">
+                    <form method="POST" class="student-account">
+                        <div class="student-title">Student</div>
+                        <input type="hidden" name="account_type" id="account_type" value="student" />
+                        <div class="input-group">
+                            <label for="first_name">First Name:</label>
+                            <input type="text" name="first_name" id="first_name" placeholder="First name" />
+                        </div>
+
+                        <div class="input-group">
+                            <label for="last_name">Last Name:</label>
+                            <input type="text" name="last_name" id="last_name" placeholder="Last name" />
+                        </div>
+
+                        <div class="input-group">
+                            <label for="username">Username:</label>
+                            <input type="text" name="username" id="username" placeholder="username" required="true"/>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="email">Email:</label>
+                            <input type="text" name="email" id="email" placeholder="Email" />
+                        </div>
+
+                        <div class="input-group">
+                            <label for="password">Password:</label>
+                            <input type="text" name="password" id="password" placeholder="password" />
+                        </div>
+
+                        <div class="input-group">
+                            <label for="speciality">Speciality:</label>
+                            <input list="speciality-list" id="acadimic_level_id" name="acadimic_level_id" placeholder="speciality" />
+                            <datalist id="speciality-list">
+                                <?php 
+                                    if($acadimic_levels_r){
+                                        while($row = $acadimic_levels_r->fetch_assoc()){
+                                            echo '<option value="'.$row["id"].'">L'.$row["level"].' '.$row["speciality_name"].'</option>';
+                                        }
+                                    }
+                                ?>
+                            </datalist>
+                        </div>
+                        
+                        <button type="submit" class="btn">Create Student Account</button>
+                    </form>
+                    <form method="POST" class="teacher-account">
+                        <div class="teacher-title">Teacher</div>
+                        <input type="hidden" name="account_type" id="account_type" value="teacher" />
+                        
+                        <div class="input-group">
+                            <label for="first_name">First Name:</label>
+                            <input type="text" name="first_name" id="first_name" placeholder="First name" />
+                        </div>
+
+                        <div class="input-group">
+                            <label for="last_name">Last Name:</label>
+                            <input type="text" name="last_name" id="last_name" placeholder="Last name" />
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="username">Username:</label>
+                            <input type="text" name="username" id="username" placeholder="username" required="true"/>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="email">Email:</label>
+                            <input type="text" name="email" id="email" placeholder="Email" />
+                        </div>
+
+                        <div class="input-group">
+                            <label for="password">Password:</label>
+                            <input type="text" name="password" id="password" placeholder="password" />
+                        </div>
+
+                        <button type="submit" class="btn">Create Teacher Account</button>
+                    </form>
+                </div>
             </div>
         </div>
-            
-        <!--
-            <div id="dialogue-body" class="create-account">
-                <div class="create-account-header">
-                    <div class="create-account-title">Create new account</div>
-                    <div id="close-dialogue-btn">Close</div>
-                </div>
-                <form method="POST" class="create-account-body">
-                    <div class="create-account-input">
-                        <label>First name:</label>
-                        <input type="text" name="first_name" id="first_name">
-                    </div>
-                    <div class="create-account-input">
-                        <label>Last name:</label>
-                        <input type="text" name="last_name" id="last_name">
-                    </div>
-                    <div class="create-account-input">
-                        <label>Email:</label>
-                        <input type="text" name="email" id="email">
-                    </div>
-                    <div class="create-account-input">
-                        <label>Password:</label>
-                        <input type="password" name="password" id="password">
-                    </div>
-                    <div class="create-account-type">
-                        <label>Account Type:</label>
-                        <select class="account-select" name="account_type" id="account_type">
-                            <option class="account-option" value="admin">admin</option>
-                            <option class="account-option" value="student">student</option>
-                            <option class="account-option" value="teacher">teacher</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn create-btn">Create</button>
-                </form>
-            </div>
-        -->
     </div>
     
     <?php

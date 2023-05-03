@@ -1,16 +1,20 @@
 <?php
-    
+
+    // NOTE: Since this file is included in many other files, we will use it to disable warnings
+    //       for the old php versions.
+    error_reporting(E_ERROR | E_PARSE);
+
     $db_server = "localhost";
     $db_username = "id20569367_csdm";
     $db_password = "B/EVjF7[L/&VZ76~";
     $db_name = "id20569367_cs_departement";
     $db_port = 3306;
-    
+        
     
     // NOTE: DO_NOT_TOUCH, This is a hack for old php servers, that have a php version below '8.2.0'
     //       because of 'execute_query' method in mysqli class is available only in '8.2.0' and above.
-    $PHP_VERSION = phpversion(null);
-    if($PHP_VERSION[2] < '2'){
+    $PHP_VERSION = phpversion();
+    if(($PHP_VERSION[0] == '8' && $PHP_VERSION[2] < '2') || ($PHP_VERSION[0] < '8')){
         class mysqli_for_old_php extends mysqli {
             public function execute_query($query, $arr){
                 $r = "";

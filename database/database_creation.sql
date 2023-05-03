@@ -6,6 +6,7 @@ create table if not exists users (
     id int primary key not null AUTO_INCREMENT,
     first_name varchar(255),
     last_name varchar(255),
+    username varchar(255),
     email varchar(255),
     password varchar(255)
 );
@@ -25,6 +26,7 @@ create table if not exists acadimic_levels (
 create table if not exists groups (
     id int primary key not null AUTO_INCREMENT,
     group_number int not null,
+    responsible int references users(id),
     acadimic_level_id int references acadimic_levels(id)
 );
 
@@ -59,9 +61,8 @@ create table if not exists schedules (
     subject_id int references subjects(id),
     teacher_id int references teachers(id),
     group_id int references groups(id),
-    /* FIXME: We may need to change start_at and end_at type. */
-    start_at varchar(5),
-    end_at varchar(5)
+    start_at time,
+    end_at time
 );
 
 create table if not exists administraters (
@@ -69,7 +70,41 @@ create table if not exists administraters (
     user_id int references users(id)
 );
 
+create table if not exists semesters (
+    id int primary key not null AUTO_INCREMENT,
+    semester_name varchar(255),
+    start_at date,
+    end_at date
+);
+
+create table if not exists grades (
+    id int primary key not null AUTO_INCREMENT,
+    student_id int references students(id),
+    semester_id int references semesters(id),
+    subject_id int references subjects(id),
+    control_note float,
+    exam_note float
+);
+
+create table if not exists attendance (
+    id int primary key not null AUTO_INCREMENT,
+    student_id int references students(id),
+    subject_id int references subjects(id),
+    student_state varchar(255),
+    date date
+);
+
+create table if not exists lectures (
+    id int primary key not null AUTO_INCREMENT,
+    subject_id int references subjects(id),
+    teacher_id int references teachers(id),
+    acadimic_level_id int references acadimic_levels(id),
+    class_room_id int references resources(id),
+    start_at time,
+    end_at time
+);
+
 
 -- NOTE: In the futur we will have a install.php file to initiate the admin users. --
-insert into users (first_name, last_name, email, password) values ('admin','admin','admin@univ-medea.dz','$2y$10$R63bXYMeWgG4/pzJQacOdeVZIthlYSA3P4CNcA1mc3k4f7Ui4ockS');
+insert into users (first_name, last_name, username, email, password) values ('admin','admin', 'admin', 'admin@univ-medea.dz','$2y$10$R63bXYMeWgG4/pzJQacOdeVZIthlYSA3P4CNcA1mc3k4f7Ui4ockS');
 insert into administraters (user_id) values (1);

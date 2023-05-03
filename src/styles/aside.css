@@ -5,7 +5,7 @@ aside {
     align-items: center;
     padding-top: 80px;
     padding-bottom: 80px;
-    
+    flex-grow: 1;
     background-color: #0c4a6e;
     border-top-right-radius: 100px;
     border-bottom-right-radius: 100px;
