@@ -52,7 +52,7 @@
             <div class="section-wrapper">
                 <div class="section-content">
                     <div class="row">
-                        <button id="open-dialogue-btn" class="btn">Add</button>
+                        <button class="open-dialogue-btn btn">Add</button>
                     </div>
                     <div class="list-control">
                         <div class="search">
