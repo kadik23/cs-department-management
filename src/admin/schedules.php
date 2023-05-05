@@ -2,25 +2,45 @@
     include("../../database/db_connection.php");
     include("../../includes/admin/route_protection.php");
 
+    if(isset($_POST["first_class_start_at"]) && isset($_POST["class_duration"])){
+        $update_scheduler_settings_r = $mysqli->execute_query("update scheduler_settings set class_duration = ?, first_class_start_at = ?;", [$_POST["class_duration"], $_POST["first_class_start_at"]]);
+    }
+
+    $schudeler_settings_r = $mysqli->query("select class_duration, first_class_start_at from scheduler_settings;");
     $class_rooms_r = $mysqli->query("select * from resources where resource_type='Sale' or resource_type='Labo';");
     $groups_r = $mysqli->query("select groups.id as id, group_number,level, speciality_name from groups join acadimic_levels on groups.acadimic_level_id = acadimic_levels.id join specialities on acadimic_levels.speciality_id = specialities.id;");
     $teachers_r = $mysqli->query("select teachers.id as id, first_name, last_name from users join teachers on teachers.user_id = users.id;");
     $subjects_r = $mysqli->query("select id, subject_name from subjects;");
+
+    if(!$schudeler_settings_r){
+        echo "Something went wrong.";
+        exit();
+    }
+
+    $schudeler_settings = $schudeler_settings_r->fetch_assoc();
 
     $class_room_id = $_POST["class_room_id"];
     $group_id = $_POST["group_id"];
     $teacher_id = $_POST["teacher_id"];
     $subject_id = $_POST["subject_id"];
     $day_of_week = $_POST["day_of_week"];
-    $start_at = $_POST["start_at"];
-    $end_at = $_POST["end_at"];
+    $class_index = $_POST["class_index"];
 
-    if(isset($class_room_id) && isset($group_id) && isset($teacher_id) && isset($subject_id) && isset($day_of_week) && isset($start_at) && isset($end_at)){
-        $schedule_r = $mysqli->execute_query("insert into schedules (class_room_id, group_id, teacher_id, subject_id, day_of_week, start_at, end_at) values (?,?,?,?,?,?,?);", [$class_room_id, $group_id, $teacher_id, $subject_id, $day_of_week, $start_at, $end_at]);
+    if(isset($class_room_id) && isset($group_id) && isset($teacher_id) && isset($subject_id) && isset($day_of_week) && isset($class_index)){
+        $schedule_r = $mysqli->execute_query("insert into schedules (class_room_id, group_id, teacher_id, subject_id, day_of_week, class_index) values (?,?,?,?,?,?);", [$class_room_id, $group_id, $teacher_id, $subject_id, $day_of_week, $class_index]);
         // TODO: Handle schedule_r query result.
     }
 
-    $schedules_r = $mysqli->query("select resources.resource_type as class_room, resources.resource_number as class_room_number, subject_name, first_name, last_name, group_number, level, speciality_name, day_of_week, start_at, end_at from schedules join resources on schedules.class_room_id = resources.id join subjects on schedules.subject_id = subjects.id join teachers on schedules.teacher_id = teachers.id join users on users.id = teachers.user_id join groups on schedules.group_id = groups.id join acadimic_levels on groups.acadimic_level_id = acadimic_levels.id join specialities on acadimic_levels.speciality_id = specialities.id;");
+    $schedules_r = $mysqli->query("select resources.resource_type as class_room, resources.resource_number as class_room_number, subject_name, first_name, last_name, group_number, level, speciality_name, day_of_week, class_index from schedules join resources on schedules.class_room_id = resources.id join subjects on schedules.subject_id = subjects.id join teachers on schedules.teacher_id = teachers.id join users on users.id = teachers.user_id join groups on schedules.group_id = groups.id join acadimic_levels on groups.acadimic_level_id = acadimic_levels.id join specialities on acadimic_levels.speciality_id = specialities.id;");
+
+
+
+    function parseTime($time){
+        $hours = $time / 60;
+        $minutes = $time % 60;
+        return [$hours, $minutes];
+    }
+    $first_class_start_at = intval(substr($schudeler_settings["first_class_start_at"],0,2));
 ?>
 
 <!DOCTYPE html>
@@ -37,6 +57,41 @@
     <link rel="stylesheet" href="/styles/list.css">
     <link rel="stylesheet" href="/styles/search.css">
     <link rel="stylesheet" href="/styles/forms.css">
+    <style>
+        .scheduler-settings-form {
+            width: calc(1/3*100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            align-self: start;
+            margin-bottom: 10px;
+        }
+
+        .scheduler-settings-form div {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 5px;
+        }
+
+        .scheduler-settings-form label {
+            flex: 1;
+            font-weight: 500;
+        }
+        
+        .scheduler-settings-form input {
+            flex: 1;
+            border: none;
+            background-color: #ebebeb;
+            border-radius: 7px;
+            margin-bottom: 5px;
+            padding-left: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -52,6 +107,20 @@
             </div>
             <div class="section-wrapper">
                 <div class="section-content">
+                    <form class="scheduler-settings-form" method="POST">
+                        <div>
+                            <label for="first_class_start_at">First Class Start At: </label>
+                            <input type="time" name="first_class_start_at" id="first_class_start_at" disabled value="<?= $schudeler_settings["first_class_start_at"] ?>"/>
+                        </div>
+                        <div>
+                            <label for="class_duration">Class Duration: </label>
+                            <input type="number" name="class_duration" id="class_duration" disabled value="<?= $schudeler_settings["class_duration"] ?>" />
+                        </div>
+                        <div>
+                            <button type="button" id="cancel-scheduler-settings-edit" class="cancel-btn" style="width: fit-content; margin-right: 10px; opacity: 0; transition: 0.5s;">cancel</button>
+                            <button type="button" id="scheduler-settings-edit" class="btn" style="width: fit-content;">Edit</button>
+                        </div>
+                    </form>
                     <div class="row">
                         <button class="open-dialogue-btn btn">Add</button>
                     </div>
@@ -78,9 +147,9 @@
                                     $days_map = [
                                         "0" => "Sunday",
                                         "1" => "Monday",
-                                        "2" => "Thirsday",
+                                        "2" => "Tuesday",
                                         "3" => "Wednesday",
-                                        "4" => "Thuesday",
+                                        "4" => "Thursday",
                                         "5" => "Friday",
                                         "6" => "Saturday"
                                     ];
@@ -89,8 +158,17 @@
                                                 <div class="list-item">'.$row["class_room"].' '.$row["class_room_number"].'</div>
                                                 <div class="list-item">'.$days_map[$row["day_of_week"]].'</div>
                                                 <div class="list-item" style="flex: 2;">L'.$row["level"].' '.$row["speciality_name"].' G'.$row["group_number"].'</div>
-                                                <div class="list-item">'.substr($row["start_at"], 0, -3).'</div>
-                                                <div class="list-item">'.substr($row["end_at"], 0, -3).'</div>
+                                                <div class="list-item">';
+                                        printf('%02d',parseTime($row["class_index"] * $schudeler_settings["class_duration"])[0] + $first_class_start_at);
+                                        echo ":";
+                                        printf('%02d',parseTime($row["class_index"] * $schudeler_settings["class_duration"])[1]);
+                                        echo '</div>
+                                                <div class="list-item">';
+                                        printf('%02d',parseTime(($row["class_index"] + 1) * $schudeler_settings["class_duration"])[0] + $first_class_start_at);
+                                        echo ":";
+                                        printf('%02d',parseTime(($row["class_index"] + 1) * $schudeler_settings["class_duration"])[1]);
+                                
+                                        echo '</div>
                                                 <div class="list-item" style="flex: 2;">'.$row["subject_name"].'</div>
                                              </div>';
                                     }   
@@ -173,9 +251,9 @@
                                 $days_map = [
                                     "0" => "Sunday",
                                     "1" => "Monday",
-                                    "2" => "Thirsday",
+                                    "2" => "Tuesday",
                                     "3" => "Wednesday",
-                                    "4" => "Thuesday",
+                                    "4" => "Thursday",
                                     "5" => "Friday",
                                     "6" => "Saturday"
                                 ];
@@ -185,13 +263,23 @@
                             ?>
                         </datalist>
                     </div>
+
                     <div class="input-group">
-                        <label for="start_at">Start at:</label>
-                        <input type="time" id="start_at" name="start_at" min="08:00" max="18:00" step="300" />
-                    </div>
-                    <div class="input-group">
-                        <label for="end_at">End at:</label>
-                        <input type="time" id="end_at" name="end_at" min="08:00" max="18:00" step="300" />
+                        <label for="class_index">Start At:</label>
+                        <input list="class_indexes" id="class_index" name="class_index" />
+                        <datalist id="class_indexes">
+                            <?php 
+                                $i = 0;
+                                while(($i * $schudeler_settings["class_duration"]) < ((18-$first_class_start_at)*60)){
+                                    echo "<option value='".$i."'>";
+                                    printf('%02d',parseTime($i * $schudeler_settings["class_duration"])[0] + $first_class_start_at);
+                                    echo ":";
+                                    printf('%02d',parseTime($i * $schudeler_settings["class_duration"])[1]);
+                                    echo "</option>";
+                                    $i += 1;
+                                }
+                            ?>
+                        </datalist>
                     </div>
                     <button class="btn" type="submit">Add</button>
                 </form>
@@ -199,5 +287,31 @@
         </div>
     </div>
     <script src="/assets/js/dialogue.js"></script>
+    <script>
+        let class_duration = document.getElementById("class_duration");
+        let first_class_start_at = document.getElementById("first_class_start_at");
+        let edit_btn = document.getElementById("scheduler-settings-edit");
+        let cancel_btn = document.getElementById("cancel-scheduler-settings-edit");
+        
+        edit_btn.addEventListener('click', (ev) => {
+            if(edit_btn.innerText != "Save"){
+                ev.preventDefault();
+                edit_btn.type = "submit";
+                edit_btn.innerText = "Save";
+                class_duration.disabled = false;
+                first_class_start_at.disabled = false;
+                cancel_btn.style.opacity = 1;
+            }
+        });
+
+        cancel_btn.addEventListener('click', (ev) => {
+            ev.preventDefault();
+            edit_btn.type = "button";
+            edit_btn.innerText = "Edit";
+            class_duration.disabled = true;
+            first_class_start_at.disabled = true;
+            cancel_btn.style.opacity = 0;
+        });
+    </script>
 </body>
 </html>

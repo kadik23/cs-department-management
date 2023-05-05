@@ -73,9 +73,17 @@ create table if not exists schedules (
     teacher_id int references teachers(id),
     group_id int references `groups`(id),
     day_of_week TINYINT CHECK (day_of_week BETWEEN 0 AND 6), /* NOTE: mapping int to days of week. */
-    start_at time,
-    end_at time
+    class_index int
 );
+
+-- Using a SQL database for a single row of application settings may seem like overkill --
+create table if not exists scheduler_settings (
+    id int primary key not null AUTO_INCREMENT,
+    class_duration int, -- In Minutes --
+    first_class_start_at time
+);
+/* Insert default values for scheduler_settings. */
+insert into scheduler_settings (class_duration, first_class_start_at) values (60, '08:00');
 
 create table if not exists administraters (
     id int primary key not null AUTO_INCREMENT,
