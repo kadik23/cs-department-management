@@ -72,6 +72,7 @@ create table if not exists schedules (
     subject_id int references subjects(id),
     teacher_id int references teachers(id),
     group_id int references `groups`(id),
+    day_of_week TINYINT CHECK (day_of_week BETWEEN 0 AND 6), /* NOTE: mapping int to days of week. */
     start_at time,
     end_at time
 );

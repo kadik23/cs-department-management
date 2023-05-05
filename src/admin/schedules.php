@@ -11,15 +11,16 @@
     $group_id = $_POST["group_id"];
     $teacher_id = $_POST["teacher_id"];
     $subject_id = $_POST["subject_id"];
+    $day_of_week = $_POST["day_of_week"];
     $start_at = $_POST["start_at"];
     $end_at = $_POST["end_at"];
 
-    if(isset($class_room_id) && isset($group_id) && isset($teacher_id) && isset($subject_id) && isset($start_at) && isset($end_at)){
-        $schedule_r = $mysqli->execute_query("insert into schedules (class_room_id, group_id, teacher_id, subject_id, start_at, end_at) values (?,?,?,?,?,?);", [$class_room_id, $group_id, $teacher_id, $subject_id, $start_at, $end_at]);
+    if(isset($class_room_id) && isset($group_id) && isset($teacher_id) && isset($subject_id) && isset($day_of_week) && isset($start_at) && isset($end_at)){
+        $schedule_r = $mysqli->execute_query("insert into schedules (class_room_id, group_id, teacher_id, subject_id, day_of_week, start_at, end_at) values (?,?,?,?,?,?,?);", [$class_room_id, $group_id, $teacher_id, $subject_id, $day_of_week, $start_at, $end_at]);
         // TODO: Handle schedule_r query result.
     }
 
-    $schedules_r = $mysqli->query("select resources.resource_type as class_room, resources.resource_number as class_room_number, subject_name, first_name, last_name, group_number, level, speciality_name, start_at, end_at from schedules join resources on schedules.class_room_id = resources.id join subjects on schedules.subject_id = subjects.id join teachers on schedules.teacher_id = teachers.id join users on users.id = teachers.user_id join groups on schedules.group_id = groups.id join acadimic_levels on groups.acadimic_level_id = acadimic_levels.id join specialities on acadimic_levels.speciality_id = specialities.id;");
+    $schedules_r = $mysqli->query("select resources.resource_type as class_room, resources.resource_number as class_room_number, subject_name, first_name, last_name, group_number, level, speciality_name, day_of_week, start_at, end_at from schedules join resources on schedules.class_room_id = resources.id join subjects on schedules.subject_id = subjects.id join teachers on schedules.teacher_id = teachers.id join users on users.id = teachers.user_id join groups on schedules.group_id = groups.id join acadimic_levels on groups.acadimic_level_id = acadimic_levels.id join specialities on acadimic_levels.speciality_id = specialities.id;");
 ?>
 
 <!DOCTYPE html>
@@ -65,17 +66,28 @@
                     <div class="list">
                         <div class="list-header">
                             <div class="list-header-item">Room Number</div>
+                            <div class="list-header-item">Day</div>
                             <div class="list-header-item" style="flex: 2;">Group</div>
-                            <div class="list-header-item">From</div>
-                            <div class="list-header-item">To</div>
+                            <div class="list-header-item">Start At</div>
+                            <div class="list-header-item">End At</div>
                             <div class="list-header-item" style="flex: 2;">Subject</div>
                         </div>
                         <div class="list-body">
                             <?php
                                 if($schedules_r){
+                                    $days_map = [
+                                        "0" => "Sunday",
+                                        "1" => "Monday",
+                                        "2" => "Thirsday",
+                                        "3" => "Wednesday",
+                                        "4" => "Thuesday",
+                                        "5" => "Friday",
+                                        "6" => "Saturday"
+                                    ];
                                     while($row = $schedules_r->fetch_assoc()){
                                         echo '<div class="list-row">
                                                 <div class="list-item">'.$row["class_room"].' '.$row["class_room_number"].'</div>
+                                                <div class="list-item">'.$days_map[$row["day_of_week"]].'</div>
                                                 <div class="list-item" style="flex: 2;">L'.$row["level"].' '.$row["speciality_name"].' G'.$row["group_number"].'</div>
                                                 <div class="list-item">'.substr($row["start_at"], 0, -3).'</div>
                                                 <div class="list-item">'.substr($row["end_at"], 0, -3).'</div>
@@ -148,6 +160,27 @@
                                     while($row = $subjects_r->fetch_assoc()){
                                         echo '<option value="'.$row["id"].'">'.$row["subject_name"].'</option>';
                                     }
+                                }
+                            ?>
+                        </datalist>
+                    </div>
+                    <div class="input-group">
+                        <label for="day_of_week">Day:</label>
+                        <input list="days_of_week" id="day_of_week" name="day_of_week" />
+                        <datalist id="days_of_week">
+                            <?php 
+                                $days = [0,1,2,3,4,5,6]; 
+                                $days_map = [
+                                    "0" => "Sunday",
+                                    "1" => "Monday",
+                                    "2" => "Thirsday",
+                                    "3" => "Wednesday",
+                                    "4" => "Thuesday",
+                                    "5" => "Friday",
+                                    "6" => "Saturday"
+                                ];
+                                foreach($days as $day){
+                                    echo '<option value="'.$day.'">'.$days_map[$day].'</option>';
                                 }
                             ?>
                         </datalist>
