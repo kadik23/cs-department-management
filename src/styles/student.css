@@ -61,29 +61,35 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: #075985;
+    background-color: #0885c9;
     width: calc(11/12*100%);
     border-radius: 5px;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding-top: 15px;
+    padding-bottom: 15px;
     height: 100%;
+    transition: 0.5s;
+    cursor: pointer;
+}
+
+.card-box:hover {
+    background-color: #075985;
 }
 
 .card-title {
-    font-size: 18px;
-    color: #bfcfd8;
+    font-size: 16px;
+    color: #c1d4dd;
     font-weight: 600;
     width: calc(4/5*100%);
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
 
 .card-content {
-    font-size: 16px;
-    color: #fff;
+    font-size: 14px;
+    color: #f0faff;
     font-weight: 500;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
     text-align: center;
     width: calc(5/6*100%);
 }
