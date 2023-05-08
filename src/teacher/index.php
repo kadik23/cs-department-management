@@ -1,10 +1,46 @@
+<?php
+    include("../../database/db_connection.php");
+    include("../../includes/teacher/route.protection.php");
+    session_start();
+
+    $query= 'SELECT COUNT(id) AS number_students FROM students;';
+    $result = $mysqli->execute_query($query,[]);
+    $row = $result->fetch_array();
+   
+    // echo var_dump($result);
+
+    if(isset($_POST['send'])){
+        header('Location:/logout.php');
+    }
+
+    if(isset($_POST['profile'])){
+        header('Location: /teacher/profile.php');
+
+    }
+
+
+    $user_id = $_SESSION["user_id"];
+    
+    $query="SELECT * FROM teachers JOIN users ON teachers.user_id=users.id WHERE user_id=? ;";
+    $result2 = $mysqli->execute_query($query,[$user_id]);
+    $row2 = $result2->fetch_array();
+   
+?>
+
+
+
+
+
+
+
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Computer Science Departement</title>
-    <link rel="stylesheet" href="../styles/teatcher.css">
+    <link rel="stylesheet" href="../styles/teacher.css">
 
 </head>
 <body>
@@ -15,17 +51,21 @@
             <div class="div-Logo">
                 <img src="../assets/images/yahia-fares-logo.png" alt="" class="logo">
             </div>
-            <div class="Right-Top-header">
-                <button  type="submit" name="send">Profile</button>
+            <form  class="Right-Top-header" method="post" >
+                <button type="submit"  name="profile">Profile</button>
                 <button class="notebook">Students's Notebook</button>
                 <p>|</p>
                 <button class="logout" type="submit" name="send">Logout</button>
-            </div>
+            </form>
         </div>
 
         <div class="center-header">
-            <h1>Number of students</h1>
-            <button type="submit" >Platform</button>
+            <h1><?php 
+                
+                echo $row['number_students'].' students';
+                
+             ?></h1>
+            <button type="submit" >PLATFORM</button>
         </div>
         
         <div class="bottom-header">
@@ -39,11 +79,11 @@
         <div class="about-me">
             <h1>About Me</h1>
             <div class="teatcher-info">
-                <div><h2>ُEmail : </h2><h3>@kadiksalah03@gmail.com</h3></div>
-                <div> <h2>First Name : </h2><h3>Teatcher name</h3></div>
-                <div><h2>Last Name : </h2><h3>Teatcher name</h3></div>
-                <div><h2>Location : </h2><h3>location..</h3></div>
-                <div> <h2>Tel : </h2><h3>Tel..</h3></div>
+                <div><h2>ُEmail : </h2><h3><?php echo $row2['email'] ?></h3></div>
+                <div> <h2>First Name : </h2><h3><?php echo $row2['first_name'] ?></h3></div>
+                <div><h2>Last Name : </h2><h3><?php echo $row2['last_name'] ?></h3></div>
+                <div><h2>Location : </h2><h3><?php echo $row2['address'] ?></h3></div>
+                <div> <h2>Tel : </h2><h3><?php echo $row2['Tel'] ?></h3></div>
                 
                
                 
@@ -69,7 +109,7 @@
         </div>
 
         <div class="div-template">
-        <button class="temp-btn">Template</button>
+        <button class="temp-btn">Schedule</button>
             <div class="template">
                 <img src="" alt="">
             </div>
@@ -77,13 +117,13 @@
 
     </main>
 
-    <footer>
+    <!-- <footer>
 
         <div class="left-footer-content">Soon..</div>
         <div class="center-footer-content"></div>
         <div class="right-footer-content"></div>
 
-    </footer>
+    </footer> -->
 
 </body>
 <script>
