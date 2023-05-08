@@ -5,14 +5,14 @@
     $user_id = $_SESSION["user_id"];
     $student_r = $mysqli->execute_query("select first_name, last_name, email, group_number, level, speciality_name from students join users on students.user_id = users.id join `groups` on students.group_id = `groups`.id join acadimic_levels on students.acadimic_level_id = acadimic_levels.id join specialities on acadimic_levels.speciality_id = specialities.id where students.user_id = ?;", [ $user_id]);
     if(!$student_r){
-        echo "Something went wrong!";
+        echo "SQL Error: ".$mysqli->error;
         exit();
     }
     $student = $student_r->fetch_assoc();
 
     $grades_r = $mysqli->execute_query("select student_id, subject_name, control_note, exam_note, coefficient, credit from grades join subjects on subjects.id = grades.subject_id where semester_id = (SELECT id FROM semesters WHERE CURRENT_DATE BETWEEN start_at AND end_at) and student_id = (select id from students where user_id = ?);", [$user_id]);
     if(!$grades_r){
-        echo "Something went wrong!";
+        echo "SQL Error: ".$mysqli->error;
         exit();
     }
 ?>

@@ -13,7 +13,7 @@
     $subjects_r = $mysqli->query("select id, subject_name from subjects;");
 
     if(!$schudeler_settings_r){
-        echo "Something went wrong.";
+        echo "SQL Error: ".$mysqli->error;
         exit();
     }
 

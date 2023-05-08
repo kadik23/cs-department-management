@@ -6,13 +6,13 @@
 
     $colleagues_r = $mysqli->execute_query("select first_name, last_name from users join students on users.id = students.user_id where students.group_id = (select group_id from students where user_id = ?) and users.id != ?;", [$user_id, $user_id]);
     if(!$colleagues_r){
-        echo "Something went wrong!";
+        echo "SQL Error: ".$mysqli->error;
         exit();
     }   
 
     $student_r = $mysqli->execute_query("select first_name, last_name, email, group_number, level, speciality_name from students join users on students.user_id = users.id join `groups` on students.group_id = `groups`.id join acadimic_levels on students.acadimic_level_id = acadimic_levels.id join specialities on acadimic_levels.speciality_id = specialities.id where students.user_id = ?;", [ $user_id]);
     if(!$student_r){
-        echo "Something went wrong!";
+        echo "SQL Error: ".$mysqli->error;
         exit();
     }
 

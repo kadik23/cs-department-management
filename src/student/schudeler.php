@@ -5,14 +5,14 @@
     $user_id = $_SESSION["user_id"];
     $student_r = $mysqli->execute_query("select first_name, last_name, email, group_number, level, speciality_name from students join users on students.user_id = users.id join `groups` on students.group_id = `groups`.id join acadimic_levels on students.acadimic_level_id = acadimic_levels.id join specialities on acadimic_levels.speciality_id = specialities.id where students.user_id = ?;", [ $user_id]);
     if(!$student_r){
-        echo "Something went wrong!";
+        echo "SQL Error: ".$mysqli->error;
         exit();
     }
     $student = $student_r->fetch_assoc();
 
     $scheduler_r = $mysqli->execute_query("select * from `schedules` join subjects on schedules.subject_id = subjects.id where group_id = (select group_id from students where user_id = ?) order by day_of_week, class_index asc;", [$user_id]);
     if(!$scheduler_r){
-        echo "Something went wrong!";
+        echo "SQL Error: ".$mysqli->error;
         exit();
     }
 

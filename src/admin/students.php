@@ -13,7 +13,7 @@
     if(isset($_POST["student_id"]) && isset($_POST["group_id"])){
         $query_r = $mysqli->execute_query("update students set group_id = ? where id = ?;", [$_POST["group_id"], $_POST["student_id"]]);
         if(!$query_r){
-            echo "Something went wrong.";
+            echo "SQL Error: ".$mysqli->error;
             exit();
         }
     }

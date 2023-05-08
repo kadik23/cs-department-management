@@ -9,7 +9,7 @@
     if(isset($subject_name) && isset($coefficient) && isset($credit)){
         $result = $mysqli->execute_query("insert into subjects (subject_name, coefficient, credit) values (?,?,?);", [$subject_name, $coefficient, $credit]);
         if(!$result){
-            echo "Something went wrong";
+            echo "SQL Error: ".$mysqli->error;
             exit();
         }
     }
