@@ -15,9 +15,11 @@
         echo "Something went wrong!";
         exit();
     }
+
     $student = $student_r->fetch_assoc();
     $aside_username = $student["first_name"]." ".$student["last_name"];
 
+    $semestrer_r = $mysqli->query("SELECT * FROM semesters WHERE CURRENT_DATE BETWEEN start_at AND end_at;");
 ?>
 
 <!DOCTYPE html>
@@ -43,6 +45,19 @@
                 <div class="page-title">Home</div>
             </div>
             <div class="row-wrapper">
+                <div class="card-box-wrapper">
+                    <div class="card-box">
+                        <div class="card-title">Semestre</div>
+                        <div class="card-content"><?php 
+                            if($semestrer_r){
+                                $s = $semestrer_r->fetch_assoc();
+                                echo $s["semester_name"];
+                            }else{
+                                echo "Semester not started yet.";
+                            }
+                        ?></div>
+                    </div>
+                </div>
                 <div class="card-box-wrapper">
                     <div class="card-box">
                         <div class="card-title">Group</div>
