@@ -21,3 +21,4 @@ close_create_spec_btn.addEventListener("click", (ev) => {
         open_create_spec_btn.style.opacity = "1";
     }, 500);
 });
+

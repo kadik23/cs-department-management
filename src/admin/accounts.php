@@ -209,7 +209,8 @@
 
                         <div class="input-group">
                             <label for="speciality">Speciality:</label>
-                            <input list="speciality-list" id="acadimic_level_id" name="acadimic_level_id" placeholder="speciality" />
+                            <input type="text" class="selected_input" list="speciality-list" placeholder="speciality" />
+                            <input type="hidden" class="hidden_selected_input" list="speciality-list" id="acadimic_level_id" name="acadimic_level_id" placeholder="speciality" />
                             <datalist id="speciality-list">
                                 <?php 
                                     if($acadimic_levels_r){
@@ -268,6 +269,7 @@
     <script src="/assets/js/custom-select.js"></script>
     <script src="/assets/js/dialogue.js"></script>
     <script src="/assets/js/tabs.js"></script>
+    <script src="/assets/js/select.js"></script>
     <script>
         let account_type = document.getElementById("account-type");
         account_type.onselect = (target) => {

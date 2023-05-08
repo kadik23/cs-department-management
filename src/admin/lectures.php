@@ -53,7 +53,8 @@
                         <form method="POST" id="target_form" class="form-wrapper">
                             <div class="input-wrapper">
                                 <label for="subject">Subject:</label>
-                                <input list="subjects-list" id="subject_id" name="subject_id" placeholder="subject" />
+                                <input type="text" class="selected_input" list="subjects-list" placeholder="subject" />
+                                <input type="hidden" class="hidden_selected_input" list="subjects-list" id="subject_id" name="subject_id" placeholder="subject" />
                                 <datalist id="subjects-list">
                                     <?php 
                                         if($subjects_r){
@@ -67,7 +68,8 @@
 
                             <div class="input-wrapper">
                                 <label for="teacher">Teacher:</label>
-                                <input list="teachers-list" id="teacher_id" name="teacher_id" placeholder="teacher" />
+                                <input type="text" class="selected_input" list="teachers-list" placeholder="teacher" />
+                                <input type="hidden" class="hidden_selected_input" list="teachers-list" id="teacher_id" name="teacher_id" placeholder="teacher" />
                                 <datalist id="teachers-list">
                                     <?php 
                                         if($teachers_r){
@@ -81,7 +83,8 @@
 
                             <div class="input-wrapper">
                                 <label for="speciality">Acadimic Level:</label>
-                                <input list="speciality-list" id="acadimic_level_id" name="acadimic_level_id" placeholder="acadimic level" />
+                                <input type="text" class="selected_input" list="speciality-list" placeholder="acadimic level" />
+                                <input type="hidden" class="hidden_selected_input" list="speciality-list" id="acadimic_level_id" name="acadimic_level_id" placeholder="acadimic level" />
                                 <datalist id="speciality-list">
                                     <?php 
                                         if($acadimic_levels_r){
@@ -95,7 +98,8 @@
 
                             <div class="input-wrapper">
                                 <label for="class_room_id">Class Room:</label>
-                                <input list="class-rooms-list" id="class_room_id" name="class_room_id" placeholder="class room" />
+                                <input type="text" class="selected_input" list="class-rooms-list" placeholder="class room" />
+                                <input type="hidden" class="hidden_selected_input" list="class-rooms-list" id="class_room_id" name="class_room_id" placeholder="class room" />
                                 <datalist id="class-rooms-list">
                                     <?php 
                                         if($class_rooms_r){
@@ -162,5 +166,6 @@
         </div>
     </div>
     <script src="/assets/js/forms.js"></script>
+    <script src="/assets/js/select.js"></script>
 </body>
 </html>
