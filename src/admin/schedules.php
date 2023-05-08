@@ -13,7 +13,7 @@
     $subjects_r = $mysqli->query("select id, subject_name from subjects;");
 
     if(!$schudeler_settings_r){
-        echo "Something went wrong.";
+        echo "SQL Error: ".$mysqli->error;
         exit();
     }
 
@@ -184,7 +184,8 @@
                 <form method="POST" class="form">
                     <div class="input-group">
                         <label for="class_room_id">Class Room:</label>
-                        <input list="class_rooms" id="class_room_id" name="class_room_id" />
+                        <input type="text" class="selected_input" list="class_rooms" />
+                        <input type="hidden" class="hidden_selected_input" list="class_rooms" id="class_room_id" name="class_room_id" />
                         <datalist id="class_rooms">
                             <?php 
                                 if($class_rooms_r){
@@ -197,7 +198,8 @@
                     </div>
                     <div class="input-group">
                         <label for="group_id">Group:</label>
-                        <input list="groups" id="group_id" name="group_id" />
+                        <input type="text" class="selected_input" list="groups" />
+                        <input type="hidden" class="hidden_selected_input" list="groups" id="group_id" name="group_id" />
                         <datalist id="groups">
                             <?php 
                                 if($groups_r){
@@ -210,7 +212,8 @@
                     </div>
                     <div class="input-group">
                         <label for="teacher_id">Teacher:</label>
-                        <input list="teachers" id="teacher_id" name="teacher_id" />
+                        <input type="text" class="selected_input" list="teachers" />
+                        <input type="hidden" class="hidden_selected_input" list="teachers" id="teacher_id" name="teacher_id" />
                         <datalist id="teachers">
                             <?php 
                                 if($teachers_r){
@@ -223,7 +226,8 @@
                     </div>
                     <div class="input-group">
                         <label for="subject_id">Subject:</label>
-                        <input list="subjects" id="subject_id" name="subject_id" />
+                        <input type="text" class="selected_input" list="subjects" />
+                        <input type="hidden" class="hidden_selected_input" list="subjects" id="subject_id" name="subject_id" />
                         <datalist id="subjects">
                             <?php 
                                 if($subjects_r){
@@ -236,7 +240,8 @@
                     </div>
                     <div class="input-group">
                         <label for="day_of_week">Day:</label>
-                        <input list="days_of_week" id="day_of_week" name="day_of_week" />
+                        <input type="text" class="selected_input" list="days_of_week" />
+                        <input type="hidden" class="hidden_selected_input" list="days_of_week" id="day_of_week" name="day_of_week" />
                         <datalist id="days_of_week">
                             <?php 
                                 $days = [0,1,2,3,4,5,6]; 
@@ -258,7 +263,8 @@
 
                     <div class="input-group">
                         <label for="class_index">Start At:</label>
-                        <input list="class_indexes" id="class_index" name="class_index" />
+                        <input type="text" class="selected_input" list="class_indexes" />
+                        <input type="hidden" class="hidden_selected_input" list="class_indexes" id="class_index" name="class_index" />
                         <datalist id="class_indexes">
                             <?php 
                                 $i = 0;
@@ -279,6 +285,7 @@
         </div>
     </div>
     <script src="/assets/js/dialogue.js"></script>
+    <script src="/assets/js/select.js"></script>
     <script>
         let class_duration = document.getElementById("class_duration");
         let first_class_start_at = document.getElementById("first_class_start_at");

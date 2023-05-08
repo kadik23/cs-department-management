@@ -51,7 +51,8 @@
 
                             <div class="input-wrapper">
                                 <label for="speciality">Speciality:</label>
-                                <input list="speciality-list" id="acadimic_level_id" name="acadimic_level_id" placeholder="speciality" />
+                                <input type="text" class="selected_input" list="speciality-list" placeholder="speciality" />
+                                <input type="hidden" class="hidden_selected_input" list="speciality-list" id="acadimic_level_id" name="acadimic_level_id" placeholder="speciality" />
                                 <datalist id="speciality-list">
                                     <?php 
                                         if($acadimic_levels_result){
@@ -108,5 +109,6 @@
         </div>
     </div>
     <script src="/assets/js/forms.js"></script>
+    <script src="/assets/js/select.js"></script>
 </body>
 </html>

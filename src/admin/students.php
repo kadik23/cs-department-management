@@ -13,7 +13,7 @@
     if(isset($_POST["student_id"]) && isset($_POST["group_id"])){
         $query_r = $mysqli->execute_query("update students set group_id = ? where id = ?;", [$_POST["group_id"], $_POST["student_id"]]);
         if(!$query_r){
-            echo "Something went wrong.";
+            echo "SQL Error: ".$mysqli->error;
             exit();
         }
     }
@@ -108,7 +108,8 @@
                         <form id="assign-group-form" name="assign-group-form"  method="POST">
                             <div class="input-wrapper">
                                 <label for="speciality">Groups:</label>
-                                <input list="groups-list" id="group_id" name="group_id" placeholder="group" />
+                                <input type="text" class="selected_input" list="groups-list" placeholder="group" />
+                                <input type="hidden" class="hidden_selected_input" list="groups-list" id="group_id" name="group_id" placeholder="group" />
                                 <datalist id="groups-list">
                                     <!-- Will be loaded using javascript since we have diffrent UI for each student -->
                                 </datalist>
@@ -125,7 +126,7 @@
     </div>
 
     <script src="/assets/js/dialogue.js"></script>
-
+    <script src="/assets/js/select.js"></script>
     <script>
         let btns = document.getElementsByClassName("open-dialogue-btn");
         for(let i = 0; i < btns.length; i++){
