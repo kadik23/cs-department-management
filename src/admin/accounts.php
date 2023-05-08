@@ -109,7 +109,7 @@
                     -->
     
                     <div class="row">
-                        <button id="open-dialogue-btn" class="btn">Create new account</button>
+                        <button class="open-dialogue-btn btn" >Create new account</button>
                     </div>
 
                     <div class="accounts-header">

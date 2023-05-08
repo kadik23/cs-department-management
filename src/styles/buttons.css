@@ -1,4 +1,4 @@
-.btn, .cancel-btn {
+.btn, .small-btn, .cancel-btn {
     outline: none;
     padding-left: 40px;
     padding-right: 40px;
@@ -11,6 +11,15 @@
     font-weight: 700;
     cursor: pointer;
     transition: 0.5s;
+}
+
+.small-btn {
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    font-size: 12px;
+    font-weight: 600;
 }
 
 .cancel-btn {

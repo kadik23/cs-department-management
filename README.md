@@ -4,83 +4,43 @@
 
 ## **Web application to manage the computer science department:**
 	
-	- managing teachers.
-	- managing students.
-	- managing courses.
-	- managing resources.
+- Adminstraters.
+- Teachers.
+- Students.
 
+
+## **Database:**
+
+    Comming Soon.
 
 ## **Notes:**
 
-	Management: (create, edit, delete, search).
+**Management:** (create, edit, delete, search).
 
 
-### Our users will be:
-	
-1. **The administration members:**
+## **Discussion:**	
+1. **Adminstraters:**
+    - Accounts management.
+    - Schedules management.
+    - Schedules management.
+    - Lectures management.
+    - Resources management.
+    - Students maangement.
+    - Groups management.
+    - Subjects management.
+    - Specialities management.
 
-    - Accounts management. (Teachers and Students accounts).
-    - Schedules management. (Teachers and Students will have a diffrent UI).
-    - Plan courses.
-    - Track student progress.
-    - Manage resources such as classrooms, computer labs and equipment.
-    - Manage Course registration, Exam results and student grades.		
+2. **Teachers:**
+    - Students Attendance.
+    - Students Notes.
+    - Schudeler.
 
-2. **The teachers:**
-
-    - Submit students attendance.
-    - Submit students notes.
-    - Upload course document for students.
-    - View schudeler.
-
-3. **The students:**
-
-    - View notes.
-    - View schudeler.
+3. **Students:**
+    - Notes.
+    - Schudeler.
 
 
-4. **Data:**
-	- Admin
-	- Teacher
-	- Student
-	- Schedules
-	- Course
-	- Student Progress
-	- Resources
-	- Exams
-	- Grades
-	- Documents
-
-`This is not the acctual database`
-
-```
-Users:
-	id, first_name, last_name, type
-
-Schedules:
-	id, teacher, module, start_time, end_time, group, year
-
-Course:
-	id, module
-
-Resources:
-	id, name, category
-
-Exams:
-	id, module, document
-
-Grades:
-	id, student, note, module
-
-Document:
-	id, path_or_name
-```
-
-
-## System Design:
-
-Comming Soon.
 
 ## Authentication:
 
-Comming Soon.
+We are using one UI to login into diffrent accounts types such as admins, students and teachers. since our database schema is implemented in a good way. when a user try to login we will detect his account type and then give him a php session and redirect him to the correspondent UI. 

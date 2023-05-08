@@ -61,9 +61,19 @@ create table if not exists schedules (
     subject_id int references subjects(id),
     teacher_id int references teachers(id),
     group_id int references groups(id),
-    start_at time,
-    end_at time
+    day_of_week TINYINT CHECK (day_of_week BETWEEN 0 AND 6), /* NOTE: mapping int to days of week. */
+    class_index int
 );
+
+-- Using a SQL database for a single row of application settings may seem like overkill --
+create table if not exists scheduler_settings (
+    id int primary key not null AUTO_INCREMENT,
+    class_duration int, -- In Minutes --
+    first_class_start_at time
+);
+/* Insert default values for scheduler_settings. */
+insert into scheduler_settings (class_duration, first_class_start_at) values (60, '08:00');
+
 
 create table if not exists administraters (
     id int primary key not null AUTO_INCREMENT,
@@ -103,7 +113,6 @@ create table if not exists lectures (
     start_at time,
     end_at time
 );
-
 
 -- NOTE: In the futur we will have a install.php file to initiate the admin users. --
 insert into users (first_name, last_name, username, email, password) values ('admin','admin', 'admin', 'admin@univ-medea.dz','$2y$10$R63bXYMeWgG4/pzJQacOdeVZIthlYSA3P4CNcA1mc3k4f7Ui4ockS');
