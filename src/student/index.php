@@ -1,6 +1,23 @@
 <?php 
     include("../../database/db_connection.php");
     include("../../includes/student/route_protection.php");
+
+    $user_id = $_SESSION["user_id"];
+
+    $colleagues_r = $mysqli->execute_query("select first_name, last_name from users join students on users.id = students.user_id where students.group_id = (select group_id from students where user_id = ?) and users.id != ?;", [$user_id, $user_id]);
+    if(!$colleagues_r){
+        echo "Something went wrong!";
+        exit();
+    }   
+
+    $student_r = $mysqli->execute_query("select first_name, last_name, email, group_number, level, speciality_name from students join users on students.user_id = users.id join `groups` on students.group_id = `groups`.id join acadimic_levels on students.acadimic_level_id = acadimic_levels.id join specialities on acadimic_levels.speciality_id = specialities.id where students.user_id = ?;", [ $user_id]);
+    if(!$student_r){
+        echo "Something went wrong!";
+        exit();
+    }
+    $student = $student_r->fetch_assoc();
+    $aside_username = $student["first_name"]." ".$student["last_name"];
+
 ?>
 
 <!DOCTYPE html>
@@ -28,22 +45,15 @@
             <div class="row-wrapper">
                 <div class="card-box-wrapper">
                     <div class="card-box">
-                        <div class="card-title">Section</div>
-                        <div class="card-content">1</div>
-                    </div>
-                </div>
-
-                <div class="card-box-wrapper">
-                    <div class="card-box">
                         <div class="card-title">Group</div>
-                        <div class="card-content">4</div>
+                        <div class="card-content"><?= $student["group_number"] ?></div>
                     </div>
                 </div>
                 
                 <div class="card-box-wrapper">
                     <div class="card-box">
                         <div class="card-title">Study Year</div>
-                        <div class="card-content">2 Year License</div>
+                        <div class="card-content"><?= ($student["level"] > 3 ? $student["level"] % 3 : $student["level"])." Year ".($student["level"] > 3 ? "Master " : "License ").$student["speciality_name"] ?></div>
                     </div>
                 </div>
                 
@@ -63,7 +73,7 @@
                         <div class="info-icon">
                             <img src="/assets/icons/email.svg" alt="">
                         </div>
-                        <div class="info-content">student@univ-medea.dz</div>
+                        <div class="info-content"><?= $student["email"] ?></div>
                     </div>
                     <div class="info-wrapper">
                         <div class="info-icon">
@@ -79,42 +89,18 @@
                 </div>
                 <div class="section-content">
                     <div class="friends">
-                    <div class="friend">
-                            <div class="friend-profile-pic">
-                                <img src="/assets/images/student.jpg" alt="">
-                            </div>
-                            <div class="friend-name">Student name</div>
-                        </div>
-                        <div class="friend">
-                            <div class="friend-profile-pic">
-                                <img src="/assets/images/student.jpg" alt="">
-                            </div>
-                            <div class="friend-name">Student name</div>
-                        </div>
-                        <div class="friend">
-                            <div class="friend-profile-pic">
-                                <img src="/assets/images/student.jpg" alt="">
-                            </div>
-                            <div class="friend-name">Student name</div>
-                        </div>
-                        <div class="friend">
-                            <div class="friend-profile-pic">
-                                <img src="/assets/images/student.jpg" alt="">
-                            </div>
-                            <div class="friend-name">Student name</div>
-                        </div>
-                        <div class="friend">
-                            <div class="friend-profile-pic">
-                                <img src="/assets/images/student.jpg" alt="">
-                            </div>
-                            <div class="friend-name">Student name</div>
-                        </div>
-                        <div class="friend">
-                            <div class="friend-profile-pic">
-                                <img src="/assets/images/student.jpg" alt="">
-                            </div>
-                            <div class="friend-name">Student name</div>
-                        </div>
+                        <?php 
+                            while($row = $colleagues_r->fetch_assoc()){
+                                echo '
+                                    <div class="friend">
+                                        <div class="friend-profile-pic">
+                                            <img src="/assets/images/student.jpg" alt="profile_image">
+                                        </div>
+                                        <div class="friend-name">'.$row["first_name"].' '.$row["last_name"].'</div>
+                                    </div>
+                                ';
+                            }
+                        ?>
                     </div>
                 </div>
             </div>

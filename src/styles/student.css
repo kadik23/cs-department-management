@@ -37,7 +37,7 @@ body {
 .page-title {
     font-size: 1.5rem;
     font-weight: 600;
-    color: #1e293b;
+    color: #0c4a6e;
     padding-top: 10px;
     padding-bottom: 10px;
 }
@@ -46,42 +46,46 @@ body {
     width: calc(11/12*100%);
     display: flex;
     flex-direction: row;
-    align-items: center;   
+    align-items: center;
 }
 
 .card-box-wrapper {
-    width: calc(1/4*100%);
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
+    height: 100%;
 }
 
 .card-box {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: #334155;
+    background-color: #075985;
     width: calc(11/12*100%);
     border-radius: 5px;
     padding-top: 10px;
     padding-bottom: 10px;
+    height: 100%;
 }
 
 .card-title {
-    font-size: 0.875rem;
-    color: #fff;
-    font-weight: 500;
+    font-size: 18px;
+    color: #bfcfd8;
+    font-weight: 600;
     width: calc(4/5*100%);
     padding-top: 10px;
     padding-bottom: 10px;
 }
 
 .card-content {
-    font-size: 1.2em;
+    font-size: 16px;
     color: #fff;
-    font-weight: 600;
+    font-weight: 500;
     padding-top: 10px;
     padding-bottom: 10px;
+    text-align: center;
+    width: calc(5/6*100%);
 }
 
 .section-wrapper {
@@ -103,7 +107,7 @@ body {
     font-weight: 600;
     padding-top: 8px;
     padding-bottom: 8px;
-    color: #1e293b;
+    color: #0c4a6e;
 }
 
 .section-content {
