@@ -8,7 +8,7 @@
 
     $schudeler_settings_r = $mysqli->query("select class_duration, first_class_start_at from scheduler_settings;");
     $class_rooms_r = $mysqli->query("select * from resources where resource_type='Sale' or resource_type='Labo';");
-    $groups_r = $mysqli->query("select groups.id as id, group_number,level, speciality_name from groups join acadimic_levels on groups.acadimic_level_id = acadimic_levels.id join specialities on acadimic_levels.speciality_id = specialities.id;");
+    $groups_r = $mysqli->query("select `groups`.id as id, group_number,level, speciality_name from `groups` join acadimic_levels on `groups`.acadimic_level_id = acadimic_levels.id join specialities on acadimic_levels.speciality_id = specialities.id;");
     $teachers_r = $mysqli->query("select teachers.id as id, first_name, last_name from users join teachers on teachers.user_id = users.id;");
     $subjects_r = $mysqli->query("select id, subject_name from subjects;");
 
@@ -31,7 +31,7 @@
         // TODO: Handle schedule_r query result.
     }
 
-    $schedules_r = $mysqli->query("select resources.resource_type as class_room, resources.resource_number as class_room_number, subject_name, first_name, last_name, group_number, level, speciality_name, day_of_week, class_index from schedules join resources on schedules.class_room_id = resources.id join subjects on schedules.subject_id = subjects.id join teachers on schedules.teacher_id = teachers.id join users on users.id = teachers.user_id join groups on schedules.group_id = groups.id join acadimic_levels on groups.acadimic_level_id = acadimic_levels.id join specialities on acadimic_levels.speciality_id = specialities.id;");
+    $schedules_r = $mysqli->query("select resources.resource_type as class_room, resources.resource_number as class_room_number, subject_name, first_name, last_name, group_number, level, speciality_name, day_of_week, class_index from schedules join resources on schedules.class_room_id = resources.id join subjects on schedules.subject_id = subjects.id join teachers on schedules.teacher_id = teachers.id join users on users.id = teachers.user_id join `groups` on schedules.group_id = `groups`.id join acadimic_levels on `groups`.acadimic_level_id = acadimic_levels.id join specialities on acadimic_levels.speciality_id = specialities.id;");
 
 
 
@@ -144,15 +144,7 @@
                         <div class="list-body">
                             <?php
                                 if($schedules_r){
-                                    $days_map = [
-                                        "0" => "Sunday",
-                                        "1" => "Monday",
-                                        "2" => "Tuesday",
-                                        "3" => "Wednesday",
-                                        "4" => "Thursday",
-                                        "5" => "Friday",
-                                        "6" => "Saturday"
-                                    ];
+                                    $days_map = ["Saturday","Sunday","Monday","Tuesday","Wednesday","Thursday"];
                                     while($row = $schedules_r->fetch_assoc()){
                                         echo '<div class="list-row">
                                                 <div class="list-item">'.$row["class_room"].' '.$row["class_room_number"].'</div>

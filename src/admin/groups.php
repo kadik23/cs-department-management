@@ -6,12 +6,12 @@
     $acadimic_level_id = $_POST["acadimic_level_id"];
 
     if(isset($group_number) && isset($acadimic_level_id)){
-        $result = $mysqli->execute_query("insert into groups (group_number, acadimic_level_id) values (?,?);", [$group_number, $acadimic_level_id]);
+        $result = $mysqli->execute_query("insert into `groups` (group_number, acadimic_level_id) values (?,?);", [$group_number, $acadimic_level_id]);
     }
 
     $acadimic_levels_result = $mysqli->query("select acadimic_levels.id as id, specialities.speciality_name as speciality_name, acadimic_levels.level as level from acadimic_levels join specialities on acadimic_levels.speciality_id = specialities.id;");
     
-    $groups_result = $mysqli->query("SELECT groups.id AS id, group_number, speciality_name, level, users.first_name AS responsible, COUNT(students.id) AS total_students FROM groups JOIN acadimic_levels ON groups.acadimic_level_id = acadimic_levels.id JOIN specialities ON acadimic_levels.speciality_id = specialities.id LEFT JOIN users ON responsible = users.id LEFT JOIN students ON students.group_id = groups.id group by groups.id HAVING groups.id IS NOT NULL;");
+    $groups_result = $mysqli->query("SELECT `groups`.id AS id, group_number, speciality_name, level, users.first_name AS responsible, COUNT(students.id) AS total_students FROM `groups` JOIN acadimic_levels ON `groups`.acadimic_level_id = acadimic_levels.id JOIN specialities ON acadimic_levels.speciality_id = specialities.id LEFT JOIN users ON responsible = users.id LEFT JOIN students ON students.group_id = `groups`.id group by `groups`.id HAVING `groups`.id IS NOT NULL;");
 
 ?>
 <!DOCTYPE html>
