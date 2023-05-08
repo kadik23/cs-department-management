@@ -30,6 +30,10 @@
                 $stmt->bind_param($r, ...$arr);
                 $stmt->execute();
                 $result = $stmt->get_result();
+                // NOTE: DO NOT REMOVE THIS LINE.
+                if(!$result && $stmt->affected_rows > 0){
+                    return true;
+                }
                 return $result;
             }
         }
