@@ -64,7 +64,7 @@
 
             <div class="center_section">
                 <div>
-                    <input type="text"  id="inp" value="Student name" class="inp_SN">
+                    <input type="text"  id="inp" placeholder="Student name" class="inp_SN">
                     <button name="go" class="btn_go" type="submit" >Go</button>
                 </div>
                 <div>
@@ -77,11 +77,11 @@
             <div class="bottom_section">
                 <div class="bottom_section1">
                      <p style="margin-right:10px">Exam Note:</p>
-                    <input type="text"  id="inp1" class="btn_bottom">
+                    <input type="text"  id="inp1" class="inp_bottom">
                 </div>
                 <div class="bottom_section2">
                     <p>Control Note:</p>
-                    <input type="text" id="inp1"  class="btn_bottom">
+                    <input type="text" id="inp1"  class="inp_bottom">
                 </div>
                 <div class="bottom_section3">
                     <button name="prev" type="submit" id="prev" class="prev">Prev</button>
