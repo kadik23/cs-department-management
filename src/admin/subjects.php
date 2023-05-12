@@ -7,14 +7,18 @@
     $credit = $_POST["credit"];
     
     if(isset($subject_name) && isset($coefficient) && isset($credit)){
-        $result = $mysqli->execute_query("insert into subjects (subject_name, coefficient, credit) values (?,?,?);", [$subject_name, $coefficient, $credit]);
-        if(!$result){
+        $subject_r = $mysqli->execute_query("insert into subjects (subject_name, coefficient, credit) values (?,?,?);", [$subject_name, $coefficient, $credit]);
+        if(!$subject_r){
             echo "SQL Error: ".$mysqli->error;
             exit();
         }
     }
 
-    $result = $mysqli->query("select * from subjects;");
+    if(isset($_POST["search"])){
+        $subjects_r = $mysqli->execute_query("select * from subjects where subject_name like concat('%',?,'%');", [$_POST['search']]);
+    }else{
+        $subjects_r = $mysqli->query("select * from subjects;");
+    }
 
 ?>
 <!DOCTYPE html>
@@ -65,13 +69,14 @@
                             </div>
                         </form>
                         <button id="open_create_spec" class="btn">Create Subject</button>
-                    </div>                    <div class="list-control">
-                        <div class="search">
-                            <input type="text" placeholder="search..." />
+                    </div>     
+                    <div class="list-control">
+                        <form method="POST" class="search">
+                            <input type="text" name="search" placeholder="search..." value="<?= $_POST["search"] ?>"/>
                             <div class="search-icon">
                                 <img src="/assets/icons/search.svg" alt="search-icon" />
                             </div>
-                        </div>
+                        </form>
                     </div>
                     <div class="list">
                         <div class="list-header">
@@ -82,8 +87,8 @@
                         </div>
                         <div class="list-body">
                             <?php
-                                if($result){
-                                    while($row = $result->fetch_assoc()){
+                                if($subjects_r){
+                                    while($row = $subjects_r->fetch_assoc()){
                                         echo '<div class="list-row">
                                             <div class="list-item">'.$row["id"].'</div>
                                             <div class="list-item" style="flex: 3;">'.$row["subject_name"].'</div>

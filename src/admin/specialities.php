@@ -6,17 +6,20 @@
     $spec_levels = $_POST["speciality_levels"];
     
     if(isset($spec_name) && isset($spec_levels)){
-        $result = $mysqli->execute_query("insert into specialities (speciality_name) values (?);", [$spec_name]);
+        $speciality_r = $mysqli->execute_query("insert into specialities (speciality_name) values (?);", [$spec_name]);
         $spec_id = $mysqli->insert_id;
-        if($result){
+        if($speciality_r){
             // NOTE: For now we dont have a custom selection on levels in the UI.
             for($i = 1; $i <= intval($spec_levels); $i++){
-                $result = $mysqli->execute_query("insert into acadimic_levels (speciality_id, level) values (?,?);", [$spec_id, $i]);
+                $level_r = $mysqli->execute_query("insert into acadimic_levels (speciality_id, level) values (?,?);", [$spec_id, $i]);
             }
         }
     }
-
-    $result = $mysqli->query("select specialities.*,count(acadimic_levels.id) as levels from specialities join acadimic_levels on acadimic_levels.speciality_id = specialities.id group by acadimic_levels.speciality_id;");
+    if(isset($_POST["search"])){
+        $specialities_r = $mysqli->execute_query("select specialities.*,count(acadimic_levels.id) as levels from specialities join acadimic_levels on acadimic_levels.speciality_id = specialities.id where speciality_name like concat('%',?,'%') group by acadimic_levels.speciality_id;", [$_POST["search"]]);
+    }else{
+        $specialities_r = $mysqli->query("select specialities.*,count(acadimic_levels.id) as levels from specialities join acadimic_levels on acadimic_levels.speciality_id = specialities.id group by acadimic_levels.speciality_id;");
+    }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -65,12 +68,12 @@
                         <button id="open_create_spec" class="btn">Add New Speciality</button>
                     </div>
                     <div class="list-control">
-                        <div class="search">
-                            <input type="text" placeholder="search..." />
+                        <form method="POST" class="search">
+                            <input type="text" name="search" placeholder="search..." value="<?= $_POST["search"] ?>"/>
                             <div class="search-icon">
                                 <img src="/assets/icons/search.svg" alt="search-icon" />
                             </div>
-                        </div>
+                        </form>
                     </div>
                     <div class="list">
                         <div class="list-header">
@@ -80,8 +83,8 @@
                         </div>
                         <div class="list-body">
                             <?php
-                                if($result){
-                                    while($row = $result->fetch_assoc()){
+                                if($specialities_r){
+                                    while($row = $specialities_r->fetch_assoc()){
                                         echo '<div class="list-row">
                                                 <div class="list-item">'.$row["id"].'</div>
                                                 <div class="list-item" style="flex: 2;">'.$row["speciality_name"].'</div>

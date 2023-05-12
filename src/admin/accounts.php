@@ -2,6 +2,20 @@
     include("../../database/db_connection.php");
     include("../../includes/admin/route_protection.php");
 
+    $querys_map = [
+        "accounts" => "select users.id as user_id, username, first_name, last_name, email from users;",
+        "teachers" => "select users.id as user_id, username, first_name, last_name, email from teachers join users on teachers.user_id = users.id;",
+        "students" => "select users.id as user_id, username, first_name, last_name, email from students join users on students.user_id = users.id;",
+        "admins" => "select users.id as user_id, username, first_name, last_name, email from users where id not in (select user_id from students) and id not in (select user_id from teachers);"
+    ];
+
+    $search_querys = [
+        "accounts" => "select users.id as user_id, username, first_name, last_name, email from users where username like concat('%',?,'%') or first_name like concat('%',?,'%') or last_name like concat('%',?,'%') or email like concat('%',?,'%');",
+        "teachers" => "select users.id as user_id, username, first_name, last_name, email from teachers join users on teachers.user_id = users.id where username like concat('%',?,'%') or first_name like concat('%',?,'%') or last_name like concat('%',?,'%') or email like concat('%',?,'%');",
+        "students" => "select users.id as user_id, username, first_name, last_name, email from students join users on students.user_id = users.id where username like concat('%',?,'%') or first_name like concat('%',?,'%') or last_name like concat('%',?,'%') or email like concat('%',?,'%');",
+        "admins" => "select users.id as user_id, username, first_name, last_name, email from users where id not in (select user_id from students) and id not in (select user_id from teachers) and (username like concat('%',?,'%') or first_name like concat('%',?,'%') or last_name like concat('%',?,'%') or email like concat('%',?,'%'));"
+    ];
+
     $first_name = $_POST["first_name"];
     $last_name = $_POST["last_name"];
     $username = $_POST["username"];
@@ -10,7 +24,6 @@
     $account_type = $_POST["account_type"];
     $acadimic_level_id = $_POST["acadimic_level_id"];
     
-    // TODO: Only admin can perform this task.
     if(isset($first_name) && isset($last_name) && isset($username) && isset($email) && isset($password) && isset($account_type)){
         // Check if user exist.
         $query = "SELECT * FROM users where username=?;";
@@ -49,23 +62,17 @@
         }
     }
 
+    
     $account_type = $_GET["account_type"];
     if(isset($account_type)){
-        switch($account_type){
-            case "student":
-                $qeury = "SELECT * FROM users join students on students.user_id = users.id;";
-                break;
-            case "teacher":
-                $qeury = "SELECT * FROM users join teachers on teachers.user_id = users.id;";
-                break;
-            default:
-                $qeury = "SELECT * FROM users;";
-                break;
+        if(isset($_POST["search"])){
+            $search = $_POST["search"];
+            $result = $mysqli->execute_query((isset($search_querys[$account_type])) ? $search_querys[$account_type] : $search_querys["accounts"],[$search, $search, $search, $search]);
+        }else{
+            $result = $mysqli->query(isset($querys_map[$account_type]) ? $querys_map[$account_type] : $querys_map["accounts"]);
         }
-        $result = $mysqli->query($qeury);
     }else{
-        $qeury = "SELECT * FROM users;";
-        $result = $mysqli->query($qeury);
+        $result = $mysqli->query($querys_map["accounts"]);
     }
 
     $acadimic_levels_r = $mysqli->query("select acadimic_levels.id as id, specialities.speciality_name as speciality_name, acadimic_levels.level as level from acadimic_levels join specialities on acadimic_levels.speciality_id = specialities.id;");
@@ -121,7 +128,7 @@
                                     }else{
                                         echo '<option value="0">Select Account type:</option>';
                                     }
-                                    $account_types = ["all","admin","student","teacher"];
+                                    $account_types = ["all","admins","students","teachers"];
                                     foreach($account_types as $t){
                                         if($account_type != $t){
                                             echo '<option value="'.$t.'">'.$t.'</option>';
@@ -130,12 +137,12 @@
                                 ?>
                             </select>
                         </div>
-                        <div class="search">
-                            <input type="text" placeholder="search..." />
+                        <form method="POST" class="search">
+                            <input type="text" name="search" placeholder="search..." value="<?= $_POST["search"] ?>"/>
                             <div class="search-icon">
                                 <img src="/assets/icons/search.svg" alt="search-icon" />
                             </div>
-                        </div>
+                        </form>
                     </div>                    
 
                     <div class="list">
@@ -147,7 +154,7 @@
                             <div class="list-header-item" style="flex: 2;">Last name</div>
                             <div class="list-header-item" style="flex: 3;">Email</div>
                         </div>
-                        <div class="list-body">
+                        <div id="list_body" class="list-body">
                             <?php
                                 if($result && $result->num_rows > 0){
                                     while($row = $result->fetch_assoc()) {
@@ -155,7 +162,7 @@
                                             <div class="list-item">
                                                 <img class="user-profile-picture" src="/assets/images/student.jpg" alt="">
                                             </div>
-                                            <div class="list-item">'.$row["id"].'</div>
+                                            <div class="list-item">'.$row["user_id"].'</div>
                                             <div class="list-item" style="flex: 2;">'.$row["username"].'</div>
                                             <div class="list-item" style="flex: 2;">'.$row["first_name"].'</div>
                                             <div class="list-item" style="flex: 2;">'.$row["last_name"].'</div>
@@ -270,11 +277,7 @@
     <script src="/assets/js/dialogue.js"></script>
     <script src="/assets/js/tabs.js"></script>
     <script src="/assets/js/select.js"></script>
-    <script>
-        let account_type = document.getElementById("account-type");
-        account_type.onselect = (target) => {
-            window.location.search = "?account_type="+target.toLocaleLowerCase();
-        }    
-    </script>
+    <script src="/assets/js/list.js"></script>
+    <script src="/assets/js/accounts.js"></script>
 </body>
 </html>
