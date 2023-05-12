@@ -110,7 +110,7 @@ create table if not exists lectures (
     id int primary key not null AUTO_INCREMENT,
     subject_id int references subjects(id),
     teacher_id int references teachers(id),
-    acadimic_level_id int references acadimic_levels(id),
+    group_id int references groups(id),
     class_room_id int references resources(id),
     start_at time,
     end_at time
