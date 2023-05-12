@@ -2,6 +2,21 @@
     include("../../database/db_connection.php");
     include("../../includes/admin/route_protection.php");
 
+    $querys_map = [
+        "schedules" => "select resources.resource_type as class_room, resources.resource_number as class_room_number, subject_name, first_name, last_name, group_number, level, speciality_name, day_of_week, class_index from schedules join resources on schedules.class_room_id = resources.id join subjects on schedules.subject_id = subjects.id join teachers on schedules.teacher_id = teachers.id join users on users.id = teachers.user_id join `groups` on schedules.group_id = `groups`.id join acadimic_levels on `groups`.acadimic_level_id = acadimic_levels.id join specialities on acadimic_levels.speciality_id = specialities.id;"
+    ];
+
+    $filter_querys_map = [
+        "schedules" => "select resources.resource_type as class_room, resources.resource_number as class_room_number, subject_name, first_name, last_name, group_number, level, speciality_name, day_of_week, class_index from schedules join resources on schedules.class_room_id = resources.id join subjects on schedules.subject_id = subjects.id join teachers on schedules.teacher_id = teachers.id join users on users.id = teachers.user_id join `groups` on schedules.group_id = `groups`.id join acadimic_levels on `groups`.acadimic_level_id = acadimic_levels.id join specialities on acadimic_levels.speciality_id = specialities.id where schedules.group_id = ?;"
+    ];
+
+    if(isset($_POST["filter_group_id"])){
+        $schedules_r = $mysqli->execute_query($filter_querys_map["schedules"] ,[$_POST["filter_group_id"]]);
+    }else{
+        $schedules_r = $mysqli->query($querys_map["schedules"]);
+    }
+
+
     if(isset($_POST["first_class_start_at"]) && isset($_POST["class_duration"])){
         $update_scheduler_settings_r = $mysqli->execute_query("update scheduler_settings set class_duration = ?, first_class_start_at = ?;", [$_POST["class_duration"], $_POST["first_class_start_at"]]);
     }
@@ -31,7 +46,7 @@
         // TODO: Handle schedule_r query result.
     }
 
-    $schedules_r = $mysqli->query("select resources.resource_type as class_room, resources.resource_number as class_room_number, subject_name, first_name, last_name, group_number, level, speciality_name, day_of_week, class_index from schedules join resources on schedules.class_room_id = resources.id join subjects on schedules.subject_id = subjects.id join teachers on schedules.teacher_id = teachers.id join users on users.id = teachers.user_id join `groups` on schedules.group_id = `groups`.id join acadimic_levels on `groups`.acadimic_level_id = acadimic_levels.id join specialities on acadimic_levels.speciality_id = specialities.id;");
+    //$schedules_r = $mysqli->query();
 
 
 
@@ -55,7 +70,6 @@
     <link rel="stylesheet" href="/styles/buttons.css">
     <link rel="stylesheet" href="/styles/dialogue.css">
     <link rel="stylesheet" href="/styles/list.css">
-    <link rel="stylesheet" href="/styles/search.css">
     <link rel="stylesheet" href="/styles/forms.css">
     <style>
         .scheduler-settings-form {
@@ -124,13 +138,27 @@
                     <div class="row">
                         <button class="open-dialogue-btn btn">Add</button>
                     </div>
-                    <div class="list-control">
-                        <div class="search">
-                            <input type="text" placeholder="search..." />
-                            <div class="search-icon">
-                                <img src="/assets/icons/search.svg" alt="search-icon" />
-                            </div>
-                        </div>
+                    <div class="list-control" style="justify-content: space-between;">
+                        <form method="POST" class="input-group" style="margin-right: 10px;">
+                            <input style="background-color: #ebebeb; padding: 10px 20px;" placeholder="Group" type="text" class="selected_input" list="filter-groups" value="<?php 
+                                if(isset($_POST["filter_group_id"])){
+                                    $result = $mysqli->execute_query("select group_number, level, speciality_name from groups join acadimic_levels on groups.acadimic_level_id = acadimic_levels.id join specialities on acadimic_levels.speciality_id = specialities.id where groups.id = ?;", [$_POST['filter_group_id']]);
+                                    $r = $result->fetch_assoc();
+                                    echo 'L'.$r["level"].' '.$r["speciality_name"].' Group '.$r["group_number"];
+                                }
+                            ?>" />
+                            <input type="hidden" class="hidden_selected_input" list="filter-groups" id="filter_group_id" name="filter_group_id" value="<?= $_POST['filter_group_id'] ?>" />
+                            <datalist id="filter-groups">
+                                <?php 
+                                    if($groups_r){
+                                        while($row = $groups_r->fetch_assoc()){
+                                            echo '<option value="'.$row["id"].'">L'.$row["level"].' '.$row["speciality_name"].' Group '.$row["group_number"].'</option>';
+                                        }
+                                    }
+                                ?>
+                            </datalist>
+                            <button style="margin-right: 10px; margin-left: 10px; background-color: #16a34a; border: none;" class="btn" type="submit">Filter</button>
+                        </form>
                     </div>
                     <div class="list">
                         <div class="list-header">
