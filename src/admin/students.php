@@ -103,7 +103,7 @@
                 <div class="dialogue-close-btn" id="dialogue-close-btn">Close</div>
             </div>
             <div class="dialogue-body">
-               <div class="row">
+               <div class="row" style="min-width: 800px;">
                     <div class="dialogue-student-profile">
                         <img src="/assets/images/student.jpg" alt="profile_image" />
                         <div class="student-name" style="width: fit-content; margin-top: 10px;">Abdelfetah Lachenani</div>
