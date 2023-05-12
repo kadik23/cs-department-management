@@ -14,6 +14,9 @@
         header('Location: ./index.php');
     }
 
+    $query="SELECT * FROM"
+
+
 ?>
 
 <html lang="en">
@@ -63,14 +66,26 @@
 
 
             <div class="center_section">
-                <div>
-                    <input type="text"  id="inp" placeholder="Student name" class="inp_SN">
+                <form method="POST">
+                    <input type="text"  id="inp" name="value" placeholder="Student name" class="inp_SN">
                     <button name="go" class="btn_go" type="submit" >Go</button>
-                </div>
-                <div>
+                </form>
+                <form>
                     <h3 style="width:fit-content;margin-right:10px; opacity:0.8;">Student Name: </h3>
-                    <p style="width:fit-content; ">Kadik salah eddine</p>
-                </div>
+                    <p style="width:fit-content; margin-top:2px; "><?php    
+                         if(isset($_POST['go'])){
+                            $value=$_POST['value'];
+                            
+                            $search="SELECT CONCAT(users.first_name, ' ', users.last_name) AS full_name FROM users JOIN students ON users.id = students.user_id WHERE CONCAT(users.first_name, ' ', users.last_name) = ?;";
+                            $result = $mysqli->execute_query($search,[$value]);
+                            $final_result = $result->fetch_array();
+                            if($final_result){
+                                echo $final_result['full_name'];
+                            }
+                            
+                        } ?>
+                    </p>
+                </form>
             </div>
 
 

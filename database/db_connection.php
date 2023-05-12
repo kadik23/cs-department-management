@@ -5,9 +5,9 @@
     error_reporting(E_ERROR | E_PARSE);
     
     $db_server = "localhost";
-    $db_username = "id20569367_csdm";
-    $db_password = "B/EVjF7[L/&VZ76~";
-    $db_name = "id20569367_cs_departement";
+    $db_username = "root";
+    $db_password = "";
+    $db_name = "cs-departement-management";
     $db_port = 3306;
     
 
