@@ -19,6 +19,11 @@
     }
 
 
+    if(isset($_POST['notebook'])){
+        header('Location: /teacher/notebook.php');
+
+    }
+
     $user_id = $_SESSION["user_id"];
     
     $query="SELECT * FROM teachers JOIN users ON teachers.user_id=users.id WHERE user_id=? ;";
@@ -53,7 +58,7 @@
             </div>
             <form  class="Right-Top-header" method="post" >
                 <button type="submit"  name="profile">Profile</button>
-                <button class="notebook">Students's Notebook</button>
+                <button type="submit" class="notebook" name="notebook">Students's Notebook</button>
                 <p>|</p>
                 <button class="logout" type="submit" name="send">Logout</button>
             </form>

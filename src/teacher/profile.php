@@ -4,9 +4,7 @@
     session_start();
     $user_id = $_SESSION["user_id"];
 
-    if(isset($_POST['send'])){
-        header('Location:/logout.php');
-    }
+
 
     // modify location
     if(isset($_POST['edit1'])){

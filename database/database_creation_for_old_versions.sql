@@ -19,8 +19,8 @@ create table if not exists users (
     last_name varchar(255),
     username varchar(255),
     email varchar(255),
-    address varchar(255),
-    Tel int not null,
+    phone_number varchar(255),
+    location varchar(255),
     password varchar(255)
 );
 

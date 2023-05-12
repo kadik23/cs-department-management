@@ -107,7 +107,7 @@
                     <div class="student-group-select">
                         <form id="assign-group-form" name="assign-group-form"  method="POST">
                             <div class="input-wrapper">
-                                <label for="speciality">Groups:</label>
+                                <label for="group_id">Groups:</label>
                                 <input type="text" class="selected_input" list="groups-list" placeholder="group" />
                                 <input type="hidden" class="hidden_selected_input" list="groups-list" id="group_id" name="group_id" placeholder="group" />
                                 <datalist id="groups-list">
@@ -126,6 +126,7 @@
     </div>
 
     <script src="/assets/js/dialogue.js"></script>
+    
     <script src="/assets/js/select.js"></script>
     <script>
         let btns = document.getElementsByClassName("open-dialogue-btn");
@@ -147,6 +148,7 @@
                             //        There is another method, i will use ut later, for now that's it.
                             document.getElementById("groups-list").innerHTML += ("<option value='"+data[i]['id']+"'>L"+data[i]['level']+" "+data[i]['speciality_name']+" Group "+data[i]['group_number']+"</option>")
                         }
+                        initSelectedList();
                     });
                 }).catch(err => console.log({ error: err }));
             });
