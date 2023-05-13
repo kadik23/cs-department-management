@@ -15,7 +15,6 @@
 }
 
 .dialogue-inner {
-    width: calc(100%*2/3);
     display: flex;
     flex-direction: column;
     align-items: center;

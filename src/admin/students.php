@@ -18,8 +18,12 @@
         }
     }
 
-    $students_r = $mysqli->query('select students.id as id, students.acadimic_level_id as acadimic_level_id, first_name, last_name, group_number, count(attendance.id) as absence from students join users on users.id = students.user_id left join `groups` on group_id = `groups`.id left join attendance on students.id = attendance.student_id and attendance.student_state = "absence" group by students.id having students.id is not null;');
-    
+    if(isset($_POST["search"])){
+        $search = $_POST["search"];
+        $students_r = $mysqli->execute_query("select students.id as id, students.acadimic_level_id as acadimic_level_id, first_name, last_name, group_number, count(attendance.id) as absence from students join users on users.id = students.user_id left join `groups` on group_id = `groups`.id left join attendance on students.id = attendance.student_id and attendance.student_state = 'absence' where username like concat('%',?,'%') or first_name like concat('%',?,'%') or last_name like concat('%',?,'%') group by students.id having students.id is not null;",[$search, $search, $search]);
+    }else{
+        $students_r = $mysqli->query('select students.id as id, students.acadimic_level_id as acadimic_level_id, first_name, last_name, group_number, count(attendance.id) as absence from students join users on users.id = students.user_id left join `groups` on group_id = `groups`.id left join attendance on students.id = attendance.student_id and attendance.student_state = "absence" group by students.id having students.id is not null;');
+    }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -53,12 +57,12 @@
             <div class="section-wrapper">
                 <div class="section-content">
                     <div class="list-control">
-                        <div class="search">
-                            <input type="text" placeholder="search..." />
+                        <form method="POST" class="search">
+                            <input type="text" name="search" placeholder="search..." value="<?= $_POST["search"] ?>"/>
                             <div class="search-icon">
                                 <img src="/assets/icons/search.svg" alt="search-icon" />
                             </div>
-                        </div>
+                        </form>
                     </div>
                     
                     <div class="card-boxes-wrapper">
@@ -99,7 +103,7 @@
                 <div class="dialogue-close-btn" id="dialogue-close-btn">Close</div>
             </div>
             <div class="dialogue-body">
-               <div class="row">
+               <div class="row" style="min-width: 800px;">
                     <div class="dialogue-student-profile">
                         <img src="/assets/images/student.jpg" alt="profile_image" />
                         <div class="student-name" style="width: fit-content; margin-top: 10px;">Abdelfetah Lachenani</div>

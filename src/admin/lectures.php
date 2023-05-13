@@ -6,6 +6,7 @@
     $teachers_r = $mysqli->query("select teachers.id as id, first_name, last_name from users join teachers on users.id = teachers.user_id;");
     $acadimic_levels_r = $mysqli->query("select acadimic_levels.id as id, specialities.speciality_name as speciality_name, acadimic_levels.level as level from acadimic_levels join specialities on acadimic_levels.speciality_id = specialities.id;");
     $class_rooms_r = $mysqli->query("select * from resources where resource_type='Amphi';");
+    $groups_r = $mysqli->query("select `groups`.id as id, group_number,level, speciality_name from `groups` join acadimic_levels on `groups`.acadimic_level_id = acadimic_levels.id join specialities on acadimic_levels.speciality_id = specialities.id;");
 
     $subject_id = $_POST["subject_id"];
     $teacher_id = $_POST["teacher_id"];
@@ -18,7 +19,11 @@
         // TODO: Handle query results (Error/Success Message).
     }
 
-    $lectures_r = $mysqli->query("select lectures.id as id, subjects.subject_name as lecture_name, start_at, end_at, first_name, last_name from lectures join subjects on lectures.subject_id = subjects.id join teachers on lectures.teacher_id = teachers.id join users on users.id = teachers.user_id;");
+    if(isset($_POST["filter_group_id"])){
+        $lectures_r = $mysqli->execute_query("SELECT lectures.id AS id, subjects.subject_name AS lecture_name, start_at, end_at, first_name, last_name, speciality_name, level, group_number, resource_type, resource_number FROM lectures JOIN subjects ON lectures.subject_id = subjects.id JOIN teachers ON lectures.teacher_id = teachers.id JOIN users ON users.id = teachers.user_id JOIN groups ON groups.id = lectures.group_id JOIN acadimic_levels ON acadimic_levels.id = groups.acadimic_level_id JOIN specialities ON specialities.id = acadimic_levels.speciality_id JOIN resources ON class_room_id = resources.id where groups.id = ?;",[$_POST["filter_group_id"]]);
+    }else{
+        $lectures_r = $mysqli->query("SELECT lectures.id AS id, subjects.subject_name AS lecture_name, start_at, end_at, first_name, last_name, speciality_name, level, group_number, resource_type, resource_number FROM lectures JOIN subjects ON lectures.subject_id = subjects.id JOIN teachers ON lectures.teacher_id = teachers.id JOIN users ON users.id = teachers.user_id JOIN groups ON groups.id = lectures.group_id JOIN acadimic_levels ON acadimic_levels.id = groups.acadimic_level_id JOIN specialities ON specialities.id = acadimic_levels.speciality_id JOIN resources ON class_room_id = resources.id;");
+    }
 
 ?>
 <!DOCTYPE html>
@@ -129,20 +134,36 @@
                         <button id="open_create_spec" class="btn">Add New Lecture</button>
                     </div>
                     <div class="list-control">
-                        <div class="search">
-                            <input type="text" placeholder="search..." />
-                            <div class="search-icon">
-                                <img src="/assets/icons/search.svg" alt="search-icon" />
-                            </div>
-                        </div>
+                        <form method="POST" class="input-group" style="margin-right: 10px;">
+                            <input style="background-color: #ebebeb; padding: 10px 20px;" placeholder="Group" type="text" class="selected_input" list="filter-groups" value="<?php 
+                                if(isset($_POST["filter_group_id"])){
+                                    $result = $mysqli->execute_query("select group_number, level, speciality_name from groups join acadimic_levels on groups.acadimic_level_id = acadimic_levels.id join specialities on acadimic_levels.speciality_id = specialities.id where groups.id = ?;", [$_POST['filter_group_id']]);
+                                    $r = $result->fetch_assoc();
+                                    echo 'L'.$r["level"].' '.$r["speciality_name"].' Group '.$r["group_number"];
+                                }
+                            ?>" />
+                            <input type="hidden" class="hidden_selected_input" list="filter-groups" id="filter_group_id" name="filter_group_id" value="<?= $_POST['filter_group_id'] ?>" />
+                            <datalist id="filter-groups">
+                                <?php 
+                                    if($groups_r){
+                                        while($row = $groups_r->fetch_assoc()){
+                                            echo '<option value="'.$row["id"].'">L'.$row["level"].' '.$row["speciality_name"].' Group '.$row["group_number"].'</option>';
+                                        }
+                                    }
+                                ?>
+                            </datalist>
+                            <button style="margin-right: 10px; margin-left: 10px; background-color: #16a34a; border: none;" class="btn" type="submit">Filter</button>
+                        </form>
                     </div>
                     <div class="list">
                         <div class="list-header">
                             <div class="list-header-item">Lecture Id</div>
                             <div class="list-header-item" style="flex: 2;">Lecture name</div>
+                            <div class="list-header-item" style="flex: 2;">Teacher</div>
+                            <div class="list-header-item" style="flex: 3;">Group</div>
+                            <div class="list-header-item">Class Room</div>
                             <div class="list-header-item">From</div>
                             <div class="list-header-item">To</div>
-                            <div class="list-header-item" style="flex: 2;">Teacher</div>
                         </div>
                         <div class="list-body">
                             <?php
@@ -151,9 +172,11 @@
                                         echo '<div class="list-row">
                                                 <div class="list-item">'.$row["id"].'</div>
                                                 <div class="list-item" style="flex: 2;">'.$row["lecture_name"].'</div>
+                                                <div class="list-item" style="flex: 2;">'.$row["first_name"].' '.$row["last_name"].'</div>
+                                                <div class="list-item" style="flex: 3;">L'.$row["level"].' '.$row["speciality_name"].' Group '.$row["group_number"].'</div>
+                                                <div class="list-item">'.$row["resource_type"].' '.$row["resource_number"].'</div>
                                                 <div class="list-item">'.substr($row["start_at"], 0, -3).'</div>
                                                 <div class="list-item">'.substr($row["end_at"], 0, -3).'</div>
-                                                <div class="list-item" style="flex: 2;">'.$row["first_name"].' '.$row["last_name"].'</div>
                                              </div>';
                                     }        
                                 }

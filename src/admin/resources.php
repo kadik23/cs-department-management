@@ -9,8 +9,12 @@
         $resource_r = $mysqli->execute_query("insert into resources (resource_type, resource_number) values (?,?);", [$resource_type, $resource_number]);
         // TODO: Handle Error/Success messages.
     }
-
-    $resources_r = $mysqli->query("select * from resources;");
+    
+    if(isset($_POST["filter_resource_type"]) && $_POST["filter_resource_type"] != 'All'){
+        $resources_r = $mysqli->execute_query("select * from resources where resource_type like concat('%',?,'%');",[$_POST["filter_resource_type"]]);
+    }else{
+        $resources_r = $mysqli->query("select * from resources;");
+    }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -59,12 +63,17 @@
                         <button id="open_create_spec" class="btn">Create Resource</button>
                     </div>
                     <div class="list-control">
-                        <div class="search">
-                            <input type="text" placeholder="search..." />
-                            <div class="search-icon">
-                                <img src="/assets/icons/search.svg" alt="search-icon" />
-                            </div>
-                        </div>
+                        <form method="POST" class="input-group" style="margin-right: 10px;">
+                            <input style="background-color: #ebebeb; padding: 10px 20px;" placeholder="Resource Type" type="text" class="selected_input" list="filter-resource-types" value="<?= $_POST['filter_resource_type'] ?>" />
+                            <input type="hidden" class="hidden_selected_input" id="filter_resource_type" name="filter_resource_type" value="<?= $_POST['filter_resource_type'] ?>" />
+                            <datalist id="filter-resource-types">
+                                <option value="All">All</option>
+                                <option value="Amphi">Amphi</option>
+                                <option value="Sale">Sale</option>
+                                <option value="Labo">Labo</option>
+                            </datalist>
+                            <button style="margin-right: 10px; margin-left: 10px; background-color: #16a34a; border: none;" class="btn" type="submit">Filter</button>
+                        </form>
                     </div>
                     <div class="list">
                         <div class="list-header">
@@ -92,5 +101,6 @@
         </div>
     </div>
     <script src="/assets/js/forms.js"></script>
+    <script src="/assets/js/select.js"></script>
 </body>
 </html>

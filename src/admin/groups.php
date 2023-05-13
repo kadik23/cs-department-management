@@ -71,14 +71,6 @@
                         </form>
                         <button id="open_create_spec" class="btn">Create Group</button>
                     </div>
-                    <div class="list-control">
-                        <div class="search">
-                            <input type="text" placeholder="search..." />
-                            <div class="search-icon">
-                                <img src="/assets/icons/search.svg" alt="search-icon" />
-                            </div>
-                        </div>
-                    </div>
                     <div class="list">
                         <div class="list-header">
                             <div class="list-header-item">Group Id</div>
