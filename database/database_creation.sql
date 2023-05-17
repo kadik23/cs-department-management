@@ -108,12 +108,12 @@ create table if not exists attendance (
 
 create table if not exists lectures (
     id int primary key not null AUTO_INCREMENT,
+    class_room_id int references resources(id),
     subject_id int references subjects(id),
     teacher_id int references teachers(id),
-    group_id int references groups(id),
-    class_room_id int references resources(id),
-    start_at time,
-    end_at time
+    acadimic_level_id int references acadimic_levels(id),
+    day_of_week TINYINT CHECK (day_of_week BETWEEN 0 AND 6), /* NOTE: mapping int to days of week. */
+    class_index int
 );
 
 -- NOTE: In the futur we will have a install.php file to initiate the admin users. --
