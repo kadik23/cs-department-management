@@ -57,7 +57,7 @@
 
         // Adding new lecture.
         $lecture_r = $mysqli->execute_query("insert into lectures (subject_id, teacher_id, class_room_id, acadimic_level_id, day_of_week, class_index) select ?,?,?,?,?,? where not exists (select * from lectures where subject_id = ? and teacher_id = ? and class_room_id = ? and acadimic_level_id = ? and day_of_week = ? and class_index = ?);", [$subject_id, $teacher_id, $class_room_id,$acadimic_level_id, $day_of_week, $class_index, $subject_id, $teacher_id, $class_room_id,$acadimic_level_id, $day_of_week, $class_index]);
-        if($mysqli->affected_rows > 0){
+        if($mysqli->affected_rows < 1){
             $error_message = "Lecture Already Exist.";
         }else{
             $success_message = "Lecture Added Successfuly.";

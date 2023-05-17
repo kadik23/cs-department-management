@@ -7,7 +7,7 @@
 
     if(isset($resource_type) && isset($resource_number)){
         $resource_r = $mysqli->execute_query("insert into resources (resource_type, resource_number) select ?,? where not exists (select * from resources where resource_type = ? and resource_number = ?);", [$resource_type, $resource_number, $resource_type, $resource_number]);
-        if($mysqli->affected_rows > 0){
+        if($mysqli->affected_rows < 1){
             $error_message = "Resource Already Exist.";
         }else{
             $success_message = "Resource Added Successfuly.";
