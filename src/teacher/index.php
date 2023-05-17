@@ -24,12 +24,37 @@
 
     }
 
+    if(isset($_POST['attendance'])){
+        header('Location: /teacher/attendance.php');
+
+    }
+
     $user_id = $_SESSION["user_id"];
     
     $query="SELECT * FROM teachers JOIN users ON teachers.user_id=users.id WHERE user_id=? ;";
     $result2 = $mysqli->execute_query($query,[$user_id]);
     $row2 = $result2->fetch_array();
-   
+
+   $lecture = $mysqli->execute_query("select resources.resource_type as class_room, resources.resource_number as class_room_number, subject_name, first_name, last_name, level, speciality_name, start_at, end_at ,day_of_week from lectures join resources on lectures.class_room_id = resources.id join subjects on lectures.subject_id = subjects.id join teachers on lectures.teacher_id = teachers.id join users on users.id = teachers.user_id join acadimic_levels on `lectures`.acadimic_level_id = acadimic_levels.id join specialities on acadimic_levels.speciality_id = specialities.id where users.id=?;", [$_SESSION["user_id"]]);
+    
+    $schudeler_settings_r = $mysqli->query("select class_duration, first_class_start_at from scheduler_settings;");
+    $schudeler_settings = $schudeler_settings_r->fetch_assoc();
+
+    $first_class_start_at = intval(substr($schudeler_settings["first_class_start_at"],0,2));
+
+
+    $schedule= $mysqli->execute_query(" select resources.resource_type as class_room, resources.resource_number as class_room_number, subject_name, first_name, last_name, group_number, level, speciality_name, day_of_week, class_index from schedules join resources on schedules.class_room_id = resources.id join subjects on schedules.subject_id = subjects.id join teachers on schedules.teacher_id = teachers.id join users on users.id = teachers.user_id join `groups` on schedules.group_id = `groups`.id join acadimic_levels on `groups`.acadimic_level_id = acadimic_levels.id join specialities on acadimic_levels.speciality_id = specialities.id where users.id=?;", [$_SESSION["user_id"]]);
+    function parseTime($time){
+        $hours = $time / 60;
+        $minutes = $time % 60;
+        return [$hours, $minutes];
+    }
+
+    function convertedTime($time){
+        $timeWithSeconds =$time;
+        $convert= date("H:i", strtotime($timeWithSeconds));
+        return $convert;
+    }
 ?>
 
 
@@ -87,8 +112,8 @@
                 <div><h2>ُEmail : </h2><h3><?php echo $row2['email'] ?></h3></div>
                 <div> <h2>First Name : </h2><h3><?php echo $row2['first_name'] ?></h3></div>
                 <div><h2>Last Name : </h2><h3><?php echo $row2['last_name'] ?></h3></div>
-                <div><h2>Location : </h2><h3><?php echo $row2['address'] ?></h3></div>
-                <div> <h2>Tel : </h2><h3><?php echo $row2['Tel'] ?></h3></div>
+                <div><h2>Location : </h2><h3><?php echo $row2['location'] ?></h3></div>
+                <div> <h2>Tel : </h2><h3><?php echo $row2['phone_number'] ?></h3></div>
                 
                
                 
@@ -103,10 +128,10 @@
                 <button type="submit" name="examPost" class="exams-button" id="btn1"> <b>Preparation of exam topics</b> </button>
                 <p>Preparing exam topics is by uploading topics from pdf format on the exams platform</p>
             </div>
-            <div class="STD-attendance" onmouseover="change2(true)" onmouseout="change2(false)" > 
-                <button type="submit" class="att-button" id="btn2"><b> Student attendance</b></button>
+            <form method="POST" class="STD-attendance" onmouseover="change2(true)" onmouseout="change2(false)" > 
+                <button type="submit" name="attendance" class="att-button" id="btn2"><b> Student attendance</b></button>
                 <p>Registration of absences and monitoring of students according to the conditions of the university's internal system</p>
-            </div>
+            </form>
             <div class="soon">
                 <h2>Soon..</h2> 
             </div>
@@ -116,7 +141,58 @@
         <div class="div-template">
         <button class="temp-btn">Schedule</button>
             <div class="template">
-                <img src="" alt="">
+                    <div class="schedule_label">
+                        <h2 class="schedule-item">Day</h2>
+                        <h2 class="schedule-item">Subject</h2>
+                        <h2 class="schedule-item">Room</h2>
+                        <h2 class="schedule-item">Group</h2>
+                        <h2 class="schedule-item">Start At</h2>
+                        <h2 class="schedule-item">End At</h2>
+                    </div>
+                    <div class="schedule_value">
+                        <?php 
+                            if($schedule){
+                                $days = ["Saturday","Sunday","Monday","Tuesday","Wednesday","Thursday"];
+                                while($row = $schedule->fetch_assoc()){
+                                    echo '<div class="list-row">
+                                                <div class="list-item">'.$days[$row["day_of_week"]].'</div>
+                                                <div class="list-item" ">'.$row["subject_name"].'</div>
+                                                <div class="list-item">'.$row["class_room"].' '.$row["class_room_number"].'</div>
+                                                <div class="list-item" ">L'.$row["level"].' '.$row["speciality_name"].' G'.$row["group_number"].'</div>
+                                                <div class="list-item">';
+                                                                printf('%02d',parseTime($row["class_index"] * $schudeler_settings["class_duration"])[0] + $first_class_start_at);
+                                                                echo ":";
+                                                                printf('%02d',parseTime($row["class_index"] * $schudeler_settings["class_duration"])[1]);
+                                                                echo '</div>
+                                                <div class="list-item">';
+                                                                printf('%02d',parseTime(($row["class_index"] + 1) * $schudeler_settings["class_duration"])[0] + $first_class_start_at);
+                                                                echo ":";
+                                                                printf('%02d',parseTime(($row["class_index"] + 1) * $schudeler_settings["class_duration"])[1]);
+                                                        
+                                                                echo '</div>
+                                                
+                                        </div>';
+                                }
+                        
+                            }
+
+                            if($lecture){
+                                $days = ["Saturday","Sunday","Monday","Tuesday","Wednesday","Thursday"];
+                                while($row = $lecture->fetch_assoc()){
+                                    echo '<div class="list-row">
+                                                <div class="list-item">'.$days[$row["day_of_week"]].'</div>
+                                                <div class="list-item" ">'.$row["subject_name"].'</div>
+                                                <div class="list-item">'.$row["class_room"].' '.$row["class_room_number"].'</div>
+                                                <div class="list-item" ">L'.$row["level"].' '.$row["speciality_name"].'</div>
+                                                <div class="list-item" ">'.convertedTime($row["start_at"]).'</div>
+                                                <div class="list-item" ">'.convertedTime($row["end_at"]).'</div>
+
+                                        </div>';
+                                }
+                        
+                            }
+                        ?>
+                    </div>
             </div>
         </div>
 

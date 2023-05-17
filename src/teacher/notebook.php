@@ -14,7 +14,19 @@
         header('Location: ./index.php');
     }
 
-    $query="SELECT * FROM"
+     if(isset($_POST['save'])){
+                  
+        $group=$_POST['group'];
+                $query="SELECT first_name , last_name FROM users JOIN students ON users.id=students.user_id JOIN groups ON students.group_id =groups.id WHERE  group_number = ? ;";
+                $result = $mysqli->execute_query($query,[$group]);
+                $final_result = $result->fetch_array();
+                if($final_result){
+                $_POST['group']=$group;
+                }
+  
+    }
+
+
 
 
 ?>
@@ -57,33 +69,50 @@
 
             <div class="top_section">
                 <h2 class="top_section1">Students Notes</h2>
-                <div class="top_section2">
-                        <p>Operating System | Group 04</p>
+                <form method="post" class="top_section2" id="appen">
+                        <input type="text" id="edit_Subject" value="Operating System " disabled>
+                        <p style="width: max-content; background-color: #e7e7e7; display:flex; align-items:center; padding-right:2px; color:#545454;font-weight: bold;" >| Group </p>
+                        <input type="text" id="edit_Group" value="<?= $_SERVER['group']?>" name="group" disabled>
                         <button type="submit" class="btn_edit" name="edit" id="edit">Edit</button>
-                </div>
+                </form>
                 
             </div>
 
 
             <div class="center_section">
                 <form method="POST">
-                    <input type="text"  id="inp" name="value" placeholder="Student name" class="inp_SN">
+                    <input type="text"  id="inp" name="value" placeholder="Student name" class="inp_SN" value="<?= $_SERVER['group']?>">
                     <button name="go" class="btn_go" type="submit" >Go</button>
                 </form>
-                <form>
+                <form method="POST">
                     <h3 style="width:fit-content;margin-right:10px; opacity:0.8;">Student Name: </h3>
-                    <p style="width:fit-content; margin-top:2px; "><?php    
-                         if(isset($_POST['go'])){
-                            $value=$_POST['value'];
-                            
-                            $search="SELECT CONCAT(users.first_name, ' ', users.last_name) AS full_name FROM users JOIN students ON users.id = students.user_id WHERE CONCAT(users.first_name, ' ', users.last_name) = ?;";
-                            $result = $mysqli->execute_query($search,[$value]);
-                            $final_result = $result->fetch_array();
-                            if($final_result){
-                                echo $final_result['full_name'];
-                            }
-                            
-                        } ?>
+                    <p style="width:fit-content; margin-top:2px; "><?php   
+                    if(isset($_POST['save'])) {
+
+                        $group=$_POST['group'];
+
+                        // echo $group;
+                        $search="SELECT CONCAT(users.first_name, ' ', users.last_name) AS full_name FROM users JOIN students ON users.id = students.user_id WHERE students.group_number=? ;";
+                                $result = $mysqli->execute_query($search,[$group]);
+                                $final_result = $result->fetch_array();
+                                if($final_result){
+                                    echo $final_result['full_name'];
+                                }
+                                
+                    }
+                    // $_POST['group']=$_SERVER['group'];
+
+                    // if(isset($_POST['go']) && isset($_POST['group'])){
+                    // $value=$_POST['value'];
+                    //         $search="SELECT CONCAT(users.first_name, ' ', users.last_name) AS full_name FROM users JOIN students ON users.id = students.user_id WHERE CONCAT(users.first_name, ' ', users.last_name) = ? AND (students.group_number=?) ;";
+                    //         $result = $mysqli->execute_query($search,[$value,$_POST['group']]);
+                    //         $final_result = $result->fetch_array();
+                    //         if($final_result){
+                    //             echo $final_result['full_name'];
+                    //         }
+                               
+                    //     } 
+                    ?>
                     </p>
                 </form>
             </div>
@@ -108,4 +137,48 @@
 
     </main>
 </body>
+<script>
+
+    var edit=document.getElementById("edit")
+    var editS=document.getElementById("edit_Subject")
+    var editG=document.getElementById("edit_Group")
+    valueSubject=editS.value
+    valueGroup=editG.value
+
+    edit.addEventListener("click",(event)=>{
+        if(edit.textContent=="Edit"){
+            event.preventDefault();
+            edit.textContent="Save"
+            edit.name="save";
+            
+            const element=document.createElement("button")
+                element.setAttribute("id","cancel")
+                element.setAttribute("class","btn_cancel")
+                element.textContent="Cancel"
+
+                var appen=document.getElementById("appen")
+                appen.appendChild(element)
+
+                editG.disabled=false
+                editS.disabled=false
+
+        }
+
+
+         // if click on cancel
+        var cancel=document.getElementById("cancel");
+        cancel.addEventListener("click",()=>{
+   
+            edit.textContent="Edit"
+         
+            const elementToRemove = document.querySelector('#cancel');
+            elementToRemove.remove();
+
+            editG.disabled=true
+            editS.disabled=true
+            editS.value =valueSubject
+            editG.value =valueGroup
+        })
+    })
+</script>
 </html>

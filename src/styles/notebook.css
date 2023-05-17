@@ -98,7 +98,6 @@ main{
     .top_section{
         width: 100%;
         height: 30%;
-        /* background-color: #9733EE; */
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -107,7 +106,6 @@ main{
     .center_section{
         width: 80%;
         height: 30%;
-        /* background-color: #713c9f; */
         display: flex;
         flex-direction: column;
         justify-content: start;
@@ -134,30 +132,42 @@ main{
     .bottom_section{
         width: 100%;
         height: 40%;
-        /* background-color: #c1a0de; */
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
     }
 
-    .top_section2{
-        display: flex;
-        flex-direction: row;
-    }
-
     .top_section h2{
         color: #9733EE;
         margin-bottom: 20px;
     }
+/* --------------------------------------------notebook.php----------------------------------------------------- */
+    .top_section2{
+        display: flex;
+        flex-direction: row;
+        position: relative;
+    }
 
-    .top_section p{
-        margin-right: 30px; 
+    .top_section2 input{
         font-weight: bold;
         background-color: #e7e7e7;
-        border-radius: 5px;
-        padding: 5px 20px;
+        padding: 5px 0px;
+        border: none;
+        width: 150px;
+        outline: none;
+    }
 
+    .top_section2 :nth-child(1){
+        border-radius: 5px 0px 0px 5px;
+        text-align: right;
+        
+    }
+
+    .top_section2 :nth-child(3){
+        margin-right: 30px; 
+        border-radius: 0px 5px 5px 0px;
+        width: 100px; 
     }
 
     .btn_edit{
@@ -192,6 +202,15 @@ main{
         border-radius: 5px;
         cursor: pointer;
         color: white;
+    }
+
+    .bottom_section{
+        width: 100%;
+        height: 40%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
     }
 
     .bottom_section div{
@@ -243,3 +262,150 @@ main{
         outline: none;
 
     }
+
+    .btn_cancel{
+        padding: 0px 20px;
+        height: 30px;
+        border-radius: 10px;
+        background-color: white;
+        border: solid 1px  #4596c2;
+        cursor: pointer;
+        position: absolute;
+        left: 40%;
+    }
+
+/* -------------------------------------------attendance.php----------------------------------------------------- */
+
+.top_section2_1{
+    display: flex;
+    flex-direction: row;
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.top_section2_1 input{
+    font-weight: bold;
+    background-color: #e7e7e7;
+    padding: 5px 0px;
+    border: none;
+    width: 100px;
+    outline: none;
+}
+
+.top_section2_1 :nth-child(1){
+    border-radius: 5px 0px 0px 5px;
+    text-align: center;
+    width: 150px;     
+}
+
+.top_section2_1 :nth-child(2){
+    width: 50px; 
+}
+
+.top_section2_1 :nth-child(3){
+    margin-right: 30px; 
+    border-radius: 0px 5px 5px 0px;
+    width: 103px; 
+}
+
+.top_section2_2{
+    display: flex;
+    flex-direction: row;
+    position: relative;
+}
+
+.top_section2_2 input{
+    font-weight: bold;
+    background-color: #e7e7e7;
+    padding: 5px 0px;
+    border: none;
+    width: 150px;
+    outline: none;
+}
+
+.top_section2_2 :nth-child(1){
+    border-radius: 5px 0px 0px 5px;
+    text-align: right;
+    
+}
+
+.top_section2_2 :nth-child(3){
+    margin-right: 30px; 
+    border-radius: 0px 5px 5px 0px;
+    width: 100px; 
+}
+
+
+.section_milieu{
+    width: 80%;
+    height: 30%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.section_milieu form:nth-child(n){
+    width: 100%;
+    height: 20%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+.sectionFond{
+    width: 100%;
+    height: 40%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.sectionFond div{
+    width: 38%;
+    height: 25%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: start;
+    justify-content: space-around;
+    margin-right: 150px;
+
+}
+
+.sectionFond div:nth-child(2){
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* background-color: #4596c2; */
+}
+
+.sectionFond div:nth-child(1){
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 30px;
+    /* background-color: #4596c2; */
+}
+
+.yes{
+    padding: 6px 50px;
+    color: white;
+    background-color: #2879a6;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+.no{
+    padding: 5px 50px;
+    color: #2879a6;
+    background-color: white;
+    border: solid 2px #2879a6;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+

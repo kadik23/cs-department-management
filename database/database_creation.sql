@@ -114,6 +114,7 @@ create table if not exists lectures (
     class_room_id int references resources(id),
     start_at time,
     end_at time
+    day_of_week int 
 );
 
 -- NOTE: In the futur we will have a install.php file to initiate the admin users. --

@@ -123,7 +123,8 @@ create table if not exists lectures (
     group_id int references `groups`(id),
     class_room_id int references resources(id),
     start_at time,
-    end_at time
+    end_at time,
+    day_of_week int 
 );
 
 

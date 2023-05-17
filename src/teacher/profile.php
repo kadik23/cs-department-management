@@ -9,7 +9,7 @@
     // modify location
     if(isset($_POST['edit1'])){
         $address = $_POST['edit1'];
-        $update = "UPDATE users SET address=? WHERE id=?";
+        $update = "UPDATE users SET location=? WHERE id=?";
         $set = $mysqli->execute_query($update, [$address, $user_id]);
         if ($set === false) {
             echo "query execution failed: " . $mysqli->error;
@@ -22,7 +22,7 @@
     //modify telephone number
     if(isset($_POST['edit2'])){
         $tel = $_POST['edit2'];
-        $update = "UPDATE users SET tel=? WHERE id=?";
+        $update = "UPDATE users SET phone_number=? WHERE id=?";
         $set = $mysqli->execute_query($update, [$tel, $user_id]);
         if ($set === false) {
             echo "query execution failed: " . $mysqli->error;
@@ -98,10 +98,10 @@
                <div> <h2>ُEmail :</h2>  <h3><?php echo $row2['email'] ;?></h3>  </div>
                 <div> <h2>First Name :</h2>  <h3><?php echo $row2['first_name'] ;?></h3>  </div>
                 <div>  <h2>Last Name :</h2>  <h3><?php echo $row2['last_name']; ?></h3>  </div>
-                <div id="appen">  <h2>Location : </h2 >  <input type="text" id="h1" name="edit1" disabled value="<?php echo $row2['address'] ;?>" class="address">
+                <div id="appen">  <h2>Location : </h2 >  <input type="text" id="h1" name="edit1" disabled value="<?php echo $row2['location'] ;?>" class="address">
                 <button  type="submit" class="btn_edit" id="modif_address">edit</button>         
                 </div>
-                <div id="appen2"> <h2>Telephone  : </h2>  <input type="text" id="h2"name="edit2"  disabled value="<?php echo $row2['Tel'] ;?>" class="address">
+                <div id="appen2"> <h2>Telephone  : </h2>  <input type="text" id="h2"name="edit2"  disabled value="<?php echo $row2['phone_number'] ;?>" class="address">
                 <button  type="submit" class="btn_edit" id="modif_tel">edit</button>  
                 </div>
         </form>
