@@ -7,7 +7,7 @@
 
     if(isset($group_number) && isset($acadimic_level_id)){
         $result = $mysqli->execute_query("insert into `groups` (group_number, acadimic_level_id) select ?, ? where not exists (select group_number, acadimic_level_id from groups where group_number = ? and acadimic_level_id = ?);", [$group_number, $acadimic_level_id, $group_number, $acadimic_level_id]);
-        if($mysqli->affected_rows == 0){
+        if($mysqli->affected_rows > 0){
             $error_message = "Group Already Exist.";
         }else{
             $success_message = "Group Created Successfuly.";

@@ -8,7 +8,7 @@
     
     if(isset($subject_name) && isset($coefficient) && isset($credit)){
         $subject_r = $mysqli->execute_query("insert into subjects (subject_name, coefficient, credit) select ?,?,? where not exists (select * from subjects where subject_name = ?);", [$subject_name, $coefficient, $credit, $subject_name]);
-        if($mysqli->affected_rows == 0){
+        if($mysqli->affected_rows > 0){
             $error_message = "Subject Already Exist.";
         }else{
             $success_message = "Subject Added Successfuly.";

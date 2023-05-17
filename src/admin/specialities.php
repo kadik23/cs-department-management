@@ -9,7 +9,7 @@
         $speciality_r = $mysqli->execute_query("insert into specialities (speciality_name) select ? where not exists (select * from specialities where speciality_name = ?);", [$spec_name, $spec_name]);
         $spec_id = $mysqli->insert_id;
         
-        if($mysqli->affected_rows == 0){
+        if($mysqli->affected_rows > 0){
             $error_message = "Speciality Already Exist.";
         }else{
             $success_message = "Speciality Created Successfuly.";

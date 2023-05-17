@@ -34,7 +34,7 @@
 
         // Create Schedule.
         $schedule_r = $mysqli->execute_query("insert into schedules (class_room_id, group_id, teacher_id, subject_id, day_of_week, class_index) select ?,?,?,?,?,? where not exists (select * from schedules where class_room_id = ? and group_id = ? and teacher_id = ? and subject_id = ? and day_of_week = ? and class_index = ?);", [$class_room_id, $group_id, $teacher_id, $subject_id, $day_of_week, $class_index, $class_room_id, $group_id, $teacher_id, $subject_id, $day_of_week, $class_index]);
-        if($mysqli->affected_rows == 0){
+        if($mysqli->affected_rows > 0){
             $error_message = "Schedule Already Exist.";
         }else{
             $success_message = "Schedule Added Successfuly.";
