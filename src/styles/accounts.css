@@ -71,6 +71,10 @@
     min-width: 1000px;
 }
 
+.create-account form button {
+    margin-top: 20px;
+}
+
 .student-account, .teacher-account {
     flex: 1;
     display: flex;

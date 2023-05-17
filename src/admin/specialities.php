@@ -6,10 +6,14 @@
     $spec_levels = $_POST["speciality_levels"];
     
     if(isset($spec_name) && isset($spec_levels)){
-        $speciality_r = $mysqli->execute_query("insert into specialities (speciality_name) values (?);", [$spec_name]);
+        $speciality_r = $mysqli->execute_query("insert into specialities (speciality_name) select ? where not exists (select * from specialities where speciality_name = ?);", [$spec_name, $spec_name]);
         $spec_id = $mysqli->insert_id;
-        if($speciality_r){
-            // NOTE: For now we dont have a custom selection on levels in the UI.
+        
+        if($mysqli->affected_rows == 0){
+            $error_message = "Speciality Already Exist.";
+        }else{
+            $success_message = "Speciality Created Successfuly.";
+            // NOTE: For now we dont have a custom selection on levels in the UI instead we have the number of levels.
             for($i = 1; $i <= intval($spec_levels); $i++){
                 $level_r = $mysqli->execute_query("insert into acadimic_levels (speciality_id, level) values (?,?);", [$spec_id, $i]);
             }
@@ -34,6 +38,7 @@
     <link rel="stylesheet" href="/styles/search.css">
     <link rel="stylesheet" href="/styles/buttons.css">
     <link rel="stylesheet" href="/styles/forms.css">
+    <link rel="stylesheet" href="/styles/dialogue.css">
 </head>
 <body>
     <div class="container">
@@ -100,6 +105,9 @@
             </div>
         </div>
     </div>
+
+    <?php include("../../includes/admin/alert_message.php")  ?>
+
     <script src="/assets/js/forms.js"></script>
 </body>
 </html>

@@ -7,10 +7,11 @@
     $credit = $_POST["credit"];
     
     if(isset($subject_name) && isset($coefficient) && isset($credit)){
-        $subject_r = $mysqli->execute_query("insert into subjects (subject_name, coefficient, credit) values (?,?,?);", [$subject_name, $coefficient, $credit]);
-        if(!$subject_r){
-            echo "SQL Error: ".$mysqli->error;
-            exit();
+        $subject_r = $mysqli->execute_query("insert into subjects (subject_name, coefficient, credit) select ?,?,? where not exists (select * from subjects where subject_name = ?);", [$subject_name, $coefficient, $credit, $subject_name]);
+        if($mysqli->affected_rows == 0){
+            $error_message = "Subject Already Exist.";
+        }else{
+            $success_message = "Subject Added Successfuly.";
         }
     }
 
@@ -34,6 +35,7 @@
     <link rel="stylesheet" href="/styles/search.css">
     <link rel="stylesheet" href="/styles/buttons.css">
     <link rel="stylesheet" href="/styles/forms.css">
+    <link rel="stylesheet" href="/styles/dialogue.css">
 </head>
 <body>
     <div class="container">
@@ -104,6 +106,9 @@
             </div>
         </div>
     </div>
+
+    <?php include("../../includes/admin/alert_message.php")  ?>
+
     <script src="/assets/js/forms.js"></script>
 </body>
 </html>

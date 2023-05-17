@@ -30,10 +30,10 @@
         $result = $mysqli->execute_query($query, [$username]);
         if($result){
             if($result->num_rows > 0){
-                $alert_message = "User alredy exist.";
+                $error_message = "User alredy exist.";
             }else{
                 if($account_type == "student" && !isset($acadimic_level_id)){
-                    $alert_message = "Acadimic level input not set";
+                    $error_message = "Acadimic level input not set";
                 }else{
                     $hashed_password = password_hash($password, null);
                     // Create user.
@@ -46,14 +46,14 @@
                             $query = "INSERT INTO teachers (user_id) values (?);";
                             $result = $mysqli->execute_query($query,[$user_id]);
                             if($result){
-                                $alert_message = "User created successfuly.";
+                                $success_message = "User created successfuly.";
                             }
                             break;
                         case "student":
                             $query = "INSERT INTO students (user_id, acadimic_level_id) values (?,?);";
                             $result = $mysqli->execute_query($query,[$user_id, $acadimic_level_id]);
                             if($result){
-                                $alert_message = "User created successfuly.";
+                                $success_message = "User created successfuly.";
                             }
                             break;
                     }
@@ -261,11 +261,7 @@
         </div>
     </div>
     
-    <?php
-        if(isset($alert_message)){
-            echo '<div class="dialogue-alert-message">'.$alert_message.'</div>';
-        }
-    ?>
+   <?php include("../../includes/admin/alert_message.php")  ?>
 
     <script src="/assets/js/custom-select.js"></script>
     <script src="/assets/js/dialogue.js"></script>

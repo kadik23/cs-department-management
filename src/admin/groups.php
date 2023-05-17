@@ -6,7 +6,12 @@
     $acadimic_level_id = $_POST["acadimic_level_id"];
 
     if(isset($group_number) && isset($acadimic_level_id)){
-        $result = $mysqli->execute_query("insert into `groups` (group_number, acadimic_level_id) values (?,?);", [$group_number, $acadimic_level_id]);
+        $result = $mysqli->execute_query("insert into `groups` (group_number, acadimic_level_id) select ?, ? where not exists (select group_number, acadimic_level_id from groups where group_number = ? and acadimic_level_id = ?);", [$group_number, $acadimic_level_id, $group_number, $acadimic_level_id]);
+        if($mysqli->affected_rows == 0){
+            $error_message = "Group Already Exist.";
+        }else{
+            $success_message = "Group Created Successfuly.";
+        }
     }
 
     $acadimic_levels_result = $mysqli->query("select acadimic_levels.id as id, specialities.speciality_name as speciality_name, acadimic_levels.level as level from acadimic_levels join specialities on acadimic_levels.speciality_id = specialities.id;");
@@ -27,6 +32,7 @@
     <link rel="stylesheet" href="/styles/list.css">
     <link rel="stylesheet" href="/styles/search.css">
     <link rel="stylesheet" href="/styles/forms.css">
+    <link rel="stylesheet" href="/styles/dialogue.css">
 </head>
 <body>
     <div class="container">
@@ -100,6 +106,9 @@
             </div>
         </div>
     </div>
+
+    <?php include("../../includes/admin/alert_message.php")  ?>
+
     <script src="/assets/js/forms.js"></script>
     <script src="/assets/js/select.js"></script>
 </body>
