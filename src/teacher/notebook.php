@@ -23,7 +23,11 @@
                 if($final_result){
                 $_POST['group']=$group;
                 }
-  
+                $student= $mysqli->execute_query("SELECT CONCAT(users.first_name, ' ', users.last_name) AS full_name FROM users JOIN students ON users.id = students.user_id  where students.group_id=?;",[$_POST["group"]]);
+$r=$student->fetch_assoc();
+echo $r["full_name"];
+
+                
     }
 
 
@@ -72,7 +76,7 @@
                 <form method="post" class="top_section2" id="appen">
                         <input type="text" id="edit_Subject" value="Operating System " disabled>
                         <p style="width: max-content; background-color: #e7e7e7; display:flex; align-items:center; padding-right:2px; color:#545454;font-weight: bold;" >| Group </p>
-                        <input type="text" id="edit_Group" value="<?= $_SERVER['group']?>" name="group" disabled>
+                        <input type="text" id="edit_Group" value="<?= $_POST['group']?>" name="group" disabled>
                         <button type="submit" class="btn_edit" name="edit" id="edit">Edit</button>
                 </form>
                 
@@ -87,31 +91,30 @@
                 <form method="POST">
                     <h3 style="width:fit-content;margin-right:10px; opacity:0.8;">Student Name: </h3>
                     <p style="width:fit-content; margin-top:2px; "><?php   
-                    if(isset($_POST['save'])) {
+                    // if(isset($_POST['save'])) {
 
-                        $group=$_POST['group'];
+                    //     $group=$_POST['group'];
 
                         // echo $group;
-                        $search="SELECT CONCAT(users.first_name, ' ', users.last_name) AS full_name FROM users JOIN students ON users.id = students.user_id WHERE students.group_number=? ;";
-                                $result = $mysqli->execute_query($search,[$group]);
-                                $final_result = $result->fetch_array();
-                                if($final_result){
-                                    echo $final_result['full_name'];
-                                }
+                    //     $search="SELECT CONCAT(users.first_name, ' ', users.last_name) AS full_name FROM users JOIN students ON users.id = students.user_id WHERE students.group_number=? ;";
+                    //             $result = $mysqli->execute_query($search,[$group]);
+                    //             $final_result = $result->fetch_array();
+                    //             if($final_result){
+                    //                 echo $final_result['full_name'];
+                    //             }
                                 
-                    }
+                    // }
                     // $_POST['group']=$_SERVER['group'];
 
-                    // if(isset($_POST['go']) && isset($_POST['group'])){
-                    // $value=$_POST['value'];
-                    //         $search="SELECT CONCAT(users.first_name, ' ', users.last_name) AS full_name FROM users JOIN students ON users.id = students.user_id WHERE CONCAT(users.first_name, ' ', users.last_name) = ? AND (students.group_number=?) ;";
-                    //         $result = $mysqli->execute_query($search,[$value,$_POST['group']]);
-                    //         $final_result = $result->fetch_array();
-                    //         if($final_result){
-                    //             echo $final_result['full_name'];
-                    //         }
-                               
-                    //     } 
+                    if(isset($_POST['go'])){
+                    $value=$_POST['value'];
+                            $search="SELECT CONCAT(users.first_name, ' ', users.last_name) AS full_name FROM users JOIN students ON users.id = students.user_id WHERE CONCAT(users.first_name, ' ', users.last_name) = ? ;";
+                            $result = $mysqli->execute_query($search,[$value]);
+                            $final_result = $result->fetch_array();
+                            if($final_result){
+                                echo $final_result['full_name'];
+                            }       
+                    } 
                     ?>
                     </p>
                 </form>
