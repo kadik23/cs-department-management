@@ -109,12 +109,6 @@
             </div>
             <div class="section-wrapper">
                 <div class="section-content">
-
-                    <!--
-                        TODO: Show total users.
-                        <div class="total-accounts">2565 Users</div>
-                    -->
-    
                     <div class="row">
                         <button class="open-dialogue-btn btn" >Create new account</button>
                     </div>
