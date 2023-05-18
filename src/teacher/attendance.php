@@ -14,7 +14,9 @@
         header('Location: ./index.php');
     }
 
-   
+    $student=$mysqli->query("SELECT CONCAT(users.first_name, ' ', users.last_name) AS full_name FROM users JOIN students ON users.id = students.user_id ;");
+
+ 
 
 ?>
 
@@ -57,60 +59,103 @@
 
             <div class="top_section">
                 <h2 class="top_section1">Students Attendance</h2>
-                <form method="post" class="top_section2_1" id="appen1">
-                        <input type="text" id="edit_day" value="01-01-2023" disabled>
-                        <input type="text" id="edit_hour" value="08:00" disabled>
+                <form method="post"  style="height : 100px; display:flex; flex-direction:column; justify-content:space-around;">
+
+                    <div class="top_section1_1">
+                        <input type="text" id="edit_day" value="2023-01-01" name="date" disabled>
+                        <input type="text" id="edit_hour" value="08:00" name="time" disabled>
                         <input type="text" id="edit_hour_type" value="AM" disabled>
-                        <button type="submit" class="btn_edit" name="edit1" id="edit1">Edit</button>
-                </form>
-                <form method="post" class="top_section2_2" id="appen2">
-                        <input type="text" id="edit_Subject" value="Operating System " disabled>
+                    </div> 
+
+                    <div class="top_section1_2">
+                        <input type="text" id="edit_Subject" value="Operating System " name="subject" disabled>
                         <p style="width: max-content; background-color: #e7e7e7; display:flex; align-items:center; color:#545454;font-weight: bold;" >| Group </p>
                         <input type="text" id="edit_Group" value=" 02" name="group" disabled>
-                        <button type="submit" class="btn_edit" name="edit2" id="edit2">Edit</button>
+                    </div>
+                    <div  id="appen" >
+                        <button type="submit" class="btn_edit" name="edit" id="edit">Edit</button>
+                        </div>
+                    </div>
                 </form>
                 
             </div>
 
 
-            <div class="section_milieu">
-                <form method="POST">
-                    <h3 style="width:fit-content;margin-right:10px; opacity:0.8;">Student Name: </h3>
-                    <p style="width:fit-content; margin-top:2px; "><?php   
-                    echo "kadik salah" ?>
-                    </p>
+            <div class="slider2" id="slider2">
+             
+                <?php 
+                   if(isset($_POST["save"])){
+                    $data=$mysqli->execute_query("select CONCAT(users.first_name, ' ', users.last_name) AS full_name ,groups.group_number  FROM users JOIN students ON users.id = students.user_id JOIN groups ON groups.id=students.group_id JOIN attendance on students.id=attendance.student_id JOIN subjects ON subjects.id = attendance.subject_id WHERE (subjects.subject_name=?) AND (attendance.time=?) AND (attendance.date=?) AND (groups.group_number=?);",[$_POST["subject"],$_POST["time"],$_POST["date"],$_POST["group"]]);
+                    foreach ($data as $student_r) {
+            
+                echo '   <div class="infos">
+                <form method="POST" class="section_milieu_form">
+                    <div style="margin-right: 25px;">
+                        <h3 style="width:fit-content;margin-right:10px; opacity:0.8; margin-left:100px;">Student Name: </h3>
+                        <p style="width:fit-content; font-size:1.1rem; margin-top:2px; border:none; background-color:transparent;" >'.$student_r["full_name"].'</p>
+                    </div>
+                  
+                    <div>
+                        <h3 style="width:fit-content;margin-right:10px; opacity:0.8;"> Group: </h3>
+                        <p style="width:fit-content; margin-top:2px; ">'.$student_r["group_number"].'
+                        </p>
+                    </div>
                 </form>
-                <form method="POST">
-                    <h3 style="width:fit-content;margin-right:10px; opacity:0.8;"> Group: </h3>
-                    <p style="width:fit-content; margin-top:2px; "><?php   
-                    echo "L2 Info 04" ?>
-                    </p>
+                <form method="POST" >
+                     <h1 style="margin-bottom: 10px;">Does he/she attend:</h1>
+                     <button name="yes" type="submit" id="yes" class="yes">Yes</button>
+                     <button name="no" type="submit" id="no" class="no">No</button>
+                </form></div>';
+            }}else{
+                echo '
+                <div class="infos">
+                <form method="POST" class="section_milieu_form">
+                    <div style="margin-right: 25px;">
+                        <h3 style="width:fit-content;margin-right:10px; opacity:0.8; margin-left:100px;">Student Name: </h3>
+                        <p style="width:fit-content; font-size:1.1rem; margin-top:2px; border:none; background-color:transparent;" ></p>
+                    </div>
+                  
+                    <div>
+                        <h3 style="width:fit-content;margin-right:10px; opacity:0.8;"> Group: </h3>
+                        <p style="width:fit-content; margin-top:2px; ">
+                        </p>
+                    </div>
                 </form>
+                <form method="POST" >
+                     <h1 style="margin-bottom: 10px;">Does he/she attend:</h1>
+                     <button name="yes" type="submit" id="yes" class="yes">Yes</button>
+                     <button name="no" type="submit" id="no" class="no">No</button>
+                </form></div>';
+            }
+                ?>
             </div>
 
 
-            <div class="sectionFond">
-                <div class="sectionFond1">
-                     <h1 >Does he/she attend:</h1>
-                </div>
-
-                <div class="sectionFond2">
-                    <button name="yes" type="submit" id="yes" class="yes">Yes</button>
-                    <button name="no" type="submit" id="no" class="no">No</button>
-                </div>
-            </div>
+            <div class="bottom_section">
+              
+              <div class="bottom_section3">
+                  <button name="prev" type="submit" id="prev" class="prev">Prev</button>
+                  <button name="next" type="submit" id="next" class="next">Next</button>
+              </div>
+          </div>
         </section>
 
     </main>
 
 </body>
 <script>
-
-    var edit=document.getElementById("edit2")
+    // if click edit 
     var editS=document.getElementById("edit_Subject")
     var editG=document.getElementById("edit_Group")
     valueSubject=editS.value
     valueGroup=editG.value
+    var edit=document.getElementById("edit")
+    var editD=document.getElementById("edit_day")
+    var editH=document.getElementById("edit_hour")
+    var editTH=document.getElementById("edit_hour_type")
+    valueDay=editD.value
+    valueHour=editH.value
+    valueTH=editTH.value
 
     edit.addEventListener("click",(event)=>{
         if(edit.textContent=="Edit"){
@@ -120,14 +165,17 @@
             
             const element=document.createElement("button")
                 element.setAttribute("id","cancel")
-                element.setAttribute("class","btn_cancel")
+                element.setAttribute("class","btn_cancel2")
                 element.textContent="Cancel"
 
-                var appen=document.getElementById("appen2")
+                var appen=document.getElementById("appen")
                 appen.appendChild(element)
 
                 editG.disabled=false
                 editS.disabled=false
+                editH.disabled=false
+                editD.disabled=false
+                editTH.disabled=false
 
         }
 
@@ -141,62 +189,38 @@
             const elementToRemove = document.querySelector('#cancel');
             elementToRemove.remove();
 
+            editD.disabled=true
+            editH.disabled=true
+            editTH.disabled=true
             editG.disabled=true
             editS.disabled=true
+            editD.value =valueDay
+            editH.value =valueHour
+            editTH.value =valueTH
             editS.value =valueSubject
             editG.value =valueGroup
         })
     })
 
+    // scroll animation
+            let next = document.getElementById('next');
+            let prev = document.getElementById('prev');
+            let slider = document.getElementById('slider2');
 
+            next.addEventListener('click', (event) => {
+                event.preventDefault();
+                if(slider.scrollLeft % slider.clientWidth <= 5){
+                    slider.scrollTo({ behavior: 'smooth', left: slider.scrollLeft + slider.clientWidth });
+                }
 
+            });
 
+            prev.addEventListener('click', (event) => {
+                event.preventDefault();
 
-    var edit2=document.getElementById("edit1")
-    var editD=document.getElementById("edit_day")
-    var editH=document.getElementById("edit_hour")
-    var editTH=document.getElementById("edit_hour_type")
-    valueDay=editD.value
-    valueHour=editH.value
-    valueTH=editTH.value
-
-    edit2.addEventListener("click",(event)=>{
-        if(edit2.textContent=="Edit"){
-            event.preventDefault();
-            edit2.textContent="Save"
-            edit2.name="save";
-            
-            const element=document.createElement("button")
-                element.setAttribute("id","cancel")
-                element.setAttribute("class","btn_cancel")
-                element.textContent="Cancel"
-
-                var appen2=document.getElementById("appen1")
-                appen2.appendChild(element)
-
-                editH.disabled=false
-                editD.disabled=false
-                editTH.disabled=false
-
-        }
-
-
-         // if click on cancel
-        var cancel=document.getElementById("cancel");
-        cancel.addEventListener("click",()=>{
-   
-            edit2.textContent="Edit"
-         
-            const elementToRemove = document.querySelector('#cancel');
-            elementToRemove.remove();
-
-            editD.disabled=true
-            editH.disabled=true
-            editTH.disabled=true
-            editD.value =valueDay
-            editH.value =valueHour
-            editTH.value =valueTH
-        })
-    })
+                if(slider.scrollLeft % slider.clientWidth <= 5){
+                    slider.scrollTo({ behavior: 'smooth', left: slider.scrollLeft - slider.clientWidth });
+                }
+            });
 </script>
 </html>
