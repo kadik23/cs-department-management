@@ -19,6 +19,10 @@
             "title" => "Schedules",
         ],
         [
+            "path" => "/admin/exams.php",
+            "title" => "Exams Schedules",
+        ],
+        [
             "path" => "/admin/lectures.php",
             "title" => "Lectures",
         ],
