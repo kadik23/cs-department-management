@@ -1,7 +1,7 @@
  <!-- This is a user aside menu -->
  <?php
-    // NOTE: Since include is just placing the code. we will pass data using variables
-    //       using names like $<path>_<component>_<target> is the best practice as shown in the following code:
+    // NOTE: Since include is just placing the code. we will pass data using variables.
+    //       Using names like $<path>_<component>_<target> is the best practice as shown in the following code:
     $aside_links = [
         [
             "path" => "/student",
