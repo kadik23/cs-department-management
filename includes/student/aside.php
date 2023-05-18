@@ -13,6 +13,10 @@
         [
             "path" => "/student/notes.php",
             "title" => "Notes",
+        ],
+        [
+            "path" => "/student/exams.php",
+            "title" => "Exams Schedules",
         ]
     ];
     include("../../includes/aside.php")
