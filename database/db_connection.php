@@ -48,30 +48,6 @@
 
     // echo "Database connected successfuly.";
 
-    /*
-
-    // NOTE: Since 000webhost do not support php 8.2 yet, This is the alternative implementation of 'execute_query' method.
-    class Test extends mysqli {
-        public function execute_query($query, $arr){
-            $r = "";
-            foreach($arr as $item){
-                if(gettype($item) == "string"){
-                    $r .= "s";
-                }
-                if(gettype($item) == "integer"){
-                    $r .= "i";
-                }
-            }
-            $stmt = $this->prepare($query);
-            $stmt->bind_param($r, ...$arr);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            return $result;
-        }
-    }
-    
-    */
-
     function is_admin($user_id){
         global $mysqli;
         $query = 'select * from administraters where user_id = ?;';
