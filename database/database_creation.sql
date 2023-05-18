@@ -121,7 +121,7 @@ create table if not exists exams_schedules (
     class_room_id int references resources(id),
     subject_id int references subjects(id),
     group_id int references groups(id),
-    day_of_week TINYINT CHECK (day_of_week BETWEEN 0 AND 6), /* NOTE: mapping int to days of week. */
+    date date,
     class_index int
 );
 
