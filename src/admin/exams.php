@@ -3,36 +3,36 @@
     // include("../../includes/admin/route_protection.php");
 
     $querys_map = [
-        "exams_schedules" => "select resources.resource_type as class_room, resources.resource_number as class_room_number, subject_name, group_number, level, speciality_name, day_of_week, class_index from exams_schedules join resources on exams_schedules.class_room_id = resources.id join subjects on exams_schedules.subject_id = subjects.id join `groups` on exams_schedules.group_id = `groups`.id join acadimic_levels on `groups`.acadimic_level_id = acadimic_levels.id join specialities on acadimic_levels.speciality_id = specialities.id;"
+        "exams_schedules" => "select resources.resource_type as class_room, resources.resource_number as class_room_number, subject_name, group_number, level, speciality_name, date, class_index from exams_schedules join resources on exams_schedules.class_room_id = resources.id join subjects on exams_schedules.subject_id = subjects.id join `groups` on exams_schedules.group_id = `groups`.id join acadimic_levels on `groups`.acadimic_level_id = acadimic_levels.id join specialities on acadimic_levels.speciality_id = specialities.id;"
     ];
 
     $filter_querys_map = [
-        "exams_schedules" => "select resources.resource_type as class_room, resources.resource_number as class_room_number, subject_name, group_number, level, speciality_name, day_of_week, class_index from exams_schedules join resources on exams_schedules.class_room_id = resources.id join subjects on exams_schedules.subject_id = subjects.id join `groups` on exams_schedules.group_id = `groups`.id join acadimic_levels on `groups`.acadimic_level_id = acadimic_levels.id join specialities on acadimic_levels.speciality_id = specialities.id where exams_schedules.group_id = ?;"
+        "exams_schedules" => "select resources.resource_type as class_room, resources.resource_number as class_room_number, subject_name, group_number, level, speciality_name, date, class_index from exams_schedules join resources on exams_schedules.class_room_id = resources.id join subjects on exams_schedules.subject_id = subjects.id join `groups` on exams_schedules.group_id = `groups`.id join acadimic_levels on `groups`.acadimic_level_id = acadimic_levels.id join specialities on acadimic_levels.speciality_id = specialities.id where exams_schedules.group_id = ?;"
     ];
 
     $class_room_id = $_POST["class_room_id"];
     $group_id = $_POST["group_id"];
     $subject_id = $_POST["subject_id"];
-    $day_of_week = $_POST["day_of_week"];
+    $date = $_POST["date"];
     $class_index = $_POST["class_index"];
 
-    if(isset($class_room_id) && isset($group_id) && isset($subject_id) && isset($day_of_week) && isset($class_index)){
+    if(isset($class_room_id) && isset($group_id) && isset($subject_id) && isset($date) && isset($class_index)){
         // Check If The Group is Empty At That Time.
-        $is_empty_r = $mysqli->execute_query("select * from exams_schedules where group_id = ? and class_index = ? and day_of_week = ?;", [$group_id, $class_index, $day_of_week]);
+        $is_empty_r = $mysqli->execute_query("select * from exams_schedules where group_id = ? and class_index = ? and date = ?;", [$group_id, $class_index, $date]);
         if($is_empty_r && $is_empty_r->num_rows > 0){
             $error_message = "This group already has another class at that time.";
             goto skip;
         }
 
         // Check If The Class Room was reserved at that time.
-        $is_reserved_r = $mysqli->execute_query("select * from exams_schedules where class_room_id = ? and class_index = ? and day_of_week = ?;", [$class_room_id, $class_index, $day_of_week]);
+        $is_reserved_r = $mysqli->execute_query("select * from exams_schedules where class_room_id = ? and class_index = ? and date = ?;", [$class_room_id, $class_index, $date]);
         if($is_reserved_r && $is_reserved_r->num_rows > 0){
             $error_message = "The class room is already reserved at that time.";
             goto skip;
         }
 
         // Create Schedule.
-        $exam_schedule_r = $mysqli->execute_query("insert into exams_schedules (class_room_id, group_id, subject_id, day_of_week, class_index) select ?,?,?,?,? where not exists (select * from exams_schedules where class_room_id = ? and group_id = ? and subject_id = ? and day_of_week = ? and class_index = ?);", [$class_room_id, $group_id, $subject_id, $day_of_week, $class_index, $class_room_id, $group_id, $subject_id, $day_of_week, $class_index]);
+        $exam_schedule_r = $mysqli->execute_query("insert into exams_schedules (class_room_id, group_id, subject_id, date, class_index) select ?,?,?,?,? where not exists (select * from exams_schedules where class_room_id = ? and group_id = ? and subject_id = ? and date = ? and class_index = ?);", [$class_room_id, $group_id, $subject_id, $date, $class_index, $class_room_id, $group_id, $subject_id, $date, $class_index]);
         if($mysqli->affected_rows < 1){
             $error_message = "Schedule Already Exist.";
         }else{
@@ -189,7 +189,6 @@
                         <div class="list-body">
                             <?php
                                 if($exams_schedules_r){
-                                    $days_map = ["Saturday","Sunday","Monday","Tuesday","Wednesday","Thursday"];
                                     while($row = $exams_schedules_r->fetch_assoc()){
                                         $from_calc = parseTime($row["class_index"] * $exams_schudeler_settings["exam_duration"] + $first_exam_start_at[1]);
                                         $from_hours = $from_calc[0] + $first_exam_start_at[0];
@@ -200,7 +199,7 @@
                                         $to_minutes = $to_calc[1];
                                         echo '<div class="list-row">
                                                 <div class="list-item">'.$row["class_room"].' '.$row["class_room_number"].'</div>
-                                                <div class="list-item">'.$days_map[$row["day_of_week"]].'</div>
+                                                <div class="list-item">'.$row["date"].'</div>
                                                 <div class="list-item" style="flex: 2;">L'.$row["level"].' '.$row["speciality_name"].' G'.$row["group_number"].'</div>
                                                 <div class="list-item">';
                                                 printf('%02d', $from_hours);
@@ -220,7 +219,6 @@
                             ?>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -275,25 +273,8 @@
                         </datalist>
                     </div>
                     <div class="input-group">
-                        <label for="day_of_week">Day:</label>
-                        <input type="text" class="selected_input" list="days_of_week" />
-                        <input type="hidden" class="hidden_selected_input" list="days_of_week" id="day_of_week" name="day_of_week" />
-                        <datalist id="days_of_week">
-                            <?php 
-                                $days = [0,1,2,3,4,5]; 
-                                $days_map = [
-                                    "0" => "Saturday",
-                                    "1" => "Sunday",
-                                    "2" => "Monday",
-                                    "3" => "Tuesday",
-                                    "4" => "Wednesday",
-                                    "5" => "Thursday"
-                                ];
-                                foreach($days as $day){
-                                    echo '<option value="'.$day.'">'.$days_map[$day].'</option>';
-                                }
-                            ?>
-                        </datalist>
+                        <label for="date">Day:</label>
+                        <input type="date" name="date" />
                     </div>
 
                     <div class="input-group">
