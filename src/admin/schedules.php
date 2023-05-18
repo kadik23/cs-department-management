@@ -2,6 +2,55 @@
     include("../../database/db_connection.php");
     include("../../includes/admin/route_protection.php");
 
+    $querys_map = [
+        "schedules" => "select resources.resource_type as class_room, resources.resource_number as class_room_number, subject_name, first_name, last_name, group_number, level, speciality_name, day_of_week, class_index from schedules join resources on schedules.class_room_id = resources.id join subjects on schedules.subject_id = subjects.id join teachers on schedules.teacher_id = teachers.id join users on users.id = teachers.user_id join `groups` on schedules.group_id = `groups`.id join acadimic_levels on `groups`.acadimic_level_id = acadimic_levels.id join specialities on acadimic_levels.speciality_id = specialities.id;"
+    ];
+
+    $filter_querys_map = [
+        "schedules" => "select resources.resource_type as class_room, resources.resource_number as class_room_number, subject_name, first_name, last_name, group_number, level, speciality_name, day_of_week, class_index from schedules join resources on schedules.class_room_id = resources.id join subjects on schedules.subject_id = subjects.id join teachers on schedules.teacher_id = teachers.id join users on users.id = teachers.user_id join `groups` on schedules.group_id = `groups`.id join acadimic_levels on `groups`.acadimic_level_id = acadimic_levels.id join specialities on acadimic_levels.speciality_id = specialities.id where schedules.group_id = ?;"
+    ];
+
+    if(isset($class_room_id) && isset($group_id) && isset($teacher_id) && isset($subject_id) && isset($day_of_week) && isset($class_index)){
+        // Check If The Group is Empty At That Time.
+        $is_empty_r = $mysqli->execute_query("select * from schedules where group_id = ? and class_index = ? and day_of_week = ?;", [$group_id, $class_index, $day_of_week]);
+        if($is_empty_r && $is_empty_r->num_rows > 0){
+            $error_message = "This group already has another class at that time.";
+            goto skip;
+        }
+        
+        // Check If The Teacher is Empty at that time.
+        $is_empty_r = $mysqli->execute_query("select * from schedules where teacher_id = ? and class_index = ? and day_of_week = ?;", [$teacher_id, $class_index, $day_of_week]);
+        if($is_empty_r && $is_empty_r->num_rows > 0){
+            $error_message = "This group already has another class at that time.";
+            goto skip;
+        }
+
+        // Check If The Class Room was reserved at that time.
+        $is_reserved_r = $mysqli->execute_query("select * from schedules where class_room_id = ? and class_index = ? and day_of_week = ?;", [$class_room_id, $class_index, $day_of_week]);
+        if($is_reserved_r && $is_reserved_r->num_rows > 0){
+            $error_message = "The class room is already reserved at that time.";
+            goto skip;
+        }
+
+        // Create Schedule.
+        $schedule_r = $mysqli->execute_query("insert into schedules (class_room_id, group_id, teacher_id, subject_id, day_of_week, class_index) select ?,?,?,?,?,? where not exists (select * from schedules where class_room_id = ? and group_id = ? and teacher_id = ? and subject_id = ? and day_of_week = ? and class_index = ?);", [$class_room_id, $group_id, $teacher_id, $subject_id, $day_of_week, $class_index, $class_room_id, $group_id, $teacher_id, $subject_id, $day_of_week, $class_index]);
+        if($mysqli->affected_rows < 1){
+            $error_message = "Schedule Already Exist.";
+        }else{
+            $success_message = "Schedule Added Successfuly.";
+        }
+
+        // This label is used to skip the query in case there was a error_message.
+        skip:
+    }
+
+    if(isset($_POST["filter_group_id"])){
+        $schedules_r = $mysqli->execute_query($filter_querys_map["schedules"] ,[$_POST["filter_group_id"]]);
+    }else{
+        $schedules_r = $mysqli->query($querys_map["schedules"]);
+    }
+
+
     if(isset($_POST["first_class_start_at"]) && isset($_POST["class_duration"])){
         $update_scheduler_settings_r = $mysqli->execute_query("update scheduler_settings set class_duration = ?, first_class_start_at = ?;", [$_POST["class_duration"], $_POST["first_class_start_at"]]);
     }
@@ -11,6 +60,8 @@
     $groups_r = $mysqli->query("select `groups`.id as id, group_number,level, speciality_name from `groups` join acadimic_levels on `groups`.acadimic_level_id = acadimic_levels.id join specialities on acadimic_levels.speciality_id = specialities.id;");
     $teachers_r = $mysqli->query("select teachers.id as id, first_name, last_name from users join teachers on teachers.user_id = users.id;");
     $subjects_r = $mysqli->query("select id, subject_name from subjects;");
+
+    $groups = $groups_r->fetch_all(MYSQLI_ASSOC);
 
     if(!$schudeler_settings_r){
         echo "SQL Error: ".$mysqli->error;
@@ -26,20 +77,12 @@
     $day_of_week = $_POST["day_of_week"];
     $class_index = $_POST["class_index"];
 
-    if(isset($class_room_id) && isset($group_id) && isset($teacher_id) && isset($subject_id) && isset($day_of_week) && isset($class_index)){
-        $schedule_r = $mysqli->execute_query("insert into schedules (class_room_id, group_id, teacher_id, subject_id, day_of_week, class_index) values (?,?,?,?,?,?);", [$class_room_id, $group_id, $teacher_id, $subject_id, $day_of_week, $class_index]);
-        // TODO: Handle schedule_r query result.
-    }
-
-    $schedules_r = $mysqli->query("select resources.resource_type as class_room, resources.resource_number as class_room_number, subject_name, first_name, last_name, group_number, level, speciality_name, day_of_week, class_index from schedules join resources on schedules.class_room_id = resources.id join subjects on schedules.subject_id = subjects.id join teachers on schedules.teacher_id = teachers.id join users on users.id = teachers.user_id join `groups` on schedules.group_id = `groups`.id join acadimic_levels on `groups`.acadimic_level_id = acadimic_levels.id join specialities on acadimic_levels.speciality_id = specialities.id;");
-
-
-
     function parseTime($time){
         $hours = $time / 60;
         $minutes = $time % 60;
         return [$hours, $minutes];
     }
+
     $first_class_start_at = intval(substr($schudeler_settings["first_class_start_at"],0,2));
 ?>
 
@@ -55,7 +98,6 @@
     <link rel="stylesheet" href="/styles/buttons.css">
     <link rel="stylesheet" href="/styles/dialogue.css">
     <link rel="stylesheet" href="/styles/list.css">
-    <link rel="stylesheet" href="/styles/search.css">
     <link rel="stylesheet" href="/styles/forms.css">
     <style>
         .scheduler-settings-form {
@@ -116,7 +158,7 @@
                             <label for="class_duration">Class Duration: </label>
                             <input type="number" name="class_duration" id="class_duration" disabled value="<?= $schudeler_settings["class_duration"] ?>" />
                         </div>
-                        <div>   
+                        <div>
                             <button type="button" id="cancel-scheduler-settings-edit" class="cancel-btn" style="width: fit-content; margin-right: 10px; opacity: 0; transition: 0.5s;">cancel</button>
                             <button type="button" id="scheduler-settings-edit" class="btn" style="width: fit-content;">Edit</button>
                         </div>
@@ -124,13 +166,25 @@
                     <div class="row">
                         <button class="open-dialogue-btn btn">Add</button>
                     </div>
-                    <div class="list-control">
-                        <div class="search">
-                            <input type="text" placeholder="search..." />
-                            <div class="search-icon">
-                                <img src="/assets/icons/search.svg" alt="search-icon" />
-                            </div>
-                        </div>
+                    <div class="list-control" style="justify-content: space-between;">
+                        <form method="POST" class="input-group" style="margin-right: 10px;">
+                            <input style="background-color: #ebebeb; padding: 10px 20px;" placeholder="Group" type="text" class="selected_input" list="filter-groups" value="<?php 
+                                if(isset($_POST["filter_group_id"])){
+                                    $result = $mysqli->execute_query("select group_number, level, speciality_name from groups join acadimic_levels on groups.acadimic_level_id = acadimic_levels.id join specialities on acadimic_levels.speciality_id = specialities.id where groups.id = ?;", [$_POST['filter_group_id']]);
+                                    $r = $result->fetch_assoc();
+                                    echo 'L'.$r["level"].' '.$r["speciality_name"].' Group '.$r["group_number"];
+                                }
+                            ?>" />
+                            <input type="hidden" class="hidden_selected_input" list="filter-groups" id="filter_group_id" name="filter_group_id" value="<?= $_POST['filter_group_id'] ?>" />
+                            <datalist id="filter-groups">
+                                <?php 
+                                    foreach($groups as $row){
+                                        echo '<option value="'.$row["id"].'">L'.$row["level"].' '.$row["speciality_name"].' Group '.$row["group_number"].'</option>';
+                                    }
+                                ?>
+                            </datalist>
+                            <button style="margin-right: 10px; margin-left: 10px; background-color: #16a34a; border: none;" class="btn" type="submit">Filter</button>
+                        </form>
                     </div>
                     <div class="list">
                         <div class="list-header">
@@ -151,18 +205,18 @@
                                                 <div class="list-item">'.$days_map[$row["day_of_week"]].'</div>
                                                 <div class="list-item" style="flex: 2;">L'.$row["level"].' '.$row["speciality_name"].' G'.$row["group_number"].'</div>
                                                 <div class="list-item">';
-                                        printf('%02d',parseTime($row["class_index"] * $schudeler_settings["class_duration"])[0] + $first_class_start_at);
-                                        echo ":";
-                                        printf('%02d',parseTime($row["class_index"] * $schudeler_settings["class_duration"])[1]);
+                                                printf('%02d',parseTime($row["class_index"] * $schudeler_settings["class_duration"])[0] + $first_class_start_at);
+                                                echo ":";
+                                                printf('%02d',parseTime($row["class_index"] * $schudeler_settings["class_duration"])[1]);
+                                                echo '</div>
+                                                        <div class="list-item">';
+                                                printf('%02d',parseTime(($row["class_index"] + 1) * $schudeler_settings["class_duration"])[0] + $first_class_start_at);
+                                                echo ":";
+                                                printf('%02d',parseTime(($row["class_index"] + 1) * $schudeler_settings["class_duration"])[1]);
+                                        
                                         echo '</div>
-                                                <div class="list-item">';
-                                        printf('%02d',parseTime(($row["class_index"] + 1) * $schudeler_settings["class_duration"])[0] + $first_class_start_at);
-                                        echo ":";
-                                        printf('%02d',parseTime(($row["class_index"] + 1) * $schudeler_settings["class_duration"])[1]);
-                                
-                                        echo '</div>
-                                                <div class="list-item" style="flex: 2;">'.$row["subject_name"].'</div>
-                                             </div>';
+                                                    <div class="list-item" style="flex: 2;">'.$row["subject_name"].'</div>
+                                            </div>';
                                     }   
                                 }
                             ?>
@@ -202,10 +256,8 @@
                         <input type="hidden" class="hidden_selected_input" list="groups" id="group_id" name="group_id" />
                         <datalist id="groups">
                             <?php 
-                                if($groups_r){
-                                    while($row = $groups_r->fetch_assoc()){
-                                        echo '<option value="'.$row["id"].'">L'.$row["level"].' '.$row["speciality_name"].' Group '.$row["group_number"].'</option>';
-                                    }
+                                foreach($groups as $row){
+                                    echo '<option value="'.$row["id"].'">L'.$row["level"].' '.$row["speciality_name"].' Group '.$row["group_number"].'</option>';
                                 }
                             ?>
                         </datalist>
@@ -244,15 +296,14 @@
                         <input type="hidden" class="hidden_selected_input" list="days_of_week" id="day_of_week" name="day_of_week" />
                         <datalist id="days_of_week">
                             <?php 
-                                $days = [0,1,2,3,4,5,6]; 
+                                $days = [0,1,2,3,4,5]; 
                                 $days_map = [
-                                    "0" => "Sunday",
-                                    "1" => "Monday",
-                                    "2" => "Tuesday",
-                                    "3" => "Wednesday",
-                                    "4" => "Thursday",
-                                    "5" => "Friday",
-                                    "6" => "Saturday"
+                                    "0" => "Saturday",
+                                    "1" => "Sunday",
+                                    "2" => "Monday",
+                                    "3" => "Tuesday",
+                                    "4" => "Wednesday",
+                                    "5" => "Thursday"
                                 ];
                                 foreach($days as $day){
                                     echo '<option value="'.$day.'">'.$days_map[$day].'</option>';
@@ -284,6 +335,9 @@
             </div>
         </div>
     </div>
+
+    <?php include("../../includes/admin/alert_message.php")  ?>
+
     <script src="/assets/js/dialogue.js"></script>
     <script src="/assets/js/select.js"></script>
     <script>
