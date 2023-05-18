@@ -10,6 +10,14 @@
         "schedules" => "select resources.resource_type as class_room, resources.resource_number as class_room_number, subject_name, first_name, last_name, group_number, level, speciality_name, day_of_week, class_index from schedules join resources on schedules.class_room_id = resources.id join subjects on schedules.subject_id = subjects.id join teachers on schedules.teacher_id = teachers.id join users on users.id = teachers.user_id join `groups` on schedules.group_id = `groups`.id join acadimic_levels on `groups`.acadimic_level_id = acadimic_levels.id join specialities on acadimic_levels.speciality_id = specialities.id where schedules.group_id = ?;"
     ];
 
+
+    $class_room_id = $_POST["class_room_id"];
+    $group_id = $_POST["group_id"];
+    $teacher_id = $_POST["teacher_id"];
+    $subject_id = $_POST["subject_id"];
+    $day_of_week = $_POST["day_of_week"];
+    $class_index = $_POST["class_index"];
+    
     if(isset($class_room_id) && isset($group_id) && isset($teacher_id) && isset($subject_id) && isset($day_of_week) && isset($class_index)){
         // Check If The Group is Empty At That Time.
         $is_empty_r = $mysqli->execute_query("select * from schedules where group_id = ? and class_index = ? and day_of_week = ?;", [$group_id, $class_index, $day_of_week]);
@@ -69,13 +77,6 @@
     }
 
     $schudeler_settings = $schudeler_settings_r->fetch_assoc();
-
-    $class_room_id = $_POST["class_room_id"];
-    $group_id = $_POST["group_id"];
-    $teacher_id = $_POST["teacher_id"];
-    $subject_id = $_POST["subject_id"];
-    $day_of_week = $_POST["day_of_week"];
-    $class_index = $_POST["class_index"];
 
     function parseTime($time){
         $hours = $time / 60;
