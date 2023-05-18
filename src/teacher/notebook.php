@@ -14,21 +14,12 @@
         header('Location: ./index.php');
     }
 
-     if(isset($_POST['save'])){
-                  
-        $group=$_POST['group'];
-                $query="SELECT first_name , last_name FROM users JOIN students ON users.id=students.user_id JOIN groups ON students.group_id =groups.id WHERE  group_number = ? ;";
-                $result = $mysqli->execute_query($query,[$group]);
-                $final_result = $result->fetch_array();
-                if($final_result){
-                $_POST['group']=$group;
-                }
-                $student= $mysqli->execute_query("SELECT CONCAT(users.first_name, ' ', users.last_name) AS full_name FROM users JOIN students ON users.id = students.user_id  where students.group_id=?;",[$_POST["group"]]);
-$r=$student->fetch_assoc();
-echo $r["full_name"];
-
-                
+     if(isset($_POST['save_note'])){
+                //   test..
+        echo $_POST["exam"];
+        echo $_POST["control"];
     }
+
 
 
 
@@ -85,51 +76,80 @@ echo $r["full_name"];
 
             <div class="center_section">
                 <form method="POST">
-                    <input type="text"  id="inp" name="value" placeholder="Student name" class="inp_SN" value="<?= $_SERVER['group']?>">
+                    <input type="text"  id="inp" name="value" placeholder="Student name" class="inp_SN">
                     <button name="go" class="btn_go" type="submit" >Go</button>
                 </form>
-                <form method="POST">
-                    <h3 style="width:fit-content;margin-right:10px; opacity:0.8;">Student Name: </h3>
-                    <p style="width:fit-content; margin-top:2px; "><?php   
-                    // if(isset($_POST['save'])) {
+                <form method="POST" class="slider" id="slider">
+                <?php   
+                    if(isset($_POST['save'])) {
+                            
+                             $student = $mysqli->execute_query("SELECT CONCAT(users.first_name, ' ', users.last_name) AS full_name FROM users JOIN students ON users.id = students.user_id  where students.group_id=?;",[$_POST["group"]]);
 
-                    //     $group=$_POST['group'];
+                             foreach ($student as $student_r) {
+                                 echo '
+                                    <div class="abc">
+                                         <div class="student_name ">
+                                            <h3 style="width:fit-content;margin-right:10px; ">Student Name: </h3>
+                                            <div class="username">'.$student_r["full_name"].'</div>
+                                         </div>
+                                         
+                                        <div class="notes">
+                                            <div class="exam_note">
+                                                <p style="margin-right:10px">Exam Note:</p>
+                                               <div class="bcd"> <input type="text"  id="inp1" class="inp_bottom"> <button type="submit" class="btn_save">save</button> </div> 
+                                            </div>
 
-                        // echo $group;
-                    //     $search="SELECT CONCAT(users.first_name, ' ', users.last_name) AS full_name FROM users JOIN students ON users.id = students.user_id WHERE students.group_number=? ;";
-                    //             $result = $mysqli->execute_query($search,[$group]);
-                    //             $final_result = $result->fetch_array();
-                    //             if($final_result){
-                    //                 echo $final_result['full_name'];
-                    //             }
-                                
-                    // }
-                    // $_POST['group']=$_SERVER['group'];
-
-                    if(isset($_POST['go'])){
-                    $value=$_POST['value'];
+                                            <div class="control_note">
+                                                <p>Control Note:</p> 
+                                                <div class="bcd"> <input type="text" id="inp1"  class="inp_bottom" name="save_note">   </div> 
+                                            </div>
+                                        </div>
+                                    </div>
+                                  ';
+                             }
+                             
+                    }else{
+                        if(isset($_POST['go'])){
+                            $value=$_POST['value'];
                             $search="SELECT CONCAT(users.first_name, ' ', users.last_name) AS full_name FROM users JOIN students ON users.id = students.user_id WHERE CONCAT(users.first_name, ' ', users.last_name) = ? ;";
                             $result = $mysqli->execute_query($search,[$value]);
                             $final_result = $result->fetch_array();
-                            if($final_result){
-                                echo $final_result['full_name'];
-                            }       
-                    } 
+                        }    
+                            
+                                echo '
+                                     <div class="abc">
+
+                                         <div class="student_name ">
+                                         <h3 style="width:fit-content;margin-right:10px; ">Student Name: </h3>
+                                             <div class="username">';
+                                             
+                                             if($final_result)
+                                                echo $final_result['full_name'];
+                                                echo    
+                                                '
+                                             </div>
+                                         </div>
+                                         
+                                        <div class="notes">
+                                            <div class="exam_note">
+                                                <p style="margin-right:10px" >Exam Note:</p>
+                                                <div class="bcd"> <input type="text"  id="inp1" class="inp_bottom" name="exam"> <button type="submit" class="btn_save" name="save_note">save</button> </div> 
+                                            </div>
+
+                                            <div class="control_note">
+                                                <p>Control Note:</p> 
+                                                <div class="bcd"> <input type="text" id="inp1"  class="inp_bottom" name="control">   </div> 
+                                            </div>
+                                        </div>
+                                    </div>';
+                    }
                     ?>
-                    </p>
                 </form>
             </div>
 
 
             <div class="bottom_section">
-                <div class="bottom_section1">
-                     <p style="margin-right:10px">Exam Note:</p>
-                    <input type="text"  id="inp1" class="inp_bottom">
-                </div>
-                <div class="bottom_section2">
-                    <p>Control Note:</p>
-                    <input type="text" id="inp1"  class="inp_bottom">
-                </div>
+              
                 <div class="bottom_section3">
                     <button name="prev" type="submit" id="prev" class="prev">Prev</button>
                     <button name="next" type="submit" id="next" class="next">Next</button>
@@ -141,7 +161,7 @@ echo $r["full_name"];
     </main>
 </body>
 <script>
-
+    
     var edit=document.getElementById("edit")
     var editS=document.getElementById("edit_Subject")
     var editG=document.getElementById("edit_Group")
@@ -183,5 +203,26 @@ echo $r["full_name"];
             editG.value =valueGroup
         })
     })
+
+            let next = document.getElementById('next');
+            let prev = document.getElementById('prev');
+            let slider = document.getElementById('slider');
+
+            next.addEventListener('click', (event) => {
+
+                event.preventDefault();
+                if(slider.scrollLeft % slider.clientWidth <= 50){
+                    slider.scrollTo({ behavior: 'smooth', left: slider.scrollLeft + slider.clientWidth });
+                }
+
+            });
+
+            prev.addEventListener('click', (event) => {
+                event.preventDefault();
+                if(slider.scrollLeft % slider.clientWidth <= 5){
+                    slider.scrollTo({ behavior: 'smooth', left: slider.scrollLeft - slider.clientWidth });
+                }
+            });
+
 </script>
 </html>

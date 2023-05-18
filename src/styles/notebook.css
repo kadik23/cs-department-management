@@ -105,7 +105,7 @@ main{
 
     .center_section{
         width: 80%;
-        height: 30%;
+        height: 50%;
         display: flex;
         flex-direction: column;
         justify-content: start;
@@ -118,24 +118,72 @@ main{
         flex-direction: row;
         justify-content: center;
         align-items: center;
+        /* background-color: #60899f; */
+
     }
 
-    .center_section form:nth-child(2){
+ 
+    .slider{
         width: 100%;
-        height: 40%;
+        height: 60%;
         display: flex;
         flex-direction: row;
         justify-content: center;
         align-items: center;
-    }
+        /* background-color: #4596c2; */
+        /* overflow: auto; */
+        overflow: hidden;
 
+        justify-content: space-between;
+
+    }
+.abc{
+    min-width: 100%;
+    height: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.ac{
+    height: 50px;
+    /* background-color: red; */
+    margin-bottom: 20px;
+}
+.exam_note{
+
+display: flex;
+flex-direction: row;
+/* background-color: gold; */
+}
+.control_note{
+ 
+    display: flex;
+    flex-direction: row;
+    /* background-color: rgb(189, 166, 39); */
+}
+.notes{
+min-width: 100%;
+height: 100px;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: space-around;
+margin-top: 50px;
+
+}
+.student_name{
+    display: flex;
+    flex-direction: row;
+}
     .bottom_section{
         width: 100%;
-        height: 40%;
+        height: 20%;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
+        /* background-color: #164d6b; */
+
     }
 
     .top_section h2{
@@ -206,7 +254,7 @@ main{
 
     .bottom_section{
         width: 100%;
-        height: 40%;
+        height: 20%;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -224,7 +272,7 @@ main{
         margin-right: 150px;
     }
 
-    .bottom_section div:nth-child(3){
+    .bottom_section div:nth-child(1){
         width: 30%;
     }
 
@@ -258,7 +306,7 @@ main{
         margin-right: 20px;
         padding-left: 5px;
         color: gray;
-        margin-top: -5px;
+        /* margin-top: -5px; */
         outline: none;
 
     }
@@ -272,6 +320,17 @@ main{
         cursor: pointer;
         position: absolute;
         left: 40%;
+    }
+    .btn_save{
+        padding: 5px 25px;
+        height: 30px;
+        border-radius: 10px;
+        border: none;
+        background-color: #2879a6;
+        color: white;
+        cursor: pointer;
+        position: absolute;
+        left: 70%;
     }
 
 /* -------------------------------------------attendance.php----------------------------------------------------- */
