@@ -133,6 +133,22 @@
     
     <script src="/assets/js/select.js"></script>
     <script>
+        function createHiddenInput(id, name, value){
+            let hidden_input = document.createElement('input');
+            hidden_input.type = "hidden";
+            hidden_input.id = id;
+            hidden_input.name = name;
+            hidden_input.value = value;
+            return hidden_input;
+        }
+
+        function createOptionElement(value, text){
+            let option = document.createElement('option');
+            option.text = text;
+            option.value = value;
+            return option;
+        }
+
         let btns = document.getElementsByClassName("open-dialogue-btn");
         for(let i = 0; i < btns.length; i++){
             let btn = open_dialogue_btns[i];
@@ -141,18 +157,21 @@
                 let student_id = ev.target.getAttribute("student_id");
                 let assign_group_form = document.getElementById("assign-group-form");
 
-                // FIXME: Using innerHTML can lead to XSS vuln and also it may break the dom tree.
-                //        There is another method, i will use ut later, for now that's it.
-                assign_group_form.innerHTML += "<input type='hidden' id='student_id' name='student_id' value='"+student_id+"' />";
+                let hidden_input = createHiddenInput("student_id", "student_id", student_id);
+                assign_group_form.appendChild(hidden_input);
 
                 fetch("/admin/students.php?acadimic_level_id="+acadimic_level_id, {}).then(response => {
                     response.json().then(data => {
-                        for(let i = 0; i < data.length; i++){
-                            // FIXME: Using innerHTML can lead to XSS vuln and also it may break the dom tree.
-                            //        There is another method, i will use ut later, for now that's it.
-                            document.getElementById("groups-list").innerHTML += ("<option value='"+data[i]['id']+"'>L"+data[i]['level']+" "+data[i]['speciality_name']+" Group "+data[i]['group_number']+"</option>")
+                        // Clear the old items.
+                        for(let i = 0; i < document.getElementById("groups-list").children.length; i++){
+                            let child = document.getElementById("groups-list").children[i];
+                            document.getElementById("groups-list").removeChild(child);
                         }
-                        initSelectedList();
+                        // Append new items
+                        for(let i = 0; i < data.length; i++){
+                            let option = createOptionElement(data[i]['id'], "L"+data[i]['level']+" "+data[i]['speciality_name']+" Group "+data[i]['group_number']);
+                            document.getElementById("groups-list").appendChild(option);
+                        }
                     });
                 }).catch(err => console.log({ error: err }));
             });

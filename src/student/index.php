@@ -10,7 +10,7 @@
         exit();
     }   
 
-    $student_r = $mysqli->execute_query("select first_name, last_name, email, group_number, level, speciality_name from students join users on students.user_id = users.id join `groups` on students.group_id = `groups`.id join acadimic_levels on students.acadimic_level_id = acadimic_levels.id join specialities on acadimic_levels.speciality_id = specialities.id where students.user_id = ?;", [ $user_id]);
+    $student_r = $mysqli->execute_query("select first_name, last_name, email, group_number, level, speciality_name from students join users on students.user_id = users.id left join `groups` on students.group_id = `groups`.id left join acadimic_levels on students.acadimic_level_id = acadimic_levels.id join specialities on acadimic_levels.speciality_id = specialities.id where students.user_id = ?;", [ $user_id]);
     if(!$student_r){
         echo "SQL Error: ".$mysqli->error;
         exit();
@@ -18,7 +18,6 @@
 
     $student = $student_r->fetch_assoc();
     $aside_username = $student["first_name"]." ".$student["last_name"];
-
     $semestrer_r = $mysqli->query("SELECT * FROM semesters WHERE CURRENT_DATE BETWEEN start_at AND end_at;");
 ?>
 
@@ -98,12 +97,12 @@
                     </div>
                 </div>
             </div>
-            <div class="section-wrapper">
+            <div class="section-wrapper" style="overflow: auto;">
                 <div class="section-header">
                     <div class="section-title">My colleagues</div>
                 </div>
-                <div class="section-content">
-                    <div class="friends">
+                <div class="section-content" style="overflow: auto;">
+                    <div class="friends" style="overflow: auto; margin-bottom: 40px;">
                         <?php 
                             while($row = $colleagues_r->fetch_assoc()){
                                 echo '

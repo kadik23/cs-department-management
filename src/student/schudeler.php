@@ -10,7 +10,7 @@
     }
     $student = $student_r->fetch_assoc();
 
-    $scheduler_r = $mysqli->execute_query("select * from `schedules` join subjects on schedules.subject_id = subjects.id where group_id = (select group_id from students where user_id = ?) order by day_of_week, class_index asc;", [$user_id]);
+    $scheduler_r = $mysqli->execute_query("select resource_type, resource_number, subject_name, first_name, last_name, day_of_week, class_index from `schedules` join subjects on schedules.subject_id = subjects.id join resources on class_room_id = resources.id join teachers on teacher_id = teachers.id join users on teachers.user_id = users.id where group_id = (select group_id from students where user_id = ?) order by day_of_week, class_index asc;", [$user_id]);
     if(!$scheduler_r){
         echo "SQL Error: ".$mysqli->error;
         exit();
@@ -88,13 +88,37 @@
                                     echo '<div class="table-item">'.$week_days[$day].'</div>';
                                 }
                                 if($row["class_index"] == $i){
-                                    echo '<div class="table-item">'.$row["subject_name"].'</div>';
+                                    echo '<div class="table-item">
+                                            <div class="subject_name">
+                                            '.$row["subject_name"].'<br/>
+                                            </div>
+                                            <div class="class_info">
+                                                <div class="teacher_name">
+                                                '.$row["first_name"].' '.$row["last_name"].'
+                                                </div>
+                                                <div class="class_room">
+                                                '.$row["resource_type"].' '.$row["resource_number"].'
+                                                </div>
+                                            </div>    
+                                        </div>';
                                     $i += 1;
                                 }else{
                                     for($j = $i; $j < $row["class_index"]; $j++){
                                         echo '<div class="table-item">Empty</div>';
                                     }
-                                    echo '<div class="table-item">'.$row["subject_name"].'</div>';
+                                    echo '<div class="table-item">
+                                            <div class="subject_name">
+                                            '.$row["subject_name"].'<br/>
+                                            </div>
+                                            <div class="class_info">
+                                                <div class="teacher_name">
+                                                '.$row["first_name"].' '.$row["last_name"].'
+                                                </div>
+                                                <div class="class_room">
+                                                '.$row["resource_type"].' '.$row["resource_number"].'
+                                                </div>
+                                            </div>    
+                                        </div>';
                                     $i = $j + 1;
                                 }    
                                 

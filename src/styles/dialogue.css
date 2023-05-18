@@ -72,9 +72,27 @@
     color: #fff;
     font-size: 12px;
     font-weight: 600;
-    background-color: #34d399;
 }
+
 
 .alert-success {
     background-color: #16a34a;
+    animation: 1s fadeInOut ease-in-out;
+    opacity: 0;
+}
+
+.alert-error {
+    background-color: #dc2626;
+    animation: 1s fadeIn ease-in;
+}
+
+@keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; }
+    50% { opacity: 1; }
+    100% { opacity: 0; }
 }

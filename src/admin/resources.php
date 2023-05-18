@@ -6,8 +6,12 @@
     $resource_number = $_POST["resource_number"];
 
     if(isset($resource_type) && isset($resource_number)){
-        $resource_r = $mysqli->execute_query("insert into resources (resource_type, resource_number) values (?,?);", [$resource_type, $resource_number]);
-        // TODO: Handle Error/Success messages.
+        $resource_r = $mysqli->execute_query("insert into resources (resource_type, resource_number) select ?,? where not exists (select * from resources where resource_type = ? and resource_number = ?);", [$resource_type, $resource_number, $resource_type, $resource_number]);
+        if($mysqli->affected_rows < 1){
+            $error_message = "Resource Already Exist.";
+        }else{
+            $success_message = "Resource Added Successfuly.";
+        }
     }
     
     if(isset($_POST["filter_resource_type"]) && $_POST["filter_resource_type"] != 'All'){
@@ -29,6 +33,7 @@
     <link rel="stylesheet" href="/styles/search.css">
     <link rel="stylesheet" href="/styles/buttons.css">
     <link rel="stylesheet" href="/styles/forms.css">
+    <link rel="stylesheet" href="/styles/dialogue.css">
 </head>
 <body>
     <div class="container">
@@ -100,6 +105,9 @@
             </div>
         </div>
     </div>
+
+    <?php include("../../includes/admin/alert_message.php")  ?>
+
     <script src="/assets/js/forms.js"></script>
     <script src="/assets/js/select.js"></script>
 </body>

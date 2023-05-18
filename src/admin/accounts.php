@@ -30,10 +30,10 @@
         $result = $mysqli->execute_query($query, [$username]);
         if($result){
             if($result->num_rows > 0){
-                $alert_message = "User alredy exist.";
+                $error_message = "User alredy exist.";
             }else{
                 if($account_type == "student" && !isset($acadimic_level_id)){
-                    $alert_message = "Acadimic level input not set";
+                    $error_message = "Acadimic level input not set";
                 }else{
                     $hashed_password = password_hash($password, null);
                     // Create user.
@@ -46,14 +46,14 @@
                             $query = "INSERT INTO teachers (user_id) values (?);";
                             $result = $mysqli->execute_query($query,[$user_id]);
                             if($result){
-                                $alert_message = "User created successfuly.";
+                                $success_message = "User created successfuly.";
                             }
                             break;
                         case "student":
                             $query = "INSERT INTO students (user_id, acadimic_level_id) values (?,?);";
                             $result = $mysqli->execute_query($query,[$user_id, $acadimic_level_id]);
                             if($result){
-                                $alert_message = "User created successfuly.";
+                                $success_message = "User created successfuly.";
                             }
                             break;
                     }
@@ -72,7 +72,12 @@
             $result = $mysqli->query(isset($querys_map[$account_type]) ? $querys_map[$account_type] : $querys_map["accounts"]);
         }
     }else{
-        $result = $mysqli->query($querys_map["accounts"]);
+        if(isset($_POST["search"])){
+            $search = $_POST["search"];
+            $result = $mysqli->execute_query($search_querys["accounts"],[$search, $search, $search, $search]);
+        }else{
+            $result = $mysqli->query($querys_map["accounts"]);
+        }
     }
 
     $acadimic_levels_r = $mysqli->query("select acadimic_levels.id as id, specialities.speciality_name as speciality_name, acadimic_levels.level as level from acadimic_levels join specialities on acadimic_levels.speciality_id = specialities.id;");
@@ -109,12 +114,6 @@
             </div>
             <div class="section-wrapper">
                 <div class="section-content">
-
-                    <!--
-                        TODO: Show total users.
-                        <div class="total-accounts">2565 Users</div>
-                    -->
-    
                     <div class="row">
                         <button class="open-dialogue-btn btn" >Create new account</button>
                     </div>
@@ -267,11 +266,7 @@
         </div>
     </div>
     
-    <?php
-        if(isset($alert_message)){
-            echo '<div class="dialogue-alert-message">'.$alert_message.'</div>';
-        }
-    ?>
+   <?php include("../../includes/admin/alert_message.php")  ?>
 
     <script src="/assets/js/custom-select.js"></script>
     <script src="/assets/js/dialogue.js"></script>

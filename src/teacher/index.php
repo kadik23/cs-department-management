@@ -35,7 +35,7 @@
     $result2 = $mysqli->execute_query($query,[$user_id]);
     $row2 = $result2->fetch_array();
 
-   $lecture = $mysqli->execute_query("select resources.resource_type as class_room, resources.resource_number as class_room_number, subject_name, first_name, last_name, level, speciality_name, start_at, end_at ,day_of_week from lectures join resources on lectures.class_room_id = resources.id join subjects on lectures.subject_id = subjects.id join teachers on lectures.teacher_id = teachers.id join users on users.id = teachers.user_id join acadimic_levels on `lectures`.acadimic_level_id = acadimic_levels.id join specialities on acadimic_levels.speciality_id = specialities.id where users.id=?;", [$_SESSION["user_id"]]);
+   $lecture = $mysqli->execute_query("select resources.resource_type as class_room, resources.resource_number as class_room_number, subject_name, first_name, last_name, level, speciality_name, class_index ,day_of_week from lectures join resources on lectures.class_room_id = resources.id join subjects on lectures.subject_id = subjects.id join teachers on lectures.teacher_id = teachers.id join users on users.id = teachers.user_id join acadimic_levels on `lectures`.acadimic_level_id = acadimic_levels.id join specialities on acadimic_levels.speciality_id = specialities.id where users.id=?;", [$_SESSION["user_id"]]);
     
     $schudeler_settings_r = $mysqli->query("select class_duration, first_class_start_at from scheduler_settings;");
     $schudeler_settings = $schudeler_settings_r->fetch_assoc();
@@ -184,8 +184,7 @@
                                                 <div class="list-item" ">'.$row["subject_name"].'</div>
                                                 <div class="list-item">'.$row["class_room"].' '.$row["class_room_number"].'</div>
                                                 <div class="list-item" ">L'.$row["level"].' '.$row["speciality_name"].'</div>
-                                                <div class="list-item" ">'.convertedTime($row["start_at"]).'</div>
-                                                <div class="list-item" ">'.convertedTime($row["end_at"]).'</div>
+                                                <div class="list-item" ">'.convertedTime($row["class_index"]).'</div>
 
                                         </div>';
                                 }

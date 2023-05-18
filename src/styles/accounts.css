@@ -47,8 +47,6 @@
 .btn {
     border: none;
     outline: none;
-    padding-left: 20px;
-    padding-right: 20px;
     padding-top: 10px;
     padding-bottom: 10px;
     border-radius: 7px;
@@ -56,6 +54,9 @@
     color: #fff;
     font-weight: 700;
     cursor: pointer;
+    font-size: 12px;
+    padding-left: 40px;
+    padding-right: 40px;
 }
 
 .btn:hover {
@@ -68,6 +69,10 @@
     margin-left: 40px;
     margin-right: 40px;
     min-width: 1000px;
+}
+
+.create-account form button {
+    margin-top: 20px;
 }
 
 .student-account, .teacher-account {
@@ -127,11 +132,4 @@
 
 .input-group input::placeholder {
     color: #0284c7;
-}
-
-.btn {
-    margin-top: 30px;
-    font-size: 12px;
-    padding-left: 40px;
-    padding-right: 40px;
 }
