@@ -185,6 +185,7 @@ body {
 }
 
 .friend {
+    width: calc(1/4*100%);
     display: flex;
     flex-direction: row;
     align-items: center;
