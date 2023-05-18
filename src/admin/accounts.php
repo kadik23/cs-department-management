@@ -72,7 +72,12 @@
             $result = $mysqli->query(isset($querys_map[$account_type]) ? $querys_map[$account_type] : $querys_map["accounts"]);
         }
     }else{
-        $result = $mysqli->query($querys_map["accounts"]);
+        if(isset($_POST["search"])){
+            $search = $_POST["search"];
+            $result = $mysqli->execute_query($search_querys["accounts"],[$search, $search, $search, $search]);
+        }else{
+            $result = $mysqli->query($querys_map["accounts"]);
+        }
     }
 
     $acadimic_levels_r = $mysqli->query("select acadimic_levels.id as id, specialities.speciality_name as speciality_name, acadimic_levels.level as level from acadimic_levels join specialities on acadimic_levels.speciality_id = specialities.id;");
