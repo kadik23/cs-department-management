@@ -1,6 +1,6 @@
 <?php 
     include("../../database/db_connection.php");
-    // include("../../includes/admin/route_protection.php");
+    include("../../includes/admin/route_protection.php");
 
     $querys_map = [
         "exams_schedules" => "select resources.resource_type as class_room, resources.resource_number as class_room_number, subject_name, group_number, level, speciality_name, date, class_index from exams_schedules join resources on exams_schedules.class_room_id = resources.id join subjects on exams_schedules.subject_id = subjects.id join `groups` on exams_schedules.group_id = `groups`.id join acadimic_levels on `groups`.acadimic_level_id = acadimic_levels.id join specialities on acadimic_levels.speciality_id = specialities.id;"
