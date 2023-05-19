@@ -1,14 +1,3 @@
-/*
-    ! IMPORTANT ! : This is only for testing and team work, the real one will use
-                    database_creation.sql file.
-                    
-    NOTE: This is the same as database_creation.sql only change the database name
-          since we are using a free remote database, we dont have access to create
-          new database and also some wierd sql syntax issue near 'groups' word, i
-          think the syntax issue is related to an old version database that is being
-          used by the remote server.
-*/
-
 create database if not exists `cs-departement-management`;
 
 use `cs-departement-management`;
@@ -36,7 +25,7 @@ create table if not exists acadimic_levels (
     level int not null
 );
 
-create table if not exists `groups` (
+create table if not exists groups (
     id int primary key not null AUTO_INCREMENT,
     group_number int not null,
     responsible int references users(id),
@@ -47,7 +36,7 @@ create table if not exists students (
     id int primary key not null AUTO_INCREMENT,
     user_id int references users(id),
     acadimic_level_id int references acadimic_levels(id),
-    group_id int references `groups`(id)
+    group_id int references groups(id)
 );
 
 create table if not exists teachers (
@@ -73,7 +62,7 @@ create table if not exists schedules (
     class_room_id int references resources(id),
     subject_id int references subjects(id),
     teacher_id int references teachers(id),
-    group_id int references `groups`(id),
+    group_id int references groups(id),
     day_of_week TINYINT CHECK (day_of_week BETWEEN 0 AND 6), /* NOTE: mapping int to days of week. */
     class_index int
 );
@@ -86,6 +75,7 @@ create table if not exists scheduler_settings (
 );
 /* Insert default values for scheduler_settings. */
 insert into scheduler_settings (class_duration, first_class_start_at) values (60, '08:00');
+
 
 create table if not exists administraters (
     id int primary key not null AUTO_INCREMENT,
