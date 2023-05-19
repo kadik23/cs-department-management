@@ -43,10 +43,9 @@
         header('Location: ./index.php');
     }
 
-    $query = "select groups.id as id, group_number, speciality_name, level, subject_name from groups join schedules on schedules.group_id = groups.id join acadimic_levels on groups.acadimic_level_id = acadimic_levels.id join specialities on acadimic_levels.speciality_id = specialities.id join subjects on schedules.subject_id = schedules.subject_id join lectures on lectures.acadimic_level_id = acadimic_levels.id where (schedules.teacher_id = (select teachers.id as id from teachers where user_id = ?)) or (lectures.teacher_id = (select teachers.id as id from teachers where user_id = ?));";
-    $groups_r = $mysqli->execute_query($query, [$user_id, $user_id]);
+    $query = "select groups.id as id, group_number, speciality_name, level, subject_name from schedules join groups on groups.id = schedules.group_id join acadimic_levels on acadimic_levels.id = groups.acadimic_level_id join specialities on specialities.id = acadimic_levels.speciality_id join subjects on subjects.id = schedules.subject_id where schedules.teacher_id = (select teachers.id as teacher_id from teachers where user_id = ?);";
+    $groups_r = $mysqli->execute_query($query, [$user_id]);
     
-
 ?>
 
 <html lang="en">
@@ -162,7 +161,6 @@
             </div>
         </section>
     </main>
-</body>
 <script>
     
     var edit = document.getElementById("edit");
@@ -243,4 +241,5 @@
     };
 </script>
     <script src="/assets/js/select.js"></script>
+</body>
 </html>
