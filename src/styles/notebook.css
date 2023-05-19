@@ -204,7 +204,7 @@ section {
 }
 
 .bottom_section {
-    width: 100%;
+    width: 80%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -293,32 +293,6 @@ section {
     color: white;
 }
 
-.bottom_section {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.bottom_section div {
-    width: 38%;
-    height: 25%;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: start;
-    justify-content: space-around;
-    margin-right: 150px;
-}
-
-.bottom_section div:nth-child(1) {
-    width: 30%;
-}
-
-.bottom_section div:nth-child(1) {
-    height: 18%;
-}
 
 .slider_control_btns {
     width: calc(11/12*100%);
@@ -406,69 +380,40 @@ section {
     flex-direction: row;
     position: relative;
     margin-bottom: 15px;
+    width: 100%;
 }
 
 .top_section1_1 input {
-    font-weight: bold;
+    font-weight: 600;
     background-color: #e7e7e7;
-    padding: 5px 0px;
+    padding: 5px 15px;
     border: none;
-    width: 100px;
     outline: none;
-}
-
-.top_section1_1 :nth-child(1) {
-    border-radius: 5px 0px 0px 5px;
-    text-align: center;
-    width: 150px;
-}
-
-.top_section1_1 :nth-child(2) {
-    width: 50px;
-}
-
-.top_section1_1 :nth-child(3) {
-    margin-right: 30px;
-    border-radius: 0px 5px 5px 0px;
-    width: 103px;
+    border-radius: 7px;
+    width: 80%;
 }
 
 .top_section1_2 {
     display: flex;
     flex-direction: row;
-    position: relative;
+    width: 100%;
 }
 
 .top_section1_2 input {
-    font-weight: bold;
+    font-weight: 600;
     background-color: #e7e7e7;
-    padding: 5px 0px;
+    padding: 5px 15px;
     border: none;
-    width: 150px;
     outline: none;
+    border-radius: 7px;
+    width: 80%;
 }
-
-.top_section1_2 :nth-child(1) {
-    border-radius: 5px 0px 0px 5px;
-    text-align: right;
-
-}
-
-.top_section1_2 :nth-child(3) {
-    margin-right: 30px;
-    border-radius: 0px 5px 5px 0px;
-    width: 100px;
-}
-
 
 .slider2 {
     width: 80%;
-    height: 50%;
     display: flex;
     flex-direction: row;
-    justify-content: center;
     align-items: center;
-    justify-content: space-between;
     overflow: hidden;
 }
 
