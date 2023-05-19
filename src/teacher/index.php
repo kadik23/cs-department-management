@@ -3,8 +3,8 @@
     include("../../includes/teacher/route.protection.php");
     session_start();
 
-    $query= 'SELECT COUNT(id) AS number_students FROM students;';
-    $result = $mysqli->execute_query($query,[]);
+    $query= 'SELECT COUNT(students.id) AS number_students FROM students left join schedules on students.group_id = schedules.group_id where schedules.teacher_id = (select teachers.id as id from teachers where teachers.user_id = ?);';
+    $result = $mysqli->execute_query($query,[$user_id]);
     $row = $result->fetch_array();
    
     // echo var_dump($result);
