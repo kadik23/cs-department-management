@@ -1,3 +1,10 @@
+@media (max-height: 800px) {
+    body {
+        height: 900px;
+        overflow: auto;
+    }
+}
+
 .student-profile {
     width: calc(11/12*100%);
     display: flex;
