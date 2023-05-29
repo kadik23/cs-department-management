@@ -155,22 +155,19 @@
                                 $days = ["Saturday","Sunday","Monday","Tuesday","Wednesday","Thursday"];
                                 while($row = $schedule->fetch_assoc()){
                                     echo '<div class="list-row">
-                                                <div class="list-item">'.$days[$row["day_of_week"]].'</div>
-                                                <div class="list-item" ">'.$row["subject_name"].'</div>
-                                                <div class="list-item">'.$row["class_room"].' '.$row["class_room_number"].'</div>
-                                                <div class="list-item" ">L'.$row["level"].' '.$row["speciality_name"].' G'.$row["group_number"].'</div>
-                                                <div class="list-item">';
-                                                                printf('%02d',parseTime($row["class_index"] * $schudeler_settings["class_duration"])[0] + $first_class_start_at);
-                                                                echo ":";
-                                                                printf('%02d',parseTime($row["class_index"] * $schudeler_settings["class_duration"])[1]);
-                                                                echo '</div>
-                                                <div class="list-item">';
-                                                                printf('%02d',parseTime(($row["class_index"] + 1) * $schudeler_settings["class_duration"])[0] + $first_class_start_at);
-                                                                echo ":";
-                                                                printf('%02d',parseTime(($row["class_index"] + 1) * $schudeler_settings["class_duration"])[1]);
-                                                        
-                                                                echo '</div>
-                                                
+                                            <div class="list-item">'.$days[$row["day_of_week"]].'</div>
+                                            <div class="list-item" ">'.$row["subject_name"].'</div>
+                                            <div class="list-item">'.$row["class_room"].' '.$row["class_room_number"].'</div>
+                                            <div class="list-item" ">L'.$row["level"].' '.$row["speciality_name"].' G'.$row["group_number"].'</div>
+                                            <div class="list-item">';
+                                            printf('%02d',parseTime($row["class_index"] * $schudeler_settings["class_duration"])[0] + $first_class_start_at);
+                                            echo ":";
+                                            printf('%02d',parseTime($row["class_index"] * $schudeler_settings["class_duration"])[1]);
+                                            echo '</div><div class="list-item">';
+                                            printf('%02d',parseTime(($row["class_index"] + 1) * $schudeler_settings["class_duration"])[0] + $first_class_start_at);
+                                            echo ":";
+                                            printf('%02d',parseTime(($row["class_index"] + 1) * $schudeler_settings["class_duration"])[1]);
+                                            echo '</div>
                                         </div>';
                                 }
                         

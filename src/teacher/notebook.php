@@ -60,28 +60,42 @@
 <body>
     
     <main>
-        <div class="side-bar">
-            
-            <form class="container" method="post">
-                <div class="logo">
-                    <a href="./index.php"><img src="../assets/images/yahia-fares-logo.png" alt="" class="logoo"></a>
-                </div>
-                
-                <div class="home-page">
+    <div class="side-bar">      
+        <div class="container">
+            <div class="logo">
+                <a href="./index.php"><img src="../assets/images/yahia-fares-logo.png" alt="" class="logoo"></a>
+            </div>
+            <a href="/teacher" style="text-decoration: none;" class="home-page">
                 <button name="home" class="material-symbols-outlined">
                     <h2 >home</h2>
                 </button>
-                </div>
+            </a>
 
-                <div class="logout">
-                <button name="logout" class="material-symbols-outlined LO">
-                <h2 >logout</h2>
+            <a href="/teacher/profile.php" style="text-decoration: none; width: 100%; display: flex; justify-content: center;">
+                <button class="material-symbols-outlined">
+                    <h2>account_circle</h2>
                 </button>
-                </div>
-            </form>
+            </a>
+            
+            <a href="/teacher/notebook.php" style="text-decoration: none; width: 100%; display: flex; justify-content: center;">
+                <button class="material-symbols-outlined">
+                    <h2>edit_note</h2>
+                </button>
+            </a>
 
+            <a href="/teacher/attendance.php" style="text-decoration: none; width: 100%; display: flex; justify-content: center;">
+                <button class="material-symbols-outlined">
+                    <h2>co_present</h2>
+                </button>
+            </a>
+
+            <a href="/logout.php" style="text-decoration: none; margin-top: 40px;" class="logout">
+                <button name="logout" class="material-symbols-outlined LO">
+                    <h2>logout</h2>
+                </button>
+            </a>
         </div>
-
+    </div>
         <section>
 
             <div class="top_section">

@@ -105,6 +105,7 @@
                                 }else{
                                     for($j = $i; $j < $row["class_index"]; $j++){
                                         echo '<div class="table-item">Empty</div>';
+                                        $i += 1;
                                     }
                                     echo '<div class="table-item">
                                             <div class="subject_name">
@@ -119,14 +120,14 @@
                                                 </div>
                                             </div>    
                                         </div>';
-                                    $i = $j + 1;
+                                    $i += 1;
                                 }    
                                 
                                 if($i == 5){
                                     echo '</div>';
                                     $day += 1;
                                     $i = 0;
-                                }
+                                }       
                             }else{
                                 if($i != 0){
                                     for($j = $i; $j < 5; $j++){
@@ -149,6 +150,14 @@
                                     goto repeat;
                                 }
                             }
+                        }
+                        if($i != 0){
+                            for($j = $i; $j < 5; $j++){
+                                echo '<div class="table-item">Empty</div>';
+                            }
+                            echo '</div>';
+                            $day += 1;
+                            $i = 0;
                         }
                         if($day < 6){
                             for($j = $day; $j < 6; $j++){

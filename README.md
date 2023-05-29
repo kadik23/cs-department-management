@@ -8,6 +8,12 @@
 - Teachers.
 - Students.
 
+## **Requirements:**
+
+- PHP Version v8.2
+- MariaDB v15.1
+- Apache Server or Equivalente that can run PHP.
+
 
 ## **Database:**
 

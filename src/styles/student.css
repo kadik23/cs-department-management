@@ -50,6 +50,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    overflow: auto;
 }
 
 .page-header {
@@ -125,6 +126,8 @@ body {
     flex-direction: column;
     align-items: center;
     margin-top: 20px;
+    margin-bottom: 20px;
+    overflow: auto;
 }
 
 .section-header {
