@@ -6,3 +6,8 @@ use Inertia\Inertia;
 Route::get('/', function () {
     return Inertia::render('Home',['name' => 'Salah']);
 });
+
+Route::get('/about', function () {
+    return Inertia::render('About');
+});
+
