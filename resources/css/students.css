@@ -1,0 +1,78 @@
+@media (max-height: 800px) {
+    body {
+        height: 900px;
+        overflow: auto;
+    }
+}
+
+.student-profile {
+    width: calc(11/12*100%);
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.student-image {
+    flex: 1;
+    border-radius: 100%;
+}
+
+.student-image img {
+    width: 90%;
+    object-fit: cover;
+    border-radius: 100%;
+}
+
+.student-info {
+    flex: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.student-name, .student-group, .student-grade, .student-absence {
+    font-family: monospace;
+    font-weight: 500;
+    width: calc(11/12*100%);
+    padding-bottom: 5px;
+}
+
+.student-name {
+    font-size: 16px;
+    color: #f0f9ff;
+    font-weight: 700;
+}
+
+.student-group, .student-grade, .student-absence {
+    font-size: 12px;
+    font-weight: 500;
+    color: #bae6fd;
+}
+
+.student-absence {
+    color: #99f6e4;
+    font-weight: 700;
+}
+
+.dialogue-student-profile, .student-group-select {
+    width: calc(1/2*100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 40px;
+    padding-bottom: 40px;
+}
+
+.student-group-select{
+    align-items: normal;
+}
+
+.student-group-select label {
+    color: #fff;
+}
+
+.dialogue-student-profile img {
+    width: 200px;
+    border-radius: 100%;
+}

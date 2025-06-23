@@ -1,0 +1,85 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+main{
+width: 100%;
+height: max-content;
+background-color: aqua;
+display: flex;
+flex-direction: row;
+}
+
+.side-bar{
+        width: 20%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 999;
+}
+
+.container{
+width: 100px;
+height: 500px;
+background-color: rgb(54,76,198);
+border-radius: 25px;
+
+}
+section{
+width: 100%;
+height: max-content;
+background-color: beige;
+display: flex;
+justify-content: center;
+flex-direction: column;
+margin-left: 20%;
+}
+.path{
+width:90% ;
+height: 100px;
+border:solid 1px gray;
+margin-bottom: 15px;
+margin-top: 25px;
+margin-left: 10px;
+}
+.courses{
+width: 90%;
+height: max-content;
+background-color: blue;
+display: flex;
+flex-wrap: wrap;
+justify-content: center;
+align-items: center;
+border:solid 1px gray;
+
+}
+.course{
+width: 700px;   
+height: 100px;
+background-color: cadetblue;
+margin-top: 15px;
+border-radius: 15px;
+display: flex;
+flex-direction: column;
+}
+.course-name{
+width: 100%;
+height: 40%;
+}
+.course-teatcher{
+    width: 100%;
+    height: 60%;
+}
+.course-name p{
+margin-top: 20px;
+margin-left: 20px;
+}
+.course-teatcher p{
+    margin-top: 10px;
+    margin-left: 20px;
+    }
