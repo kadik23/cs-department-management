@@ -11,6 +11,11 @@ Route::get('/about', function () {
     return Inertia::render('About');
 });
 
+Route::get('/counter', function () {
+    return Inertia::render('Counter');
+});
+
+
 Route::get('/flash', function () {
     return redirect()->route('home')->with('message', 'This is a success flash message!');
 });

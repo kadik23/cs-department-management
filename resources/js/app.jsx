@@ -5,6 +5,8 @@ import TeacherLayout from "@/layout/teacher/TeacherLayout";
 import StudentLayout from "@/layout/student/StudentLayout";
 import { createInertiaApp } from "@inertiajs/react";
 import { createRoot } from "react-dom/client";
+import { Provider } from 'react-redux';
+import { store } from './state/store';
 
 createInertiaApp({
     title: (title) => (title ? `${title} - CS Department Management` : "CS Department Management"),
@@ -26,7 +28,11 @@ createInertiaApp({
         return page;
     },
     setup({ el, App, props }) {
-        createRoot(el).render(<App {...props} />);
+        createRoot(el).render(
+            <Provider store={store}>
+                <App {...props} />
+            </Provider>
+        );
     },
     progress: {
         color: "#0c4a6e",
