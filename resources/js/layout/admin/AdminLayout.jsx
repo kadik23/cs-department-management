@@ -8,7 +8,7 @@ export function AdminLayout({ children }) {
     return (
         <div className="container">
             <Aside/>
-            {children}
+                {children}
         </div>
     );
 }
