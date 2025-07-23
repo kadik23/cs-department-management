@@ -10,9 +10,9 @@ class Lecture extends Model
     use HasFactory;
 
     protected $fillable = [
-        'class_room_id',
         'subject_id',
         'teacher_id',
+        'class_room_id',
         'academic_level_id',
         'day_of_week',
         'class_index',

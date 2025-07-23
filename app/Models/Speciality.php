@@ -10,7 +10,7 @@ class Speciality extends Model
     use HasFactory;
 
     protected $fillable = [
-        'speciality_name',
+        'speciality_name','description'
     ];
 
     // Relationships

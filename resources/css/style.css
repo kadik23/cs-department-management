@@ -12,6 +12,10 @@ body {
     height: 100vh;
 }
 
+#app {
+    width: 100%
+}
+
 .left-side, .right-side {
     width: calc(1/2*100%);
     height: 100%;

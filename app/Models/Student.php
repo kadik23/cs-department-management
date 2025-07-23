@@ -13,6 +13,9 @@ class Student extends Model
         'user_id',
         'academic_level_id',
         'group_id',
+        'first_name',
+        'last_name',
+        'current_grade',
     ];
 
     // Relationships

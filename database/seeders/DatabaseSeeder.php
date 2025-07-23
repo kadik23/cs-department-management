@@ -13,7 +13,27 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
+            // 1. Least dependent
+            AcademicLevelSeeder::class,
+            SpecialitySeeder::class,
+            GroupSeeder::class,
+            ResourceSeeder::class,
+            SubjectSeeder::class,
+            SemesterSeeder::class,
+            // 2. Entities referencing above
+            TeacherSeeder::class,
+            StudentSeeder::class,
+            // 3. Entities referencing above
+            ScheduleSeeder::class,
+            LectureSeeder::class,
+            AttendanceSeeder::class,
+            GradeSeeder::class,
+            // 4. Settings and admin
             DefaultDataSeeder::class,
+            AdministratorSeeder::class,
+            SchedulerSettingSeeder::class,
+            ExamSchedulerSettingSeeder::class,
+            ExamsScheduleSeeder::class,
         ]);
     }
 }

@@ -14,17 +14,17 @@ createInertiaApp({
         const pages = import.meta.glob("./Pages/**/*.jsx", { eager: true });
         let page = pages[`./Pages/${name}.jsx`];
         
-        let layout = Layout;
+        let LayoutComponent = Layout;
         
         if (name.startsWith('Admin/') || name.startsWith('admin/')) {
-            layout = AdminLayout;
+            LayoutComponent = AdminLayout;
         } else if (name.startsWith('Teacher/') || name.startsWith('teacher/')) {
-            layout = TeacherLayout;
+            LayoutComponent = TeacherLayout;
         } else if (name.startsWith('Student/') || name.startsWith('student/')) {
-            layout = StudentLayout;
+            LayoutComponent = StudentLayout;
         }
         
-        page.default.layout = page.default.layout || ((page) => <layout children={page} />);
+        page.default.layout = page.default.layout || ((page) => <LayoutComponent>{page}</LayoutComponent>);
         return page;
     },
     setup({ el, App, props }) {

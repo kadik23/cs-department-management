@@ -1,5 +1,18 @@
 @import 'tailwindcss';
 
+/* Admin CSS Files */
+@import './admin.css';
+@import './aside.css';
+@import './dialogue.css';
+@import './forms.css';
+@import './list.css';
+@import './search.css';
+@import './buttons.css';
+@import './card-box.css';
+@import './students.css';
+@import './table.css';
+@import './accounts.css';
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
