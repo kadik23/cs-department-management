@@ -28,4 +28,16 @@ class Teacher extends Model
     {
         return $this->hasMany(Lecture::class);
     }
+
+    public function subjects()
+    {
+        return $this->hasManyThrough(
+            Subject::class,
+            Schedule::class,
+            'teacher_id',
+            'id',
+            'id',
+            'subject_id'
+        );
+    }
 }

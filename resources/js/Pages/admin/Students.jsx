@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { router } from '@inertiajs/react';
+import "@css/students.css"
 
 function Students({ students, search }) {
     const [showDialogue, setShowDialogue] = useState(false);
@@ -118,20 +119,34 @@ function Students({ students, search }) {
                                     <form id="assign-group-form" name="assign-group-form" onSubmit={assignGroup}>
                                         <div className="input-wrapper">
                                             <label htmlFor="group_id">Groups:</label>
-                                            <select 
-                                                id="group_id" 
-                                                name="group_id" 
-                                                value={selectedGroupId}
-                                                onChange={(e) => setSelectedGroupId(e.target.value)}
+                                            <input
+                                                type="text"
+                                                className="selected_input"
+                                                list="groups-list"
+                                                placeholder="group"
+                                                value={groups.find(g => g.id === selectedGroupId) ? `L${groups.find(g => g.id === selectedGroupId).level} ${groups.find(g => g.id === selectedGroupId).speciality_name} Group ${groups.find(g => g.id === selectedGroupId).group_number}` : ''}
+                                                onChange={e => {
+                                                    // Find the group by display value
+                                                    const val = e.target.value;
+                                                    const found = groups.find(g => `L${g.level} ${g.speciality_name} Group ${g.group_number}` === val);
+                                                    setSelectedGroupId(found ? found.id : '');
+                                                }}
                                                 required
-                                            >
-                                                <option value="">Select a group</option>
+                                            />
+                                            <input
+                                                type="hidden"
+                                                className="hidden_selected_input"
+                                                list="groups-list"
+                                                id="group_id"
+                                                name="group_id"
+                                                value={selectedGroupId}
+                                                readOnly
+                                            />
+                                            <datalist id="groups-list">
                                                 {groups.map((group) => (
-                                                    <option key={group.id} value={group.id}>
-                                                        L{group.level} {group.speciality_name} Group {group.group_number}
-                                                    </option>
+                                                    <option key={group.id} value={`L${group.level} ${group.speciality_name} Group ${group.group_number}`}></option>
                                                 ))}
-                                            </select>
+                                            </datalist>
                                         </div>
                                         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', width: 'calc(11/12*100%)' }}>
                                             <div className="cancel-btn dialogue-close-btn" onClick={() => setShowDialogue(false)}>Cancel</div>

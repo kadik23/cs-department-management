@@ -23,4 +23,12 @@
     <body>
         @inertia
     </body>
+    <script src="{{ asset('assets/js/dialogue.js') }}"></script>
+    <script src="{{ asset('assets/js/custom-select.js') }}"></script>
+    <script src="{{ asset('assets/js/list.js') }}"></script>
+    <script src="{{ asset('assets/js/search.js') }}"></script>
+    <script src="{{ asset('assets/js/tabs.js') }}"></script>
+    <script src="{{ asset('assets/js/forms.js') }}"></script>
+    <script src="{{ asset('assets/js/buttons.js') }}"></script>
+    <script src="{{ asset('assets/js/card-box.js') }}"></script>
 </html>

@@ -13,37 +13,25 @@ class AdminResourcesController extends Controller
     {
         $search = $request->input('search');
         
-        $query = Resource::with(['subject']);
+        $query = Resource::query();
 
         if ($search) {
             $query->where(function($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                $q->where('resource_type', 'like', "%{$search}%")
+                  ->orWhere('resource_number', 'like', "%{$search}%");
             });
         }
 
         $resources = $query->get()->map(function($resource) {
             return [
                 'id' => $resource->id,
-                'title' => $resource->title,
-                'description' => $resource->description,
-                'file_path' => $resource->file_path,
-                'subject_name' => $resource->subject ? $resource->subject->name : 'Not assigned',
-                'subject_id' => $resource->subject_id,
-                'created_at' => $resource->created_at->format('Y-m-d')
-            ];
-        });
-
-        $subjects = Subject::all()->map(function($subject) {
-            return [
-                'id' => $subject->id,
-                'name' => $subject->name
+                'resource_type' => $resource->resource_type,
+                'resource_number' => $resource->resource_number,
             ];
         });
 
         return Inertia::render('admin/Resources', [
             'resources' => $resources,
-            'subjects' => $subjects,
             'search' => $search
         ]);
     }

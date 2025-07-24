@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\StudentController;
 
 Route::get('/', function () {
     return Inertia::render('Home');
@@ -60,6 +61,13 @@ Route::prefix('admin')->group(function () {
     Route::post('/exams', [App\Http\Controllers\AdminExamsController::class, 'store'])->name('admin.exams.store');
     Route::put('/exams/{id}', [App\Http\Controllers\AdminExamsController::class, 'update'])->name('admin.exams.update');
     Route::delete('/exams/{id}', [App\Http\Controllers\AdminExamsController::class, 'destroy'])->name('admin.exams.destroy');
+});
+
+Route::middleware(['auth', 'student'])->group(function () {
+    Route::get('/student', [StudentController::class, 'dashboard'])->name('student.dashboard');
+    Route::get('/student/schedule', [StudentController::class, 'schedule'])->name('student.schedule');
+    Route::get('/student/notes', [StudentController::class, 'notes'])->name('student.notes');
+    Route::get('/student/exams', [StudentController::class, 'exams'])->name('student.exams');
 });
 
 Route::get('/flash', function () {

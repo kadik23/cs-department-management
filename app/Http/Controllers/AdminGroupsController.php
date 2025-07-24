@@ -14,7 +14,7 @@ class AdminGroupsController extends Controller
     {
         $search = $request->input('search');
         
-        $query = Group::with(['academicLevel.speciality']);
+        $query = Group::with(['academicLevel.speciality', 'responsibleUser', 'students']);
 
         if ($search) {
             $query->whereHas('academicLevel.speciality', function($q) use ($search) {
@@ -26,9 +26,9 @@ class AdminGroupsController extends Controller
             return [
                 'id' => $group->id,
                 'group_number' => $group->group_number,
-                'level' => $group->academicLevel->level,
-                'speciality_name' => $group->academicLevel->speciality->name,
-                'academic_level_id' => $group->academic_level_id
+                'speciality_name' => $group->academicLevel && $group->academicLevel->speciality ? $group->academicLevel->speciality->speciality_name : '',
+                'responsable' => $group->responsibleUser ? ($group->responsibleUser->first_name . ' ' . $group->responsibleUser->last_name) : '',
+                'total_students' => $group->students ? $group->students->count() : 0,
             ];
         });
 

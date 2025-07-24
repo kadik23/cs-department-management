@@ -38,6 +38,6 @@ class Group extends Model
 
     public function examSchedules()
     {
-        return $this->hasMany(ExamSchedule::class);
+        return $this->hasMany(ExamsSchedule::class);
     }
 }
