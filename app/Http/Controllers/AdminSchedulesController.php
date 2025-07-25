@@ -66,7 +66,7 @@ class AdminSchedulesController extends Controller
                 'last_name' => $teacher->user ? $teacher->user->last_name : '',
             ];
         });
-        $classRooms = Resource::whereIn('resource_type', ['Sale', 'Labo'])->get();
+        $classRooms = Resource::get();
         $settings = SchedulerSetting::first();
 
         return Inertia::render('admin/Schedules', [
@@ -79,7 +79,8 @@ class AdminSchedulesController extends Controller
             'search' => $search,
             'filter_group_id' => $filterGroupId,
         ]);
-    }
+    }        "classRooms": [],
+
 
     public function store(Request $request)
     {

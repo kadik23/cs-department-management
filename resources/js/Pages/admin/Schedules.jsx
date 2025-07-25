@@ -10,6 +10,7 @@ function Schedules({ schedules, subjects, groups, teachers, classRooms, settings
     const [editingSchedule, setEditingSchedule] = useState(null);
     const [formData, setFormData] = useState({
         class_room_id: '',
+        class_room_input: '', // <-- new field
         group_id: '',
         teacher_id: '',
         subject_id: '',
@@ -231,17 +232,25 @@ function Schedules({ schedules, subjects, groups, teachers, classRooms, settings
                         >
                             <div className="input-wrapper">
                                 <label>Class Room:</label>
-                                <input type="text" className="selected_input" list="class_rooms" placeholder="class room" value={classRooms.find(r => r.id === formData.class_room_id) ? `${classRooms.find(r => r.id === formData.class_room_id).resource_type} ${classRooms.find(r => r.id === formData.class_room_id).resource_number}` : ''} onChange={e => {
-                                    const val = e.target.value;
-                                    const found = classRooms.find(r => `${r.resource_type} ${r.resource_number}` === val || r.id.toString() === val);
-                                    setFormData(f => ({ ...f, class_room_id: found ? found.id : '' }));
-                                }} />
-                                <input type="hidden" className="hidden_selected_input" list="class_rooms" id="class_room_id" name="class_room_id" value={formData.class_room_id} readOnly />
-                                <datalist id="class_rooms">
+                                <select
+                                    id="class_room_id"
+                                    name="class_room_id"
+                                    value={formData.class_room_id || ''}
+                                    onChange={e => {
+                                        setFormData(f => ({
+                                            ...f,
+                                            class_room_id: e.target.value
+                                        }));
+                                    }}
+                                    required
+                                >
+                                    <option value="">Select Class Room</option>
                                     {classRooms.map(r => (
-                                        <option key={r.id} value={`${r.resource_type} ${r.resource_number}`}>{`${r.resource_type} ${r.resource_number}`}</option>
+                                        <option key={r.id} value={r.id}>
+                                            {`${r.resource_type} ${r.resource_number}`}
+                                        </option>
                                     ))}
-                                </datalist>
+                                </select>
                             </div>
                             <div className="input-wrapper">
                                 <label>Group:</label>

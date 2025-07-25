@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { router } from '@inertiajs/react';
 
-function Accounts({ users, search }) {
+function Accounts({ users, search, groups = [] }) {
     const [formData, setFormData] = useState({
         username: '',
         email: '',
@@ -9,7 +9,8 @@ function Accounts({ users, search }) {
         role: 'student',
         first_name: '',
         last_name: '',
-        academic_level_id: ''
+        academic_level_id: '',
+        group_id: '',
     });
     const formRef = useRef();
     const openBtnRef = useRef();
@@ -35,7 +36,8 @@ function Accounts({ users, search }) {
                 role: 'student',
                 first_name: '',
                 last_name: '',
-                academic_level_id: ''
+                academic_level_id: '',
+                group_id: '',
             });
             openBtn.style.opacity = '0';
             form.style.maxHeight = '1000px';
@@ -59,7 +61,8 @@ function Accounts({ users, search }) {
                     role: 'student',
                     first_name: '',
                     last_name: '',
-                    academic_level_id: ''
+                    academic_level_id: '',
+                    group_id: '',
                 });
             }, 500);
         };
@@ -91,7 +94,8 @@ function Accounts({ users, search }) {
                     role: 'student',
                     first_name: '',
                     last_name: '',
-                    academic_level_id: ''
+                    academic_level_id: '',
+                    group_id: '',
                 });
             }
         });
@@ -101,6 +105,21 @@ function Accounts({ users, search }) {
         if (confirm('Are you sure you want to delete this account?')) {
             router.delete(`/admin/accounts/${id}`);
         }
+    };
+
+    // Add handler for group input
+    const handleGroupInputChange = (e) => {
+        const val = e.target.value;
+        setFormData(f => {
+            const found = groups.find(
+                g => `L${g.level} ${g.speciality_name} Group ${g.group_number}` === val || g.id.toString() === val
+            );
+            return {
+                ...f,
+                group_name: val,
+                group_id: found ? found.id : '',
+            };
+        });
     };
 
     return (
@@ -203,7 +222,49 @@ function Accounts({ users, search }) {
                                     required
                                 />
                             </div>
-                            {/* Add academic_level_id input if needed for student role */}
+                            {/* Group for students only */}
+                            {formData.role === 'student' && (
+                                <>
+                                    <div className="input-wrapper">
+                                        <label htmlFor="group_id">Group:</label>
+                                        <select
+                                            id="group_id"
+                                            name="group_id"
+                                            value={formData.group_id}
+                                            onChange={e => {
+                                                const groupId = e.target.value;
+                                                const group = groups.find(g => String(g.id) === groupId);
+                                                setFormData(f => ({
+                                                    ...f,
+                                                    group_id: groupId,
+                                                    academic_level_id: group ? group.academic_level_id : ''
+                                                }));
+                                            }}
+                                            required
+                                        >
+                                            <option value="">Select Group</option>
+                                            {groups.length > 0 ? (
+                                                groups.map(g => (
+                                                    <option key={g.id} value={g.id}>
+                                                        {`L${g.level} ${g.speciality_name} Group ${g.group_number}`}
+                                                    </option>
+                                                ))
+                                            ) : (
+                                                <option value="" disabled>No groups available</option>
+                                            )}
+                                        </select>
+                                    </div>
+                                    {/* Hidden academic_level_id input */}
+                                    <input
+                                        type="hidden"
+                                        id="academic_level_id"
+                                        name="academic_level_id"
+                                        value={formData.academic_level_id}
+                                        readOnly
+                                        required
+                                    />
+                                </>
+                            )}
                             <div className='flex item-center gap-4 '>
                                 <button
                                     id="close_create_spec"

@@ -1,12 +1,13 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { router } from '@inertiajs/react';
 
-function Exams({ exams, subjects, groups, settings, search }) {
+function Exams({ exams, subjects, groups, settings, search, classRooms = [] }) {
     const [editingExam, setEditingExam] = useState(null);
     const [formData, setFormData] = useState({
         date: '',
         subject_id: '',
         group_id: '',
+        class_room_id: '', // <-- add this
     });
     const formRef = useRef();
     const openBtnRef = useRef();
@@ -26,7 +27,7 @@ function Exams({ exams, subjects, groups, settings, search }) {
         const openHandler = (ev) => {
             ev.preventDefault();
             setEditingExam(null);
-            setFormData({ date: '', subject_id: '', group_id: '' });
+            setFormData({ date: '', subject_id: '', group_id: '', class_room_id: '' });
             openBtn.style.opacity = '0';
             form.style.maxHeight = '1000px';
             form.style.width = 'calc(100%*1/2)';
@@ -43,7 +44,7 @@ function Exams({ exams, subjects, groups, settings, search }) {
                 form.style.width = '0';
                 openBtn.style.opacity = '1';
                 setEditingExam(null);
-                setFormData({ date: '', subject_id: '', group_id: '' });
+                setFormData({ date: '', subject_id: '', group_id: '', class_room_id: '' });
             }, 500);
         };
         if (openBtn) openBtn.addEventListener('click', openHandler);
@@ -69,13 +70,13 @@ function Exams({ exams, subjects, groups, settings, search }) {
             router.put(`/admin/exams/${editingExam.id}`, formData, {
                 onSuccess: () => {
                     setEditingExam(null);
-                    setFormData({ date: '', subject_id: '', group_id: '' });
+                    setFormData({ date: '', subject_id: '', group_id: '', class_room_id: '' });
                 }
             });
         } else {
             router.post('/admin/exams', formData, {
                 onSuccess: () => {
-                    setFormData({ date: '', subject_id: '', group_id: '' });
+                    setFormData({ date: '', subject_id: '', group_id: '', class_room_id: '' });
                 }
             });
         }
@@ -86,7 +87,8 @@ function Exams({ exams, subjects, groups, settings, search }) {
         setFormData({
             date: exam.date,
             subject_id: exam.subject_id,
-            group_id: exam.group_id
+            group_id: exam.group_id,
+            class_room_id: exam.class_room_id || '',
         });
         // Open the form
         const form = formRef.current;
@@ -177,6 +179,23 @@ function Exams({ exams, subjects, groups, settings, search }) {
                                     {groups.map((group) => (
                                         <option key={group.id} value={group.id}>
                                             Group {group.group_number}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="input-wrapper">
+                                <label htmlFor="class_room_id">Class Room:</label>
+                                <select
+                                    id="class_room_id"
+                                    name="class_room_id"
+                                    value={formData.class_room_id || ''}
+                                    onChange={e => setFormData({ ...formData, class_room_id: e.target.value })}
+                                    required
+                                >
+                                    <option value="">Select Class Room</option>
+                                    {classRooms && classRooms.map(r => (
+                                        <option key={r.id} value={r.id}>
+                                            {`${r.resource_type} ${r.resource_number}`}
                                         </option>
                                     ))}
                                 </select>

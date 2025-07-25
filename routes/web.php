@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\AuthController;
 
 Route::get('/', function () {
     return Inertia::render('Home');
@@ -17,7 +18,7 @@ Route::get('/counter', function () {
 });
 
 
-Route::prefix('admin')->group(function () { 
+Route::prefix('admin')->middleware(['auth'])->group(function () { 
     Route::get('/', [App\Http\Controllers\AdminController::class, 'index'])->name('admin.dashboard');
     Route::get('/accounts', [App\Http\Controllers\AdminAccountsController::class, 'index'])->name('admin.accounts');
     Route::post('/accounts', [App\Http\Controllers\AdminAccountsController::class, 'store'])->name('admin.accounts.store');
@@ -69,6 +70,11 @@ Route::middleware(['auth', 'student'])->group(function () {
     Route::get('/student/notes', [StudentController::class, 'notes'])->name('student.notes');
     Route::get('/student/exams', [StudentController::class, 'exams'])->name('student.exams');
 });
+
+// Auth routes
+Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
+Route::get('/me', [AuthController::class, 'me'])->middleware('auth')->name('me');
 
 Route::get('/flash', function () {
     return redirect()->route('home')->with('message', 'This is a success flash message!');

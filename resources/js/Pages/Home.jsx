@@ -1,24 +1,66 @@
-import { Link, Head } from "@inertiajs/react";
+import { Link, Head, usePage } from "@inertiajs/react";
 import "../../css/style.css";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { login, logout } from "../state/auth/authSlice";
+import { login as loginAction, logout as logoutAction } from "../state/auth/authSlice";
 
-export default function Home({ flash }) {
+function getCsrfToken() {
+    const meta = document.querySelector('meta[name="csrf-token"]');
+    return meta ? meta.getAttribute('content') : '';
+}
+
+export default function Home({ flash, auth }) {
     const dispatch = useDispatch();
     const { user, isAuthenticated } = useSelector(state => state.auth);
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+    const inertiaAuth = auth && auth.user;
 
-    const handleLogin = (e) => {
+    // Hydrate Redux from Inertia shared props
+    useEffect(() => {
+        if (inertiaAuth) {
+            dispatch(loginAction(inertiaAuth));
+        }
+    }, [inertiaAuth, dispatch]);
+
+    const handleLogin = async (e) => {
         e.preventDefault();
-        dispatch(login({ name: username }));
-        setUsername("");
-        setPassword("");
+        setError("");
+        try {
+            const response = await fetch("/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-Requested-With": "XMLHttpRequest",
+                    "X-CSRF-TOKEN": getCsrfToken(),
+                },
+                body: JSON.stringify({ username, password }),
+            });
+            if (!response.ok) {
+                setError("Invalid credentials");
+                return;
+            }
+            const data = await response.json();
+            dispatch(loginAction(data.user));
+            setUsername("");
+            setPassword("");
+            window.location.href = "/admin";
+        } catch (err) {
+            setError("Login failed");
+        }
     };
 
-    const handleLogout = () => {
-        dispatch(logout());
+    const handleLogout = async () => {
+        await fetch("/logout", {
+            method: "POST",
+            headers: {
+                "X-Requested-With": "XMLHttpRequest",
+                "X-CSRF-TOKEN": getCsrfToken(),
+            },
+        });
+        dispatch(logoutAction());
+        window.location.href = "/";
     };
 
     return (
@@ -55,7 +97,7 @@ export default function Home({ flash }) {
                 <div className="wrapper">
                     {isAuthenticated ? (
                         <div>
-                            <p>Welcome, {user.name}!</p>
+                            <p>Welcome, {user.first_name} {user.last_name}!</p>
                             <button className="btn" onClick={handleLogout}>
                                 Logout
                             </button>
@@ -83,6 +125,7 @@ export default function Home({ flash }) {
                             <button className="btn" type="submit">
                                 Login
                             </button>
+                            {error && <div style={{ color: 'red', marginTop: 8 }}>{error}</div>}
                         </form>
                     )}
                 </div>
