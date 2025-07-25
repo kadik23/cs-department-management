@@ -1,15 +1,53 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { router } from '@inertiajs/react';
 
-function Subjects({ subjects, teachers, search }) {
-    const [showDialogue, setShowDialogue] = useState(false);
-    const [editingSubject, setEditingSubject] = useState(null);
+function Subjects({ subjects, search }) {
     const [formData, setFormData] = useState({
-        name: '',
-        code: '',
-        credits: '',
-        teacher_id: ''
+        subject_name: '',
+        coefficient: '',
+        credit: ''
     });
+    const formRef = useRef();
+    const openBtnRef = useRef();
+    const closeBtnRef = useRef();
+
+    useEffect(() => {
+        // Set initial collapsed styles
+        const form = formRef.current;
+        const openBtn = openBtnRef.current;
+        if (form && openBtn) {
+            form.style.maxHeight = '0';
+            form.style.width = '0';
+            form.style.opacity = '0';
+            openBtn.style.opacity = '1';
+        }
+        // Open form logic
+        const openHandler = (ev) => {
+            ev.preventDefault();
+            openBtn.style.opacity = '0';
+            form.style.maxHeight = '1000px';
+            form.style.width = 'calc(100%*1/2)';
+            setTimeout(() => {
+                form.style.opacity = '1';
+            }, 500);
+        };
+        // Close form logic
+        const closeHandler = (ev) => {
+            ev.preventDefault();
+            form.style.opacity = '0';
+            setTimeout(() => {
+                form.style.maxHeight = '0';
+                form.style.width = '0';
+                openBtn.style.opacity = '1';
+            }, 500);
+        };
+        if (openBtn) openBtn.addEventListener('click', openHandler);
+        if (closeBtnRef.current) closeBtnRef.current.addEventListener('click', closeHandler);
+        return () => {
+            if (openBtn) openBtn.removeEventListener('click', openHandler);
+            if (closeBtnRef.current) closeBtnRef.current.removeEventListener('click', closeHandler);
+        };
+    }, []);
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -22,45 +60,11 @@ function Subjects({ subjects, teachers, search }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (editingSubject) {
-            router.put(`/admin/subjects/${editingSubject.id}`, formData, {
-                onSuccess: () => {
-                    setShowDialogue(false);
-                    setEditingSubject(null);
-                    setFormData({ name: '', code: '', credits: '', teacher_id: '' });
-                }
-            });
-        } else {
-            router.post('/admin/subjects', formData, {
-                onSuccess: () => {
-                    setShowDialogue(false);
-                    setFormData({ name: '', code: '', credits: '', teacher_id: '' });
-                }
-            });
-        }
-    };
-
-    const handleEdit = (subject) => {
-        setEditingSubject(subject);
-        setFormData({
-            name: subject.name,
-            code: subject.code,
-            credits: subject.credits,
-            teacher_id: subject.teacher_id || ''
+        router.post('/admin/subjects', formData, {
+            onSuccess: () => {
+                setFormData({ subject_name: '', coefficient: '', credit: '' });
+            }
         });
-        setShowDialogue(true);
-    };
-
-    const handleDelete = (id) => {
-        if (confirm('Are you sure you want to delete this subject?')) {
-            router.delete(`/admin/subjects/${id}`);
-        }
-    };
-
-    const openAddDialogue = () => {
-        setEditingSubject(null);
-        setFormData({ name: '', code: '', credits: '', teacher_id: '' });
-        setShowDialogue(true);
     };
 
     return (
@@ -68,139 +72,104 @@ function Subjects({ subjects, teachers, search }) {
             <div className="page-content">
                 <div className="page-header">
                     <div className="page-title">Subjects</div>
-                    <div className="page-actions">
-                        <button className="btn" onClick={openAddDialogue}>Add Subject</button>
-                    </div>
                 </div>
                 <div className="section-wrapper">
                     <div className="section-content">
+                        <div className="row">
+                            <form
+                                method="POST"
+                                id="target_form"
+                                className="form-wrapper"
+                                ref={formRef}
+                                onSubmit={handleSubmit}
+                                style={{
+                                    maxHeight: 0,
+                                    width: 0,
+                                    opacity: 0,
+                                    overflow: 'hidden',
+                                    transition: 'all 0.5s',
+                                    position: 'relative',
+                                }}
+                            >
+                                <div className="input-wrapper">
+                                    <label>Subject Name:</label>
+                                    <input
+                                        type="text"
+                                        name="subject_name"
+                                        id="subject_name"
+                                        placeholder="Subject name"
+                                        value={formData.subject_name}
+                                        onChange={e => setFormData({ ...formData, subject_name: e.target.value })}
+                                    />
+                                </div>
+                                <div className="input-wrapper">
+                                    <label>Coefficient:</label>
+                                    <input
+                                        type="number"
+                                        name="coefficient"
+                                        id="coefficient"
+                                        placeholder="coefficient"
+                                        value={formData.coefficient}
+                                        onChange={e => setFormData({ ...formData, coefficient: e.target.value })}
+                                    />
+                                </div>
+                                <div className="input-wrapper">
+                                    <label>Credit:</label>
+                                    <input
+                                        type="number"
+                                        name="credit"
+                                        id="credit"
+                                        placeholder="credit"
+                                        value={formData.credit}
+                                        onChange={e => setFormData({ ...formData, credit: e.target.value })}
+                                    />
+                                </div>
+                                <div className='flex item-center gap-4 '>
+                                    <button
+                                        id="close_create_spec"
+                                        className="cancel-btn btn"
+                                        type="button"
+                                        ref={closeBtnRef}
+                                    >Cancel</button>
+                                    <button type="submit" className="btn">Create</button>
+                                </div>
+                            </form>
+                            <button
+                                id="open_create_spec"
+                                className="btn"
+                                ref={openBtnRef}
+                                style={{ opacity: 1, transition: 'opacity 0.5s' }}
+                            >Create Subject</button>
+                        </div>
                         <div className="list-control">
                             <form method="POST" className="search" onSubmit={handleSearch}>
-                                <input 
-                                    type="text" 
-                                    name="search" 
-                                    placeholder="search..." 
-                                    defaultValue={search}
-                                />
+                                <input type="text" name="search" placeholder="search..." defaultValue={search} />
                                 <div className="search-icon">
                                     <img src="/assets/icons/search.svg" alt="search-icon" />
                                 </div>
                             </form>
                         </div>
-                        
-                        <div className="table-wrapper">
-                            <table className="table">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Code</th>
-                                        <th>Credits</th>
-                                        <th>Teacher</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {subjects.map((subject) => (
-                                        <tr key={subject.id}>
-                                            <td>{subject.name}</td>
-                                            <td>{subject.code}</td>
-                                            <td>{subject.credits}</td>
-                                            <td>{subject.teacher_name}</td>
-                                            <td>
-                                                <button 
-                                                    className="btn btn-secondary" 
-                                                    onClick={() => handleEdit(subject)}
-                                                    style={{ marginRight: '10px' }}
-                                                >
-                                                    Edit
-                                                </button>
-                                                <button 
-                                                    className="btn btn-danger" 
-                                                    onClick={() => handleDelete(subject.id)}
-                                                >
-                                                    Delete
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                        <div className="list">
+                            <div className="list-header">
+                                <div className="list-header-item">Id</div>
+                                <div className="list-header-item" style={{ flex: 3 }}>Subject Name</div>
+                                <div className="list-header-item">Coefficient</div>
+                                <div className="list-header-item">Credit</div>
+                            </div>
+                            <div className="list-body">
+                                {subjects.map(row => (
+                                    <div className="list-row" key={row.id}>
+                                        <div className="list-item">{row.id}</div>
+                                        <div className="list-item" style={{ flex: 3 }}>{row.subject_name}</div>
+                                        <div className="list-item">{row.coefficient}</div>
+                                        <div className="list-item">{row.credit}</div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            {showDialogue && (
-                <div id="dialogue" className="dialogue">
-                    <div className="dialogue-inner">
-                        <div className="dialogue-header">
-                            <div className="dialogue-title">{editingSubject ? 'Edit Subject' : 'Add Subject'}</div>
-                            <div className="dialogue-close-btn" onClick={() => setShowDialogue(false)}>Close</div>
-                        </div>
-                        <div className="dialogue-body">
-                            <form onSubmit={handleSubmit}>
-                                <div className="form-row">
-                                    <div className="input-wrapper">
-                                        <label htmlFor="name">Name:</label>
-                                        <input 
-                                            type="text" 
-                                            id="name" 
-                                            name="name" 
-                                            value={formData.name}
-                                            onChange={(e) => setFormData({...formData, name: e.target.value})}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="input-wrapper">
-                                        <label htmlFor="code">Code:</label>
-                                        <input 
-                                            type="text" 
-                                            id="code" 
-                                            name="code" 
-                                            value={formData.code}
-                                            onChange={(e) => setFormData({...formData, code: e.target.value})}
-                                            required
-                                        />
-                                    </div>
-                                </div>
-                                <div className="form-row">
-                                    <div className="input-wrapper">
-                                        <label htmlFor="credits">Credits:</label>
-                                        <input 
-                                            type="number" 
-                                            id="credits" 
-                                            name="credits" 
-                                            value={formData.credits}
-                                            onChange={(e) => setFormData({...formData, credits: e.target.value})}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="input-wrapper">
-                                        <label htmlFor="teacher_id">Teacher:</label>
-                                        <select 
-                                            id="teacher_id" 
-                                            name="teacher_id" 
-                                            value={formData.teacher_id}
-                                            onChange={(e) => setFormData({...formData, teacher_id: e.target.value})}
-                                        >
-                                            <option value="">Select Teacher</option>
-                                            {teachers.map((teacher) => (
-                                                <option key={teacher.id} value={teacher.id}>
-                                                    {teacher.name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                </div>
-                                <div className="form-actions">
-                                    <div className="cancel-btn dialogue-close-btn" onClick={() => setShowDialogue(false)}>Cancel</div>
-                                    <button type="submit" className="btn">Save</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }

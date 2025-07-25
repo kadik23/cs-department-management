@@ -27,6 +27,7 @@
     background: none;
     padding-left: 20px;
     padding-right: 20px;
+    height: fit-content;
 }
 
 .btn:hover {

@@ -7,6 +7,19 @@ import { createInertiaApp } from "@inertiajs/react";
 import { createRoot } from "react-dom/client";
 import { Provider } from 'react-redux';
 import { store } from './state/store';
+import "@css/aside.css";
+import "@css/style.css";
+import "@css/accounts.css";
+import "@css/admin.css";
+import "@css/aside.css";
+import "@css/custom-select.css";
+import "@css/dialogue.css";
+import "@css/list.css";
+import "@css/search.css";
+import "@css/tabs.css";
+import "@css/forms.css";
+import "@css/buttons.css";
+import "@css/card-box.css";
 
 createInertiaApp({
     title: (title) => (title ? `${title} - CS Department Management` : "CS Department Management"),

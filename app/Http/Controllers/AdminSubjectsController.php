@@ -13,36 +13,23 @@ class AdminSubjectsController extends Controller
     {
         $search = $request->input('search');
         
-        $query = Subject::with(['teacher']);
+        $query = Subject::query();
 
         if ($search) {
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('code', 'like', "%{$search}%");
-            });
+            $query->where('subject_name', 'like', "%{$search}%");
         }
 
         $subjects = $query->get()->map(function($subject) {
             return [
                 'id' => $subject->id,
-                'name' => $subject->name,
-                'code' => $subject->code,
-                'credits' => $subject->credits,
-                'teacher_name' => $subject->teacher ? $subject->teacher->first_name . ' ' . $subject->teacher->last_name : 'Not assigned',
-                'teacher_id' => $subject->teacher_id
-            ];
-        });
-
-        $teachers = Teacher::all()->map(function($teacher) {
-            return [
-                'id' => $teacher->id,
-                'name' => $teacher->first_name . ' ' . $teacher->last_name
+                'subject_name' => $subject->subject_name,
+                'coefficient' => $subject->coefficient,
+                'credit' => $subject->credit,
             ];
         });
 
         return Inertia::render('admin/Subjects', [
             'subjects' => $subjects,
-            'teachers' => $teachers,
             'search' => $search
         ]);
     }

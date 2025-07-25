@@ -28,7 +28,7 @@ class Subject extends Model
 
     public function examSchedules()
     {
-        return $this->hasMany(ExamSchedule::class);
+        return $this->hasMany(ExamsSchedule::class);
     }
 
     public function grades()
@@ -39,5 +39,23 @@ class Subject extends Model
     public function attendance()
     {
         return $this->hasMany(Attendance::class);
+    }
+
+    public function teachers()
+    {
+        return $this->hasManyThrough(
+            Teacher::class,
+            Schedule::class,
+            'subject_id', // Foreign key on schedules table...
+            'id',         // Foreign key on teachers table...
+            'id',         // Local key on subjects table...
+            'teacher_id'  // Local key on schedules table...
+        );
+    }
+
+    // Add this only if subjects table has a teacher_id column
+    public function teacher()
+    {
+        return $this->belongsTo(Teacher::class);
     }
 }

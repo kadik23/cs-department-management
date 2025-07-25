@@ -1,7 +1,26 @@
 import { Link, Head } from "@inertiajs/react";
 import "../../css/style.css";
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { login, logout } from "../state/auth/authSlice";
 
 export default function Home({ flash }) {
+    const dispatch = useDispatch();
+    const { user, isAuthenticated } = useSelector(state => state.auth);
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+
+    const handleLogin = (e) => {
+        e.preventDefault();
+        dispatch(login({ name: username }));
+        setUsername("");
+        setPassword("");
+    };
+
+    const handleLogout = () => {
+        dispatch(logout());
+    };
+
     return (
         <div className="flex h-screen">
             <Head title="Home" />
@@ -34,25 +53,38 @@ export default function Home({ flash }) {
                     />
                 </div>
                 <div className="wrapper">
-                    <form method="POST">
-                        <label htmlFor="username">Username:</label>
-                        <input
-                            type="text"
-                            name="username"
-                            id="username"
-                            placeholder="Username"
-                        />
-                        <label htmlFor="password">Password:</label>
-                        <input
-                            type="password"
-                            name="password"
-                            id="password"
-                            placeholder="Password"
-                        />
-                        <button className="btn" type="submit">
-                            Login
-                        </button>
-                    </form>
+                    {isAuthenticated ? (
+                        <div>
+                            <p>Welcome, {user.name}!</p>
+                            <button className="btn" onClick={handleLogout}>
+                                Logout
+                            </button>
+                        </div>
+                    ) : (
+                        <form onSubmit={handleLogin}>
+                            <label htmlFor="username">Username:</label>
+                            <input
+                                type="text"
+                                name="username"
+                                id="username"
+                                placeholder="Username"
+                                value={username}
+                                onChange={e => setUsername(e.target.value)}
+                            />
+                            <label htmlFor="password">Password:</label>
+                            <input
+                                type="password"
+                                name="password"
+                                id="password"
+                                placeholder="Password"
+                                value={password}
+                                onChange={e => setPassword(e.target.value)}
+                            />
+                            <button className="btn" type="submit">
+                                Login
+                            </button>
+                        </form>
+                    )}
                 </div>
             </div>
         </div>

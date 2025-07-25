@@ -9,6 +9,7 @@ use App\Models\Attendance;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
+use App\Models\Grade;
 
 class AdminStudentsController extends Controller
 {
@@ -20,9 +21,9 @@ class AdminStudentsController extends Controller
             ->select('students.*')
             ->join('users', 'users.id', '=', 'students.user_id')
             ->leftJoin('groups', 'group_id', '=', 'groups.id')
-            ->leftJoin('attendance', function($join) {
-                $join->on('students.id', '=', 'attendance.student_id')
-                     ->where('attendance.student_state', '=', 'absence');
+            ->leftJoin('attendances', function($join) {
+                $join->on('students.id', '=', 'attendances.student_id')
+                     ->where('attendances.student_state', '=', 'absence');
             })
             ->groupBy('students.id');
 
@@ -38,7 +39,11 @@ class AdminStudentsController extends Controller
             $absenceCount = Attendance::where('student_id', $student->id)
                                     ->where('student_state', 'absence')
                                     ->count();
-            
+            // Fetch the latest grade for the student
+            $grade = Grade::where('student_id', $student->id)
+                ->orderByDesc('id')
+                ->first();
+            $gradeValue = $grade ? ($grade->control_note . ' / ' . $grade->exam_note) : 'Grade not yet';
             return [
                 'id' => $student->id,
                 'academic_level_id' => $student->academic_level_id,
@@ -46,7 +51,7 @@ class AdminStudentsController extends Controller
                 'last_name' => $student->last_name,
                 'group_number' => $student->group ? $student->group->group_number : null,
                 'absence' => $absenceCount,
-                'current_grade' => $student->current_grade ?? 'Grade not yet'
+                'current_grade' => $gradeValue
             ];
         });
 

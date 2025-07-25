@@ -27,7 +27,12 @@ class Resource extends Model
 
     public function examSchedules()
     {
-        return $this->hasMany(ExamSchedule::class, 'class_room_id');
+        return $this->hasMany(ExamSschedule::class, 'class_room_id');
+    }
+
+    public function subject()
+    {
+        return $this->belongsTo(Subject::class);
     }
 
     // Resource type constants
