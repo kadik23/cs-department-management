@@ -204,10 +204,10 @@ function Accounts({ users, search }) {
                                 />
                             </div>
                             {/* Add academic_level_id input if needed for student role */}
-                            <div>
+                            <div className='flex item-center gap-4 '>
                                 <button
                                     id="close_create_spec"
-                                    className="cancel-btn"
+                                    className="cancel-btn btn"
                                     type="button"
                                     ref={closeBtnRef}
                                 >Cancel</button>

@@ -162,10 +162,10 @@ function Groups({ groups, academicLevels, search }) {
                                     ))}
                                 </select>
                             </div>
-                            <div>
+                            <div className='flex item-center gap-4 '>
                                 <button
                                     id="close_create_spec"
-                                    className="cancel-btn"
+                                    className="cancel-btn btn"
                                     type="button"
                                     ref={closeBtnRef}
                                 >Cancel</button>
