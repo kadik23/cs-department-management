@@ -70,7 +70,8 @@ class AdminExamsController extends Controller
         $classRooms = Resource::all()->map(function($room) {
             return [
                 'id' => $room->id,
-                'name' => $room->resource_type . ' ' . $room->resource_number
+                'resource_type' => $room->resource_type,
+                'resource_number' => $room->resource_number,
             ];
         });
 
@@ -88,18 +89,18 @@ class AdminExamsController extends Controller
     {
         $request->validate([
             'class_room_id' => 'required|exists:resources,id',
-            'subject_id' => 'required|exists:subjects,id',
             'group_id' => 'required|exists:groups,id',
+            'subject_id' => 'required|exists:subjects,id',
             'date' => 'required|date',
-            'class_index' => 'required|integer|min:0'
+            'class_index' => 'required|integer|min:0',
         ]);
 
-        ExamsSchedule::create([
+        $exam = ExamsSchedule::create([
             'class_room_id' => $request->class_room_id,
-            'subject_id' => $request->subject_id,
             'group_id' => $request->group_id,
+            'subject_id' => $request->subject_id,
             'date' => $request->date,
-            'class_index' => $request->class_index
+            'class_index' => $request->class_index,
         ]);
 
         return redirect()->back()->with('success', 'Exam schedule created successfully');

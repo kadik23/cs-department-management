@@ -36,13 +36,11 @@ class AdminSpecialitiesController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|unique:specialities,name',
-            'description' => 'nullable|string'
+            'speciality_name' => 'required|string|unique:specialities,speciality_name',
         ]);
 
         Speciality::create([
-            'speciality_name' => $request->name,
-            'description' => $request->description
+            'speciality_name' => $request->speciality_name,
         ]);
 
         return redirect()->back()->with('success', 'Speciality created successfully');
@@ -51,14 +49,12 @@ class AdminSpecialitiesController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'name' => 'required|string|unique:specialities,name,' . $id,
-            'description' => 'nullable|string'
+            'speciality_name' => 'required|string|unique:specialities,speciality_name,' . $id,
         ]);
 
         $speciality = Speciality::findOrFail($id);
         $speciality->update([
-            'speciality_name' => $request->name,
-            'description' => $request->description
+            'speciality_name' => $request->speciality_name,
         ]);
 
         return redirect()->back()->with('success', 'Speciality updated successfully');

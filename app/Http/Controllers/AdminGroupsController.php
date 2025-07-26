@@ -34,9 +34,18 @@ class AdminGroupsController extends Controller
 
         $academicLevels = AcademicLevel::with('speciality')->get();
 
+        // Fetch users with the student role
+        $responsibles = \App\Models\User::whereHas('student')->get()->map(function($user) {
+            return [
+                'id' => $user->id,
+                'name' => $user->first_name . ' ' . $user->last_name . ' (' . $user->username . ')',
+            ];
+        });
+
         return Inertia::render('admin/Groups', [
             'groups' => $groups,
             'academicLevels' => $academicLevels,
+            'responsibles' => $responsibles,
             'search' => $search
         ]);
     }
@@ -45,12 +54,14 @@ class AdminGroupsController extends Controller
     {
         $request->validate([
             'group_number' => 'required|integer',
-            'academic_level_id' => 'required|exists:academic_levels,id'
+            'academic_level_id' => 'required|exists:academic_levels,id',
+            'responsible' => 'required|exists:users,id',
         ]);
 
         Group::create([
             'group_number' => $request->group_number,
-            'academic_level_id' => $request->academic_level_id
+            'academic_level_id' => $request->academic_level_id,
+            'responsible' => $request->responsible,
         ]);
 
         return redirect()->back()->with('success', 'Group created successfully');

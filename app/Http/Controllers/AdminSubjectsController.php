@@ -37,17 +37,15 @@ class AdminSubjectsController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string',
-            'code' => 'required|string|unique:subjects,code',
-            'credits' => 'required|integer',
-            'teacher_id' => 'nullable|exists:teachers,id'
+            'subject_name' => 'required|string',
+            'coefficient' => 'required|integer',
+            'credit' => 'required|integer',
         ]);
 
         Subject::create([
-            'name' => $request->name,
-            'code' => $request->code,
-            'credits' => $request->credits,
-            'teacher_id' => $request->teacher_id
+            'subject_name' => $request->subject_name,
+            'coefficient' => $request->coefficient,
+            'credit' => $request->credit,
         ]);
 
         return redirect()->back()->with('success', 'Subject created successfully');
@@ -56,18 +54,16 @@ class AdminSubjectsController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'name' => 'required|string',
-            'code' => 'required|string|unique:subjects,code,' . $id,
-            'credits' => 'required|integer',
-            'teacher_id' => 'nullable|exists:teachers,id'
+            'subject_name' => 'required|string',
+            'coefficient' => 'required|integer',
+            'credit' => 'required|integer',
         ]);
 
         $subject = Subject::findOrFail($id);
         $subject->update([
-            'name' => $request->name,
-            'code' => $request->code,
-            'credits' => $request->credits,
-            'teacher_id' => $request->teacher_id
+            'subject_name' => $request->subject_name,
+            'coefficient' => $request->coefficient,
+            'credit' => $request->credit,
         ]);
 
         return redirect()->back()->with('success', 'Subject updated successfully');

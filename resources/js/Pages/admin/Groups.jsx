@@ -1,11 +1,12 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { router } from '@inertiajs/react';
 
-function Groups({ groups, academicLevels, search }) {
+function Groups({ groups, academicLevels, search, responsibles = [] }) {
     const [editingGroup, setEditingGroup] = useState(null);
     const [formData, setFormData] = useState({
         group_number: '',
-        academic_level_id: ''
+        academic_level_id: '',
+        responsible: '',
     });
     const formRef = useRef();
     const openBtnRef = useRef();
@@ -25,7 +26,7 @@ function Groups({ groups, academicLevels, search }) {
         const openHandler = (ev) => {
             ev.preventDefault();
             setEditingGroup(null);
-            setFormData({ group_number: '', academic_level_id: '' });
+            setFormData({ group_number: '', academic_level_id: '', responsible: '' });
             openBtn.style.opacity = '0';
             form.style.maxHeight = '1000px';
             form.style.width = 'calc(100%*1/2)';
@@ -42,7 +43,7 @@ function Groups({ groups, academicLevels, search }) {
                 form.style.width = '0';
                 openBtn.style.opacity = '1';
                 setEditingGroup(null);
-                setFormData({ group_number: '', academic_level_id: '' });
+                setFormData({ group_number: '', academic_level_id: '', responsible: '' });
             }, 500);
         };
         if (openBtn) openBtn.addEventListener('click', openHandler);
@@ -68,13 +69,13 @@ function Groups({ groups, academicLevels, search }) {
             router.put(`/admin/groups/${editingGroup.id}`, formData, {
                 onSuccess: () => {
                     setEditingGroup(null);
-                    setFormData({ group_number: '', academic_level_id: '' });
+                    setFormData({ group_number: '', academic_level_id: '', responsible: '' });
                 }
             });
         } else {
             router.post('/admin/groups', formData, {
                 onSuccess: () => {
-                    setFormData({ group_number: '', academic_level_id: '' });
+                    setFormData({ group_number: '', academic_level_id: '', responsible: '' });
                 }
             });
         }
@@ -84,7 +85,8 @@ function Groups({ groups, academicLevels, search }) {
         setEditingGroup(group);
         setFormData({
             group_number: group.group_number,
-            academic_level_id: group.academic_level_id
+            academic_level_id: group.academic_level_id,
+            responsible: group.responsible || '',
         });
         // Open the form
         const form = formRef.current;
@@ -159,6 +161,21 @@ function Groups({ groups, academicLevels, search }) {
                                         <option key={level.id} value={level.id}>
                                             L{level.level} - {level.speciality.name || level.speciality_name}
                                         </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="input-wrapper">
+                                <label htmlFor="responsible">Responsible:</label>
+                                <select
+                                    id="responsible"
+                                    name="responsible"
+                                    value={formData.responsible}
+                                    onChange={e => setFormData({ ...formData, responsible: e.target.value })}
+                                    required
+                                >
+                                    <option value="">Select Responsible</option>
+                                    {responsibles.map(r => (
+                                        <option key={r.id} value={r.id}>{r.name}</option>
                                     ))}
                                 </select>
                             </div>

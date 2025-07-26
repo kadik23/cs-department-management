@@ -79,7 +79,7 @@ class AdminSchedulesController extends Controller
             'search' => $search,
             'filter_group_id' => $filterGroupId,
         ]);
-    }        "classRooms": [],
+    }
 
 
     public function store(Request $request)

@@ -4,9 +4,7 @@ import { router } from '@inertiajs/react';
 function Specialities({ specialities, search }) {
     const [editingSpeciality, setEditingSpeciality] = useState(null);
     const [formData, setFormData] = useState({
-        name: '',
-        description: '',
-        levels: ''
+        speciality_name: '',
     });
     const formRef = useRef();
     const openBtnRef = useRef();
@@ -25,7 +23,7 @@ function Specialities({ specialities, search }) {
         const openHandler = (ev) => {
             ev.preventDefault();
             setEditingSpeciality(null);
-            setFormData({ name: '', description: '', levels: '' });
+            setFormData({ speciality_name: '' });
             openBtn.style.opacity = '0';
             form.style.maxHeight = '1000px';
             form.style.width = 'calc(100%*1/2)';
@@ -42,7 +40,7 @@ function Specialities({ specialities, search }) {
                 form.style.width = '0';
                 openBtn.style.opacity = '1';
                 setEditingSpeciality(null);
-                setFormData({ name: '', description: '', levels: '' });
+                setFormData({ speciality_name: '' });
             }, 500);
         };
         if (openBtn) openBtn.addEventListener('click', openHandler);
@@ -59,7 +57,7 @@ function Specialities({ specialities, search }) {
             router.put(`/admin/specialities/${editingSpeciality.id}`, formData, {
                 onSuccess: () => {
                     setEditingSpeciality(null);
-                    setFormData({ name: '', description: '', levels: '' });
+                    setFormData({ speciality_name: '' });
                     // Collapse form
                     if (formRef.current && openBtnRef.current) {
                         formRef.current.style.opacity = '0';
@@ -74,7 +72,7 @@ function Specialities({ specialities, search }) {
         } else {
             router.post('/admin/specialities', formData, {
                 onSuccess: () => {
-                    setFormData({ name: '', description: '', levels: '' });
+                    setFormData({ speciality_name: '' });
                     // Collapse form
                     if (formRef.current && openBtnRef.current) {
                         formRef.current.style.opacity = '0';
@@ -92,9 +90,7 @@ function Specialities({ specialities, search }) {
     const handleEdit = (speciality) => {
         setEditingSpeciality(speciality);
         setFormData({
-            name: speciality.name,
-            description: speciality.description || '',
-            levels: speciality.levels || ''
+            speciality_name: speciality.speciality_name,
         });
         // Open the form
         if (formRef.current && openBtnRef.current) {
@@ -156,20 +152,8 @@ function Specialities({ specialities, search }) {
                                     name="speciality_name"
                                     id="speciality_name"
                                     placeholder="name"
-                                    value={formData.name}
-                                    onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                    required
-                                />
-                            </div>
-                            <div className="input-wrapper">
-                                <label htmlFor="speciality_levels">Levels:</label>
-                                <input
-                                    type="number"
-                                    name="speciality_levels"
-                                    id="speciality_levels"
-                                    placeholder="levels"
-                                    value={formData.levels}
-                                    onChange={e => setFormData({ ...formData, levels: e.target.value })}
+                                    value={formData.speciality_name}
+                                    onChange={e => setFormData({ ...formData, speciality_name: e.target.value })}
                                     required
                                 />
                             </div>
@@ -199,7 +183,6 @@ function Specialities({ specialities, search }) {
                         <div className="list">
                             <div className="list-header">
                                 <div className="list-header-item">Name</div>
-                                <div className="list-header-item">Description</div>
                                 <div className="list-header-item">Created</div>
                                 <div className="list-header-item">Actions</div>
                             </div>
@@ -207,7 +190,6 @@ function Specialities({ specialities, search }) {
                                 {specialities.map((speciality) => (
                                     <div className="list-row" key={speciality.id}>
                                         <div className="list-item">{speciality.name}</div>
-                                        <div className="list-item">{speciality.description}</div>
                                         <div className="list-item">{speciality.created_at}</div>
                                         <div className="list-item">
                                             <button 

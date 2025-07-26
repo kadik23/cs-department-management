@@ -107,21 +107,6 @@ function Accounts({ users, search, groups = [] }) {
         }
     };
 
-    // Add handler for group input
-    const handleGroupInputChange = (e) => {
-        const val = e.target.value;
-        setFormData(f => {
-            const found = groups.find(
-                g => `L${g.level} ${g.speciality_name} Group ${g.group_number}` === val || g.id.toString() === val
-            );
-            return {
-                ...f,
-                group_name: val,
-                group_id: found ? found.id : '',
-            };
-        });
-    };
-
     return (
         <div className="container">
             <div className="page-content">

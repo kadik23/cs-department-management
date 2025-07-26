@@ -7,7 +7,8 @@ function Exams({ exams, subjects, groups, settings, search, classRooms = [] }) {
         date: '',
         subject_id: '',
         group_id: '',
-        class_room_id: '', // <-- add this
+        class_room_id: '',
+        class_index: '', // <-- add this
     });
     const formRef = useRef();
     const openBtnRef = useRef();
@@ -27,7 +28,7 @@ function Exams({ exams, subjects, groups, settings, search, classRooms = [] }) {
         const openHandler = (ev) => {
             ev.preventDefault();
             setEditingExam(null);
-            setFormData({ date: '', subject_id: '', group_id: '', class_room_id: '' });
+            setFormData({ date: '', subject_id: '', group_id: '', class_room_id: '', class_index: '' });
             openBtn.style.opacity = '0';
             form.style.maxHeight = '1000px';
             form.style.width = 'calc(100%*1/2)';
@@ -44,7 +45,7 @@ function Exams({ exams, subjects, groups, settings, search, classRooms = [] }) {
                 form.style.width = '0';
                 openBtn.style.opacity = '1';
                 setEditingExam(null);
-                setFormData({ date: '', subject_id: '', group_id: '', class_room_id: '' });
+                setFormData({ date: '', subject_id: '', group_id: '', class_room_id: '', class_index: '' });
             }, 500);
         };
         if (openBtn) openBtn.addEventListener('click', openHandler);
@@ -70,13 +71,13 @@ function Exams({ exams, subjects, groups, settings, search, classRooms = [] }) {
             router.put(`/admin/exams/${editingExam.id}`, formData, {
                 onSuccess: () => {
                     setEditingExam(null);
-                    setFormData({ date: '', subject_id: '', group_id: '', class_room_id: '' });
+                    setFormData({ date: '', subject_id: '', group_id: '', class_room_id: '', class_index: '' });
                 }
             });
         } else {
             router.post('/admin/exams', formData, {
                 onSuccess: () => {
-                    setFormData({ date: '', subject_id: '', group_id: '', class_room_id: '' });
+                    setFormData({ date: '', subject_id: '', group_id: '', class_room_id: '', class_index: '' });
                 }
             });
         }
@@ -89,6 +90,7 @@ function Exams({ exams, subjects, groups, settings, search, classRooms = [] }) {
             subject_id: exam.subject_id,
             group_id: exam.group_id,
             class_room_id: exam.class_room_id || '',
+            class_index: exam.class_index || '',
         });
         // Open the form
         const form = formRef.current;
@@ -198,6 +200,34 @@ function Exams({ exams, subjects, groups, settings, search, classRooms = [] }) {
                                             {`${r.resource_type} ${r.resource_number}`}
                                         </option>
                                     ))}
+                                </select>
+                            </div>
+                            <div className="input-wrapper">
+                                <label htmlFor="class_index">Start At:</label>
+                                <select
+                                    id="class_index"
+                                    name="class_index"
+                                    value={formData.class_index || ''}
+                                    onChange={e => setFormData({ ...formData, class_index: e.target.value })}
+                                    required
+                                >
+                                    <option value="">Select Start Time</option>
+                                    {(() => {
+                                        if (!settings) return null;
+                                        const classDuration = settings.exam_duration; // Use exam_duration
+                                        const firstClassStartAt = parseInt(settings.first_exam_start_at?.split(':')[0] || '8', 10);
+                                        let i = 0;
+                                        const options = [];
+                                        while ((i * classDuration) < ((18 - firstClassStartAt) * 60)) {
+                                            const totalMinutes = i * classDuration;
+                                            const hours = Math.floor(totalMinutes / 60) + firstClassStartAt;
+                                            const minutes = totalMinutes % 60;
+                                            const label = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+                                            options.push(<option key={i} value={i}>{label}</option>);
+                                            i += 1;
+                                        }
+                                        return options;
+                                    })()}
                                 </select>
                             </div>
                             <div className='flex item-center gap-4 '>

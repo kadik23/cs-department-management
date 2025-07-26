@@ -39,17 +39,13 @@ class AdminResourcesController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'title' => 'required|string',
-            'description' => 'nullable|string',
-            'file_path' => 'required|string',
-            'subject_id' => 'nullable|exists:subjects,id'
+            'resource_type' => 'required|string',
+            'resource_number' => 'required|string',
         ]);
 
         Resource::create([
-            'title' => $request->title,
-            'description' => $request->description,
-            'file_path' => $request->file_path,
-            'subject_id' => $request->subject_id
+            'resource_type' => $request->resource_type,
+            'resource_number' => $request->resource_number,
         ]);
 
         return redirect()->back()->with('success', 'Resource created successfully');
@@ -58,18 +54,14 @@ class AdminResourcesController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'title' => 'required|string',
-            'description' => 'nullable|string',
-            'file_path' => 'required|string',
-            'subject_id' => 'nullable|exists:subjects,id'
+            'resource_type' => 'required|string',
+            'resource_number' => 'required|string',
         ]);
 
         $resource = Resource::findOrFail($id);
         $resource->update([
-            'title' => $request->title,
-            'description' => $request->description,
-            'file_path' => $request->file_path,
-            'subject_id' => $request->subject_id
+            'resource_type' => $request->resource_type,
+            'resource_number' => $request->resource_number,
         ]);
 
         return redirect()->back()->with('success', 'Resource updated successfully');

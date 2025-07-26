@@ -1,8 +1,15 @@
 import React from 'react'
 import { Link, usePage } from '@inertiajs/react'
+import { useDispatch } from "react-redux";
+import { logout as logoutAction } from "../../state/auth/authSlice"; // adjust path if needed
 
 function Aside() {
     const { url } = usePage();
+    const dispatch = useDispatch();
+    function getCsrfToken() {
+        const meta = document.querySelector('meta[name="csrf-token"]');
+        return meta ? meta.getAttribute('content') : '';
+    }
     
     const aside_links = [
         {
@@ -47,6 +54,18 @@ function Aside() {
         }
     ];
 
+    const handleLogout = async () => {
+        await fetch("/logout", {
+            method: "POST",
+            headers: {
+                "X-Requested-With": "XMLHttpRequest",
+                "X-CSRF-TOKEN": getCsrfToken(),
+            },
+        });
+        dispatch(logoutAction());
+        window.location.href = "/";
+    };
+
     return (
         <aside>
             <div className="user-profile-pic">
@@ -63,7 +82,9 @@ function Aside() {
                         {link.title}
                     </Link>
                 ))}
-                <a href="/logout">Log out</a>
+                <button className="btn" onClick={handleLogout}>
+                    Logout
+                </button>
             </nav>
         </aside>
     );

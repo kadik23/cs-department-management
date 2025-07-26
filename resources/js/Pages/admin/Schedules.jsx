@@ -10,7 +10,7 @@ function Schedules({ schedules, subjects, groups, teachers, classRooms, settings
     const [editingSchedule, setEditingSchedule] = useState(null);
     const [formData, setFormData] = useState({
         class_room_id: '',
-        class_room_input: '', // <-- new field
+        class_room_input: '',
         group_id: '',
         teacher_id: '',
         subject_id: '',

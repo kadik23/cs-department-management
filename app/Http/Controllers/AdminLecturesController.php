@@ -44,7 +44,7 @@ class AdminLecturesController extends Controller
             ];
         });
 
-        $classRooms = \App\Models\Resource::where('resource_type', 'Amphi')->get()->map(function($room) {
+        $classRooms = \App\Models\Resource::get()->map(function($room) {
             return [
                 'id' => $room->id,
                 'resource_type' => $room->resource_type,

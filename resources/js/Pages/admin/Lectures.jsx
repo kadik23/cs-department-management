@@ -166,14 +166,20 @@ function Lectures({ lectures, subjects, teachers, academicLevels, classRooms, se
                             </div>
                             <div className="input-wrapper">
                                 <label htmlFor="class_room_id">Class Room:</label>
-                                <input
-                                    type="text"
+                                <select
                                     id="class_room_id"
                                     name="class_room_id"
                                     value={formData.class_room_id}
-                                    onChange={(e) => setFormData({ ...formData, class_room_id: e.target.value })}
+                                    onChange={e => setFormData({ ...formData, class_room_id: e.target.value })}
                                     required
-                                />
+                                >
+                                    <option value="">Select Class Room</option>
+                                    {classRooms.map(r => (
+                                        <option key={r.id} value={r.id}>
+                                            {`${r.resource_type} ${r.resource_number}`}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                             <div className="input-wrapper">
                                 <label htmlFor="day_of_week">Day of Week:</label>
@@ -192,14 +198,31 @@ function Lectures({ lectures, subjects, teachers, academicLevels, classRooms, se
                             </div>
                             <div className="input-wrapper">
                                 <label htmlFor="class_index">Class Index:</label>
-                                <input
-                                    type="number"
+                                <select
                                     id="class_index"
                                     name="class_index"
                                     value={formData.class_index}
-                                    onChange={(e) => setFormData({ ...formData, class_index: e.target.value })}
+                                    onChange={e => setFormData({ ...formData, class_index: e.target.value })}
                                     required
-                                />
+                                >
+                                    <option value="">Select Start Time</option>
+                                    {(() => {
+                                        if (!settings) return null;
+                                        const classDuration = settings.class_duration;
+                                        const firstClassStartAt = parseInt(settings.first_class_start_at?.split(':')[0] || '8', 10);
+                                        let i = 0;
+                                        const options = [];
+                                        while ((i * classDuration) < ((18 - firstClassStartAt) * 60)) {
+                                            const totalMinutes = i * classDuration;
+                                            const hours = Math.floor(totalMinutes / 60) + firstClassStartAt;
+                                            const minutes = totalMinutes % 60;
+                                            const label = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+                                            options.push(<option key={i} value={i}>{label}</option>);
+                                            i += 1;
+                                        }
+                                        return options;
+                                    })()}
+                                </select>
                             </div>
                             <div className='flex item-center gap-4 '>
                                 <button
