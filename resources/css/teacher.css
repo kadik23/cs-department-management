@@ -1,345 +1,331 @@
-* {
-    margin: 0;
-    padding: 0;
-    font-family: monospace;
-}
-body{
+.teacher-body {
     background-color: rgb(252, 252, 252);
 }
-header{
-        width: 100%;
-        height: 85vh;
-        display: flex;
-        flex-direction: column;
-        border-radius: 0 0 200px 0;
+.teacher-header {
+    width: 100%;
+    height: 85vh;
+    display: flex;
+    flex-direction: column;
+    border-radius: 0 0 200px 0;
 }
 
-    .top-header{
-            width: 100%;
-            height: 10%;
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            justify-content: space-between;
-            background: #9733EE;
-    }
-            .div-Logo{
-                    width: 20%;
-                    height: 100%;
-                    position: relative;
-            }
-                
-                .logo{
-                    width: 46px;
-                    height: 46px;
-                    border-radius: 50%;
-                    position: absolute;
-                    top:20%;
-                    left:20%;
-                }
+.top-header {
+    width: 100%;
+    height: 10%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    justify-content: space-between;
+    background: #9733ee;
+}
+.div-Logo {
+    width: 20%;
+    height: 100%;
+    position: relative;
+}
 
+.logo {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    position: absolute;
+    top: 20%;
+    left: 20%;
+}
 
+.Right-Top-header {
+    width: 30%;
+    height: 70%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    margin-right: 2%;
+}
 
-            .Right-Top-header{
-                            width:30%;
-                            height: 70%;
-                            display: flex;
-                            flex-direction: row;
-                            justify-content: space-around;
-                            margin-right: 2%;
-            }
+.Right-Top-header button {
+    padding: 5px 10px;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    color: white;
+    margin-top: 5%;
+}
 
-                    .Right-Top-header button{
-                                            padding: 5px 10px;
-                                            border: none;
-                                            background-color: transparent;
-                                            cursor: pointer;
-                                            display: flex;
-                                            flex-direction: row;
-                                            align-items: center;
-                                            color: white;
-                                            margin-top: 5%;
-                        
-                    }
+.Right-Top-header button:hover {
+    border: solid 0.5px white;
+    border-radius: 4px;
+}
 
-                    .Right-Top-header button:hover{
-                                                border: solid 0.5px white;
-                                                border-radius: 4px;
-                    }
+.Right-Top-header p {
+    color: white;
+    cursor: pointer;
+    margin-top: 5%;
+}
 
-                    .Right-Top-header p{
-                                    color:white;
-                                    cursor:pointer; 
-                                    margin-top:5% ;
-                    }
+.center-header {
+    width: 100%;
+    height: 48%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: #9733ee;
+    background: -webkit-linear-gradient(to left, #9733ee, #da22ff);
+    background: linear-gradient(to bottom, #9733ee, #da23ff);
+}
 
+.center-header button {
+    padding: 10px 35px;
+    border: solid 1px white;
+    background-color: transparent;
+    border-radius: 20px;
+    box-shadow: 0px 3px 1px #ab00cd;
+    margin-top: 5px;
+    cursor: pointer;
+    color: white;
+}
+.center-header h1 {
+    color: white;
+}
 
+.bottom-header {
+    width: 100%;
+    height: 42%;
+}
+.vector {
+    width: 100%;
+    height: 100%;
+}
 
-    .center-header{
-                width: 100%;
-                height: 48%;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                background: #9733EE;
-                background: -webkit-linear-gradient(to left, #9733EE, #DA22FF);
-                background: linear-gradient(to bottom, #9733EE, #DA23FF);
-    }
-             
-                .center-header button{
-                                    padding: 10px 35px;
-                                    border:solid 1px white;
-                                    background-color: transparent;
-                                    border-radius: 20px;
-                                    box-shadow: 0px 3px 1px  #ab00cd;
-                                    margin-top: 5px;
-                                    cursor: pointer;
-                                    color: white;
-                }
-                .center-header h1{
-                    color: white;
-                }
-
-
-
-    .bottom-header{
-                width: 100%;
-                height: 42%;
-    }
-                .vector{
-                        width: 100%;
-                        height: 100%;
-                }
-                
-
-
-
-
-main{
+main {
     width: 100%;
     height: max-content;
     display: flex;
     flex-direction: column;
     align-items: center;
-    
 }
 
-    .about-me{
-            width: 100%;
-            height: 400px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-    }
+.schedule_value {
+    /* Add your schedule value styles here */
+}
 
-        .about-me h1{
-                    margin-top: 10px;
-                    margin-bottom: 10px;
-        }
-
-        .teatcher-info{
-                    width:500px ;
-                    height:400px ;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
-                    border-radius: 7px;
-                    box-shadow: 0 0 2px rgb(170, 170, 170)  ;
-                    margin-bottom: 1%;
-        }
-
-        .teatcher-info h2{
-                        width: 29%;
-                        margin-left: 1%;
-                        margin-top: 1%;
-        }
-
-        .teatcher-info h3{
-                        width: 70%;
-                        margin-top: 1.7%;
-        }
-
-        .teatcher-info div{
-                        margin-top: 1px;
-                        width: 90%;
-                        height: 15%;
-                        display: flex;
-                        flex-wrap: wrap;
-        }
-            .teatcher-info:hover{
-                                background: #DA22FF;
-                                background: -webkit-linear-gradient(to left, #9733EE, #DA22FF);
-                                background: linear-gradient(to bottom, #9733EE, #DA22FF);
-            }
-        
-
-
-
-    .contain{
-            width: 80%;
-            height: 400px;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: center;
-            justify-content: space-around;
-    }
-
-        .contain div{
-                    width:250px ;
-                    height:150px ;
-                    display: flex;
-                    flex-wrap: wrap;
-                    align-items: center;
-                    justify-content: center;
-                    border-radius: 7px;
-                    box-shadow: 0 0 2px rgb(170, 170, 170)  ;
-                    margin-bottom: 1%;
-                    padding: 20px;
-        }
-
-        .STD-attendance{
-            width:250px ;
-            height:150px ;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: center;
-            border-radius: 7px;
-            box-shadow: 0 0 2px rgb(170, 170, 170)  ;
-            margin-bottom: 1%;
-            padding: 20px;
-        }
-
-        .contain div:hover{
-                        background: #DA22FF;
-                        background: -webkit-linear-gradient(to left, #9733EE, #DA22FF);
-                        background: linear-gradient(to bottom, #9733EE, #DA22FF);
-        }
-
-        .STD-attendance:hover{
-            background: #DA22FF;
-            background: -webkit-linear-gradient(to left, #9733EE, #DA22FF);
-            background: linear-gradient(to bottom, #9733EE, #DA22FF);
-        }
-
-
-            .exams-button{
-                        padding: 5px 10px ;
-                        border: solid 2px rgb(192, 192, 192);
-                        border-radius: 5px;
-                        background-color: transparent;
-                        cursor: pointer;
-                        margin-top: 5%;
-            }
-
-            .exams-button-hover{
-                            cursor: pointer;
-                            border-radius: 5px;
-                            border: none;
-                            background-color:#DA22FF ;
-                            padding: 7px 12px;
-                            margin-top: 5%;
-            }
-
-
-
-            .att-button{
-                        padding: 5px 10px ;
-                        border: solid 2px rgb(192, 192, 192);
-                        border-radius: 5px;
-                        background-color: transparent;
-                        cursor: pointer;
-                        margin-top: 5%;
-            }
-
-            .att-button-hover{
-                            cursor: pointer;
-                            border-radius: 5px;
-                            border: none;
-                            background-color:#DA22FF ;
-                            padding: 7px 12px;
-                            margin-top: 5%;
-            }
-
-
-
-
-
-    .div-template{
-                width: 100%;
-                height: 700px;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-    }
-
-    .template{
-            width: 1000px;
-            height: 500px;
-            /* background-color: rgb(158, 153, 153); */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            justify-content: space-around;
-        }
-
-    .temp-btn{
-            padding: 10px 25px;
-            border: none;
-            background: #DA22FF;
-            background: -webkit-linear-gradient(to left, #9733EE, #DA22FF);
-            background: linear-gradient(to bottom, #9733EE, #DA22FF);
-            border-radius: 20px;
-            margin-bottom:2% ;
-    }
-
-    
-    .schedule_label{
-        width:90% ;
-        height: 15%;
-        background-color: rgb(207, 207, 207);
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        flex-direction: row;
-        justify-content: space-around;
-    }
-
-
-    .schedule_value{
-        width:90% ;
-        height: 80%;
-        background-color: rgb(207, 207, 207);
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        flex-direction: column;
-        justify-content: space-around;
-    }
-
-    .list-row{
-    width: 100%;
-    height: 90%;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
+.div-template {
     align-items: center;
-    
-    }
-
-    .list-item{
-    width: max-content;
-    height: max-content;
-    display: flex;
-    flex: 3;
-    flex-direction: row;
-    background-color: rgb(207, 207, 207);
     justify-content: center;
+}
 
-    }
+.about-me h1 {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+/* Teacher-specific stat card styles */
+.stat-card_teacher {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    padding: 16px;
+    margin: 8px;
+    display: flex;
+    align-items: center;
+    border: 1px solid #e5e7eb;
+}
+
+.stat-content_teacher {
+    margin-left: 12px;
+    flex: 1;
+}
+
+.stat-title_teacher {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-bottom: 4px;
+}
+
+.stat-value_teacher {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #0c4a6e;
+}
+
+.stat-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat-icon img {
+    width: 24px;
+    height: 24px;
+}
+
+/* Teacher-specific grid styles */
+.stats-grid_teacher {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin: 16px 0;
+}
+
+/* Teacher-specific card box styles */
+.card-box_teacher {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    margin: 16px 0;
+    border: 1px solid #e5e7eb;
+}
+
+.card-header_teacher {
+    padding: 16px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f9fafb;
+    border-radius: 8px 8px 0 0;
+}
+
+.card-header_teacher h3 {
+    margin: 0;
+    color: #374151;
+    font-size: 1.125rem;
+    font-weight: 600;
+}
+
+.card-body_teacher {
+    padding: 16px;
+}
+
+/* Teacher-specific page styles */
+.page-content_teacher {
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.page-header_teacher {
+    margin-bottom: 24px;
+}
+
+.page-title_teacher {
+    font-size: 1.875rem;
+    font-weight: bold;
+    color: #111827;
+    margin-bottom: 8px;
+}
+
+/* Teacher-specific section styles */
+.section-wrapper_teacher {
+    margin-bottom: 24px;
+}
+
+.section-content_teacher {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+/* Teacher-specific list styles */
+.list_teacher {
+    width: 100%;
+}
+
+.list-header_teacher {
+    display: flex;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+    font-weight: 600;
+    color: #374151;
+}
+
+.list-header-item_teacher {
+    padding: 12px 16px;
+    flex: 1;
+    border-right: 1px solid #e5e7eb;
+}
+
+.list-header-item_teacher:last-child {
+    border-right: none;
+}
+
+.list-body_teacher {
+    background: #fff;
+}
+
+.list-row_teacher {
+    display: flex;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.list-row_teacher:hover {
+    background: #f9fafb;
+}
+
+.list-item_teacher {
+    padding: 12px 16px;
+    flex: 1;
+    border-right: 1px solid #f3f4f6;
+    display: flex;
+    align-items: center;
+}
+
+.list-item_teacher:last-child {
+    border-right: none;
+}
+
+/* Teacher-specific status badge styles */
+.status-badge_teacher {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.status-badge_teacher.present {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-badge_teacher.absent {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+/* Teacher-specific quick actions */
+.quick-actions_teacher {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.action-link_teacher {
+    display: inline-block;
+    padding: 8px 16px;
+    background: #0c4a6e;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    transition: background-color 0.2s;
+}
+
+.action-link_teacher:hover {
+    background: #374151;
+}
+
+/* Teacher-specific info styles */
+.teacher-info_teacher p {
+    margin: 8px 0;
+    color: #374151;
+}
+
+.semester-info_teacher p {
+    margin: 8px 0;
+    color: #374151;
+}

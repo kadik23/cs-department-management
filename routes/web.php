@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\AuthController;
 
 Route::get('/', function () {
@@ -69,6 +70,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/student/schedule', [StudentController::class, 'schedule'])->name('student.schedule');
     Route::get('/student/notes', [StudentController::class, 'notes'])->name('student.notes');
     Route::get('/student/exams', [StudentController::class, 'exams'])->name('student.exams');
+    
+    // Teacher routes
+    Route::get('/teacher', [TeacherController::class, 'dashboard'])->name('teacher.dashboard');
+    Route::get('/teacher/courses', [TeacherController::class, 'courses'])->name('teacher.courses');
+    Route::get('/teacher/schedule', [TeacherController::class, 'schedule'])->name('teacher.schedule');
+    Route::get('/teacher/grades', [TeacherController::class, 'grades'])->name('teacher.grades');
+    Route::get('/teacher/attendance', [TeacherController::class, 'attendance'])->name('teacher.attendance');
 });
 
 // Auth routes

@@ -7,6 +7,7 @@ function Counter() {
     const dispatch = useDispatch();
     return (
         <div>
+            <h1>Test Redux (counter)</h1>
             <h2>{count}</h2>
             <div>
                 <button onClick={() => dispatch(incrementAsync(10))}>

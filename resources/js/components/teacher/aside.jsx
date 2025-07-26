@@ -14,20 +14,24 @@ function Aside() {
     
     const aside_links = [
         {
-            path: "/student/",
+            path: "/teacher",
             title: "Dashboard",
         },
         {
-            path: "/student/schedule",
+            path: "/teacher/courses",
+            title: "My Courses",
+        },
+        {
+            path: "/teacher/schedule",
             title: "Schedule",
         },
         {
-            path: "/student/notes",
-            title: "Notes",
+            path: "/teacher/grades",
+            title: "Grades",
         },
         {
-            path: "/student/exams",
-            title: "Exams",
+            path: "/teacher/attendance",
+            title: "Attendance",
         }
     ];
 
@@ -45,10 +49,10 @@ function Aside() {
 
     return (
         <aside>
-            <div className="user-profile-picture">
-                <img src={'/assets/images/student.jpg'} alt="profile picture"/>
+            <div className="user-profile-pic">
+                <img src={'/assets/images/teacher.png'} alt="profile picture"/>
             </div>
-            <div className="user-name">Student</div>
+            <div className="user-name">Teacher</div>
             <nav>
                 {aside_links.map((link, index) => (
                     <Link 
