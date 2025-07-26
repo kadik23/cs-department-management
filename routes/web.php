@@ -64,7 +64,7 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::delete('/exams/{id}', [App\Http\Controllers\AdminExamsController::class, 'destroy'])->name('admin.exams.destroy');
 });
 
-Route::middleware(['auth', 'student'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('/student', [StudentController::class, 'dashboard'])->name('student.dashboard');
     Route::get('/student/schedule', [StudentController::class, 'schedule'])->name('student.schedule');
     Route::get('/student/notes', [StudentController::class, 'notes'])->name('student.notes');

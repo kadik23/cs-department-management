@@ -27,7 +27,7 @@ class Resource extends Model
 
     public function examSchedules()
     {
-        return $this->hasMany(ExamSschedule::class, 'class_room_id');
+        return $this->hasMany(ExamsSchedule::class, 'class_room_id');
     }
 
     public function subject()

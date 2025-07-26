@@ -45,7 +45,11 @@ export default function Home({ flash, auth }) {
             dispatch(loginAction(data.user));
             setUsername("");
             setPassword("");
-            window.location.href = "/admin";
+            let role = 'admin';
+            if (data.user && data.user.role === 'teacher') role = 'teacher';
+            else if (data.user && data.user.role == 'student') role = 'student';
+            else if (data.user && data.user.role == 'admin') role = 'admin';
+            window.location.href = `/${role}`;
         } catch (err) {
             setError("Login failed");
         }
