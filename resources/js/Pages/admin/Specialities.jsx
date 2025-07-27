@@ -1,46 +1,48 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { router } from '@inertiajs/react';
+import { useForm, usePage, router } from '@inertiajs/react';
+import Alert from '@/components/Alert';
 
 function Specialities({ specialities, search }) {
+    const { flash } = usePage().props;
+    const [alert, setAlert] = useState({ type: '', message: '' });
     const [editingSpeciality, setEditingSpeciality] = useState(null);
-    const [formData, setFormData] = useState({
-        speciality_name: '',
-    });
     const formRef = useRef();
     const openBtnRef = useRef();
     const closeBtnRef = useRef();
 
+    const form = useForm({
+        speciality_name: '',
+    });
+
     useEffect(() => {
-        const form = formRef.current;
+        const formEl = formRef.current;
         const openBtn = openBtnRef.current;
-        if (form && openBtn) {
-            form.style.maxHeight = '0';
-            form.style.width = '0';
-            form.style.opacity = '0';
+        if (formEl && openBtn) {
+            formEl.style.maxHeight = '0';
+            formEl.style.width = '0';
+            formEl.style.opacity = '0';
             openBtn.style.opacity = '1';
         }
-        // Open form logic
         const openHandler = (ev) => {
             ev.preventDefault();
             setEditingSpeciality(null);
-            setFormData({ speciality_name: '' });
+            form.reset();
             openBtn.style.opacity = '0';
-            form.style.maxHeight = '1000px';
-            form.style.width = 'calc(100%*1/2)';
+            formEl.style.maxHeight = '1000px';
+            formEl.style.width = 'calc(100%*1/2)';
             setTimeout(() => {
-                form.style.opacity = '1';
+                formEl.style.opacity = '1';
             }, 500);
         };
-        // Close form logic
         const closeHandler = (ev) => {
             ev.preventDefault();
-            form.style.opacity = '0';
+            formEl.style.opacity = '0';
             setTimeout(() => {
-                form.style.maxHeight = '0';
-                form.style.width = '0';
+                formEl.style.maxHeight = '0';
+                formEl.style.width = '0';
                 openBtn.style.opacity = '1';
                 setEditingSpeciality(null);
-                setFormData({ speciality_name: '' });
+                form.reset();
             }, 500);
         };
         if (openBtn) openBtn.addEventListener('click', openHandler);
@@ -54,45 +56,34 @@ function Specialities({ specialities, search }) {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (editingSpeciality) {
-            router.put(`/admin/specialities/${editingSpeciality.id}`, formData, {
+            form.put(`/admin/specialities/${editingSpeciality.id}`, form.data, {
                 onSuccess: () => {
+                    setAlert({ type: 'success', message: 'Speciality updated successfully!' });
                     setEditingSpeciality(null);
-                    setFormData({ speciality_name: '' });
-                    // Collapse form
-                    if (formRef.current && openBtnRef.current) {
-                        formRef.current.style.opacity = '0';
-                        setTimeout(() => {
-                            formRef.current.style.maxHeight = '0';
-                            formRef.current.style.width = '0';
-                            openBtnRef.current.style.opacity = '1';
-                        }, 500);
-                    }
-                }
+                    form.reset();
+                },
+                onError: () => {
+                    setAlert({ type: 'error', message: 'Failed to update speciality.' });
+                },
             });
         } else {
-            router.post('/admin/specialities', formData, {
+            form.post('/admin/specialities', {
                 onSuccess: () => {
-                    setFormData({ speciality_name: '' });
-                    // Collapse form
-                    if (formRef.current && openBtnRef.current) {
-                        formRef.current.style.opacity = '0';
-                        setTimeout(() => {
-                            formRef.current.style.maxHeight = '0';
-                            formRef.current.style.width = '0';
-                            openBtnRef.current.style.opacity = '1';
-                        }, 500);
-                    }
-                }
+                    setAlert({ type: 'success', message: 'Speciality added successfully!' });
+                    form.reset();
+                },
+                onError: () => {
+                    setAlert({ type: 'error', message: 'Failed to add speciality.' });
+                },
             });
         }
     };
 
     const handleEdit = (speciality) => {
         setEditingSpeciality(speciality);
-        setFormData({
+        form.setData({
             speciality_name: speciality.speciality_name,
         });
-        // Open the form
         if (formRef.current && openBtnRef.current) {
             openBtnRef.current.style.opacity = '0';
             formRef.current.style.maxHeight = '1000px';
@@ -120,6 +111,9 @@ function Specialities({ specialities, search }) {
 
     return (
         <div className="container">
+            <Alert type="success" message={flash.success} />
+            <Alert type="error" message={flash.error} />
+            <Alert type={alert.type} message={alert.message} onClose={() => setAlert({})} />
             <div className="page-content">
                 <div className="page-header">
                     <div className="page-title">Specialities</div>
@@ -152,10 +146,11 @@ function Specialities({ specialities, search }) {
                                     name="speciality_name"
                                     id="speciality_name"
                                     placeholder="name"
-                                    value={formData.speciality_name}
-                                    onChange={e => setFormData({ ...formData, speciality_name: e.target.value })}
+                                    value={form.data.speciality_name}
+                                    onChange={e => form.setData('speciality_name', e.target.value)}
                                     required
                                 />
+                                {form.errors.speciality_name && <div className="text-red-500 mt-2">{form.errors.speciality_name}</div>}
                             </div>
                             <div className='flex item-center gap-4 '>
                                 <button
@@ -164,7 +159,7 @@ function Specialities({ specialities, search }) {
                                     type="button"
                                     ref={closeBtnRef}
                                 >Cancel</button>
-                                <button type="submit" className="btn">{editingSpeciality ? 'Save' : 'Add'}</button>
+                                <button type="submit" className="btn" disabled={form.processing}>{editingSpeciality ? 'Save' : 'Add'}</button>
                             </div>
                         </form>
                         <div className="list-control">

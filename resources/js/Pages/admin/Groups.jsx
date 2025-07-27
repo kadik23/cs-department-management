@@ -1,49 +1,50 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { router } from '@inertiajs/react';
+import React, { useRef, useEffect, useState } from 'react';
+import { useForm, usePage, router } from '@inertiajs/react';
+import Alert from '@/components/Alert';
 
 function Groups({ groups, academicLevels, search, responsibles = [] }) {
+    const { flash } = usePage().props;
+    const [alert, setAlert] = useState({ type: '', message: '' });
     const [editingGroup, setEditingGroup] = useState(null);
-    const [formData, setFormData] = useState({
-        group_number: '',
-        academic_level_id: '',
-        responsible: '',
-    });
     const formRef = useRef();
     const openBtnRef = useRef();
     const closeBtnRef = useRef();
 
+    const form = useForm({
+        group_number: '',
+        academic_level_id: '',
+        responsible: '',
+    });
+
     useEffect(() => {
-        // Set initial collapsed styles
-        const form = formRef.current;
+        const formEl = formRef.current;
         const openBtn = openBtnRef.current;
-        if (form && openBtn) {
-            form.style.maxHeight = '0';
-            form.style.width = '0';
-            form.style.opacity = '0';
+        if (formEl && openBtn) {
+            formEl.style.maxHeight = '0';
+            formEl.style.width = '0';
+            formEl.style.opacity = '0';
             openBtn.style.opacity = '1';
         }
-        // Open form logic
         const openHandler = (ev) => {
             ev.preventDefault();
             setEditingGroup(null);
-            setFormData({ group_number: '', academic_level_id: '', responsible: '' });
+            form.reset();
             openBtn.style.opacity = '0';
-            form.style.maxHeight = '1000px';
-            form.style.width = 'calc(100%*1/2)';
+            formEl.style.maxHeight = '1000px';
+            formEl.style.width = 'calc(100%*1/2)';
             setTimeout(() => {
-                form.style.opacity = '1';
+                formEl.style.opacity = '1';
             }, 500);
         };
-        // Close form logic
         const closeHandler = (ev) => {
             ev.preventDefault();
-            form.style.opacity = '0';
+            formEl.style.opacity = '0';
             setTimeout(() => {
-                form.style.maxHeight = '0';
-                form.style.width = '0';
+                formEl.style.maxHeight = '0';
+                formEl.style.width = '0';
                 openBtn.style.opacity = '1';
                 setEditingGroup(null);
-                setFormData({ group_number: '', academic_level_id: '', responsible: '' });
+                form.reset();
             }, 500);
         };
         if (openBtn) openBtn.addEventListener('click', openHandler);
@@ -66,36 +67,43 @@ function Groups({ groups, academicLevels, search, responsibles = [] }) {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (editingGroup) {
-            router.put(`/admin/groups/${editingGroup.id}`, formData, {
+            form.put(`/admin/groups/${editingGroup.id}`, form.data, {
                 onSuccess: () => {
+                    setAlert({ type: 'success', message: 'Group updated successfully!' });
                     setEditingGroup(null);
-                    setFormData({ group_number: '', academic_level_id: '', responsible: '' });
-                }
+                    form.reset();
+                },
+                onError: () => {
+                    setAlert({ type: 'error', message: 'Failed to update group.' });
+                },
             });
         } else {
-            router.post('/admin/groups', formData, {
+            form.post('/admin/groups', {
                 onSuccess: () => {
-                    setFormData({ group_number: '', academic_level_id: '', responsible: '' });
-                }
+                    setAlert({ type: 'success', message: 'Group created successfully!' });
+                    form.reset();
+                },
+                onError: () => {
+                    setAlert({ type: 'error', message: 'Failed to create group.' });
+                },
             });
         }
     };
 
     const handleEdit = (group) => {
         setEditingGroup(group);
-        setFormData({
+        form.setData({
             group_number: group.group_number,
             academic_level_id: group.academic_level_id,
             responsible: group.responsible || '',
         });
-        // Open the form
-        const form = formRef.current;
+        const formEl = formRef.current;
         const openBtn = openBtnRef.current;
         openBtn.style.opacity = '0';
-        form.style.maxHeight = '1000px';
-        form.style.width = 'calc(100%*1/2)';
+        formEl.style.maxHeight = '1000px';
+        formEl.style.width = 'calc(100%*1/2)';
         setTimeout(() => {
-            form.style.opacity = '1';
+            formEl.style.opacity = '1';
         }, 500);
     };
 
@@ -107,6 +115,9 @@ function Groups({ groups, academicLevels, search, responsibles = [] }) {
 
     return (
         <div className="container">
+            <Alert type="success" message={flash.success} />
+            <Alert type="error" message={flash.error} />
+            <Alert type={alert.type} message={alert.message} onClose={() => setAlert({})} />
             <div className="page-content">
                 <div className="page-header">
                     <div className="page-title">Groups</div>
@@ -142,18 +153,19 @@ function Groups({ groups, academicLevels, search, responsibles = [] }) {
                                     type="number"
                                     id="group_number"
                                     name="group_number"
-                                    value={formData.group_number}
-                                    onChange={(e) => setFormData({ ...formData, group_number: e.target.value })}
+                                    value={form.data.group_number}
+                                    onChange={e => form.setData('group_number', e.target.value)}
                                     required
                                 />
+                                {form.errors.group_number && <div className="text-red-500 mt-2">{form.errors.group_number}</div>}
                             </div>
                             <div className="input-wrapper">
                                 <label htmlFor="academic_level_id">Academic Level:</label>
                                 <select
                                     id="academic_level_id"
                                     name="academic_level_id"
-                                    value={formData.academic_level_id}
-                                    onChange={(e) => setFormData({ ...formData, academic_level_id: e.target.value })}
+                                    value={form.data.academic_level_id}
+                                    onChange={e => form.setData('academic_level_id', e.target.value)}
                                     required
                                 >
                                     <option value="">Select Academic Level</option>
@@ -163,14 +175,15 @@ function Groups({ groups, academicLevels, search, responsibles = [] }) {
                                         </option>
                                     ))}
                                 </select>
+                                {form.errors.academic_level_id && <div className="text-red-500 mt-2">{form.errors.academic_level_id}</div>}
                             </div>
                             <div className="input-wrapper">
                                 <label htmlFor="responsible">Responsible:</label>
                                 <select
                                     id="responsible"
                                     name="responsible"
-                                    value={formData.responsible}
-                                    onChange={e => setFormData({ ...formData, responsible: e.target.value })}
+                                    value={form.data.responsible}
+                                    onChange={e => form.setData('responsible', e.target.value)}
                                     required
                                 >
                                     <option value="">Select Responsible</option>
@@ -178,6 +191,7 @@ function Groups({ groups, academicLevels, search, responsibles = [] }) {
                                         <option key={r.id} value={r.id}>{r.name}</option>
                                     ))}
                                 </select>
+                                {form.errors.responsible && <div className="text-red-500 mt-2">{form.errors.responsible}</div>}
                             </div>
                             <div className='flex item-center gap-4 '>
                                 <button
@@ -186,7 +200,7 @@ function Groups({ groups, academicLevels, search, responsibles = [] }) {
                                     type="button"
                                     ref={closeBtnRef}
                                 >Cancel</button>
-                                <button type="submit" className="btn">{editingGroup ? 'Save' : 'Create'}</button>
+                                <button type="submit" className="btn" disabled={form.processing}>{editingGroup ? 'Save' : 'Create'}</button>
                             </div>
                         </form>
                         <div className="list-control">

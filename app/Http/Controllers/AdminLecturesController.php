@@ -2,17 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Lecture;
-use App\Models\Subject;
-use App\Models\Group;
-use App\Models\Teacher;
 use App\Repositories\LectureRepository;
 use App\Repositories\GroupRepository;
 use App\Repositories\SubjectRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Models\SchedulerSetting;
+use App\Repositories\ScheduleRepository;
 
 class AdminLecturesController extends Controller
 {
@@ -20,17 +16,20 @@ class AdminLecturesController extends Controller
     protected $groupRepository;
     protected $subjectRepository;
     protected $userRepository;
+    protected $schedulerSetting;
 
     public function __construct(
         LectureRepository $lectureRepository,
         GroupRepository $groupRepository,
         SubjectRepository $subjectRepository,
-        UserRepository $userRepository
+        UserRepository $userRepository,
+        ScheduleRepository $schedulerSetting
     ) {
         $this->lectureRepository = $lectureRepository;
         $this->groupRepository = $groupRepository;
         $this->subjectRepository = $subjectRepository;
         $this->userRepository = $userRepository;
+        $this->schedulerSetting = $schedulerSetting;
     }
 
     public function index(Request $request)
@@ -43,7 +42,7 @@ class AdminLecturesController extends Controller
         $classRooms = $this->lectureRepository->getClassroomResources();
         $subjects = $this->lectureRepository->getSubjectsForSelection();
         $teachers = $this->lectureRepository->getTeachersForSelection();
-        $settings = $this->lectureRepository->getSchedulerSettings();
+        $settings = $this->schedulerSetting->getSchedulerSettings();
 
         return Inertia::render('admin/Lectures', [
             'lectures' => $lectures,

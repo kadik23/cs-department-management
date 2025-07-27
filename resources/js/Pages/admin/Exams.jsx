@@ -1,51 +1,52 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { router } from '@inertiajs/react';
+import { useForm, usePage, router } from '@inertiajs/react';
+import Alert from '@/components/Alert';
 
 function Exams({ exams, subjects, groups, settings, search, classRooms = [] }) {
+    const { flash } = usePage().props;
+    const [alert, setAlert] = useState({ type: '', message: '' });
     const [editingExam, setEditingExam] = useState(null);
-    const [formData, setFormData] = useState({
-        date: '',
-        subject_id: '',
-        group_id: '',
-        class_room_id: '',
-        class_index: '', // <-- add this
-    });
     const formRef = useRef();
     const openBtnRef = useRef();
     const closeBtnRef = useRef();
 
+    const form = useForm({
+        date: '',
+        subject_id: '',
+        group_id: '',
+        class_room_id: '',
+        class_index: '',
+    });
+
     useEffect(() => {
-        // Set initial collapsed styles
-        const form = formRef.current;
+        const formEl = formRef.current;
         const openBtn = openBtnRef.current;
-        if (form && openBtn) {
-            form.style.maxHeight = '0';
-            form.style.width = '0';
-            form.style.opacity = '0';
+        if (formEl && openBtn) {
+            formEl.style.maxHeight = '0';
+            formEl.style.width = '0';
+            formEl.style.opacity = '0';
             openBtn.style.opacity = '1';
         }
-        // Open form logic
         const openHandler = (ev) => {
             ev.preventDefault();
             setEditingExam(null);
-            setFormData({ date: '', subject_id: '', group_id: '', class_room_id: '', class_index: '' });
+            form.reset();
             openBtn.style.opacity = '0';
-            form.style.maxHeight = '1000px';
-            form.style.width = 'calc(100%*1/2)';
+            formEl.style.maxHeight = '1000px';
+            formEl.style.width = 'calc(100%*1/2)';
             setTimeout(() => {
-                form.style.opacity = '1';
+                formEl.style.opacity = '1';
             }, 500);
         };
-        // Close form logic
         const closeHandler = (ev) => {
             ev.preventDefault();
-            form.style.opacity = '0';
+            formEl.style.opacity = '0';
             setTimeout(() => {
-                form.style.maxHeight = '0';
-                form.style.width = '0';
+                formEl.style.maxHeight = '0';
+                formEl.style.width = '0';
                 openBtn.style.opacity = '1';
                 setEditingExam(null);
-                setFormData({ date: '', subject_id: '', group_id: '', class_room_id: '', class_index: '' });
+                form.reset();
             }, 500);
         };
         if (openBtn) openBtn.addEventListener('click', openHandler);
@@ -68,38 +69,45 @@ function Exams({ exams, subjects, groups, settings, search, classRooms = [] }) {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (editingExam) {
-            router.put(`/admin/exams/${editingExam.id}`, formData, {
+            form.put(`/admin/exams/${editingExam.id}`, form.data, {
                 onSuccess: () => {
+                    setAlert({ type: 'success', message: 'Exam updated successfully!' });
                     setEditingExam(null);
-                    setFormData({ date: '', subject_id: '', group_id: '', class_room_id: '', class_index: '' });
-                }
+                    form.reset();
+                },
+                onError: () => {
+                    setAlert({ type: 'error', message: 'Failed to update exam.' });
+                },
             });
         } else {
-            router.post('/admin/exams', formData, {
+            form.post('/admin/exams', {
                 onSuccess: () => {
-                    setFormData({ date: '', subject_id: '', group_id: '', class_room_id: '', class_index: '' });
-                }
+                    setAlert({ type: 'success', message: 'Exam created successfully!' });
+                    form.reset();
+                },
+                onError: () => {
+                    setAlert({ type: 'error', message: 'Failed to create exam.' });
+                },
             });
         }
     };
 
     const handleEdit = (exam) => {
         setEditingExam(exam);
-        setFormData({
+        form.setData({
             date: exam.date,
             subject_id: exam.subject_id,
             group_id: exam.group_id,
             class_room_id: exam.class_room_id || '',
             class_index: exam.class_index || '',
         });
-        // Open the form
-        const form = formRef.current;
+        const formEl = formRef.current;
         const openBtn = openBtnRef.current;
         openBtn.style.opacity = '0';
-        form.style.maxHeight = '1000px';
-        form.style.width = 'calc(100%*1/2)';
+        formEl.style.maxHeight = '1000px';
+        formEl.style.width = 'calc(100%*1/2)';
         setTimeout(() => {
-            form.style.opacity = '1';
+            formEl.style.opacity = '1';
         }, 500);
     };
 
@@ -111,6 +119,9 @@ function Exams({ exams, subjects, groups, settings, search, classRooms = [] }) {
 
     return (
         <div className="container">
+            <Alert type="success" message={flash.success} />
+            <Alert type="error" message={flash.error} />
+            <Alert type={alert.type} message={alert.message} onClose={() => setAlert({})} />
             <div className="page-content">
                 <div className="page-header">
                     <div className="page-title">Exams Schedules</div>
@@ -146,18 +157,19 @@ function Exams({ exams, subjects, groups, settings, search, classRooms = [] }) {
                                     type="date"
                                     id="date"
                                     name="date"
-                                    value={formData.date}
-                                    onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                                    value={form.data.date}
+                                    onChange={e => form.setData('date', e.target.value)}
                                     required
                                 />
+                                {form.errors.date && <div className="text-red-500 mt-2">{form.errors.date}</div>}
                             </div>
                             <div className="input-wrapper">
                                 <label htmlFor="subject_id">Subject:</label>
                                 <select
                                     id="subject_id"
                                     name="subject_id"
-                                    value={formData.subject_id}
-                                    onChange={(e) => setFormData({ ...formData, subject_id: e.target.value })}
+                                    value={form.data.subject_id}
+                                    onChange={e => form.setData('subject_id', e.target.value)}
                                     required
                                 >
                                     <option value="">Select Subject</option>
@@ -167,14 +179,15 @@ function Exams({ exams, subjects, groups, settings, search, classRooms = [] }) {
                                         </option>
                                     ))}
                                 </select>
+                                {form.errors.subject_id && <div className="text-red-500 mt-2">{form.errors.subject_id}</div>}
                             </div>
                             <div className="input-wrapper">
                                 <label htmlFor="group_id">Group:</label>
                                 <select
                                     id="group_id"
                                     name="group_id"
-                                    value={formData.group_id}
-                                    onChange={(e) => setFormData({ ...formData, group_id: e.target.value })}
+                                    value={form.data.group_id}
+                                    onChange={e => form.setData('group_id', e.target.value)}
                                     required
                                 >
                                     <option value="">Select Group</option>
@@ -184,14 +197,15 @@ function Exams({ exams, subjects, groups, settings, search, classRooms = [] }) {
                                         </option>
                                     ))}
                                 </select>
+                                {form.errors.group_id && <div className="text-red-500 mt-2">{form.errors.group_id}</div>}
                             </div>
                             <div className="input-wrapper">
                                 <label htmlFor="class_room_id">Class Room:</label>
                                 <select
                                     id="class_room_id"
                                     name="class_room_id"
-                                    value={formData.class_room_id || ''}
-                                    onChange={e => setFormData({ ...formData, class_room_id: e.target.value })}
+                                    value={form.data.class_room_id || ''}
+                                    onChange={e => form.setData('class_room_id', e.target.value)}
                                     required
                                 >
                                     <option value="">Select Class Room</option>
@@ -201,14 +215,15 @@ function Exams({ exams, subjects, groups, settings, search, classRooms = [] }) {
                                         </option>
                                     ))}
                                 </select>
+                                {form.errors.class_room_id && <div className="text-red-500 mt-2">{form.errors.class_room_id}</div>}
                             </div>
                             <div className="input-wrapper">
                                 <label htmlFor="class_index">Start At:</label>
                                 <select
                                     id="class_index"
                                     name="class_index"
-                                    value={formData.class_index || ''}
-                                    onChange={e => setFormData({ ...formData, class_index: e.target.value })}
+                                    value={form.data.class_index || ''}
+                                    onChange={e => form.setData('class_index', e.target.value)}
                                     required
                                 >
                                     <option value="">Select Start Time</option>
@@ -229,6 +244,7 @@ function Exams({ exams, subjects, groups, settings, search, classRooms = [] }) {
                                         return options;
                                     })()}
                                 </select>
+                                {form.errors.class_index && <div className="text-red-500 mt-2">{form.errors.class_index}</div>}
                             </div>
                             <div className='flex item-center gap-4 '>
                                 <button
@@ -237,7 +253,7 @@ function Exams({ exams, subjects, groups, settings, search, classRooms = [] }) {
                                     type="button"
                                     ref={closeBtnRef}
                                 >Cancel</button>
-                                <button type="submit" className="btn">{editingExam ? 'Save' : 'Create'}</button>
+                                <button type="submit" className="btn" disabled={form.processing}>{editingExam ? 'Save' : 'Create'}</button>
                             </div>
                         </form>
                         <div className="list-control">

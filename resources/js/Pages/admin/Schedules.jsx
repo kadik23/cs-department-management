@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { router, usePage } from '@inertiajs/react';
+import { useForm, usePage, router } from '@inertiajs/react';
+import Alert from '@/components/Alert';
 
 const weekDays = [
     'Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'
@@ -7,56 +8,56 @@ const weekDays = [
 
 function Schedules({ schedules, subjects, groups, teachers, classRooms, settings, search, filter_group_id }) {
     const { errors, flash } = usePage().props;
+    const [alert, setAlert] = useState({ type: '', message: '' });
     const [editingSchedule, setEditingSchedule] = useState(null);
-    const [formData, setFormData] = useState({
+    const formRef = useRef();
+    const openBtnRef = useRef();
+    const closeBtnRef = useRef();
+
+    const form = useForm({
         class_room_id: '',
-        class_room_input: '',
         group_id: '',
         teacher_id: '',
         subject_id: '',
         day_of_week: '',
         class_index: '',
     });
-    const [editSettings, setEditSettings] = useState(false);
-    const [settingsForm, setSettingsForm] = useState({
+    const settingsForm = useForm({
         class_duration: settings?.class_duration || '',
         first_class_start_at: settings?.first_class_start_at || '',
     });
-    const formRef = useRef();
-    const openBtnRef = useRef();
-    const closeBtnRef = useRef();
+    const [editSettings, setEditSettings] = useState(false);
+    const [settingsFormOpen, setSettingsFormOpen] = useState(false);
 
     useEffect(() => {
-        const form = formRef.current;
+        const formEl = formRef.current;
         const openBtn = openBtnRef.current;
-        if (form && openBtn) {
-            form.style.maxHeight = '0';
-            form.style.width = '0';
-            form.style.opacity = '0';
+        if (formEl && openBtn) {
+            formEl.style.maxHeight = '0';
+            formEl.style.width = '0';
+            formEl.style.opacity = '0';
             openBtn.style.opacity = '1';
         }
-        // Open form logic
         const openHandler = (ev) => {
             ev.preventDefault();
             setEditingSchedule(null);
-            setFormData({ class_room_id: '', group_id: '', teacher_id: '', subject_id: '', day_of_week: '', class_index: '' });
+            form.reset();
             openBtn.style.opacity = '0';
-            form.style.maxHeight = '1000px';
-            form.style.width = 'calc(100%*1/2)';
+            formEl.style.maxHeight = '1000px';
+            formEl.style.width = 'calc(100%*1/2)';
             setTimeout(() => {
-                form.style.opacity = '1';
+                formEl.style.opacity = '1';
             }, 500);
         };
-        // Close form logic
         const closeHandler = (ev) => {
             ev.preventDefault();
-            form.style.opacity = '0';
+            formEl.style.opacity = '0';
             setTimeout(() => {
-                form.style.maxHeight = '0';
-                form.style.width = '0';
+                formEl.style.maxHeight = '0';
+                formEl.style.width = '0';
                 openBtn.style.opacity = '1';
                 setEditingSchedule(null);
-                setFormData({ class_room_id: '', group_id: '', teacher_id: '', subject_id: '', day_of_week: '', class_index: '' });
+                form.reset();
             }, 500);
         };
         if (openBtn) openBtn.addEventListener('click', openHandler);
@@ -69,7 +70,7 @@ function Schedules({ schedules, subjects, groups, teachers, classRooms, settings
 
     const handleEdit = (schedule) => {
         setEditingSchedule(schedule);
-        setFormData({
+        form.setData({
             class_room_id: schedule.class_room_id,
             group_id: schedule.group_id,
             teacher_id: schedule.teacher_id,
@@ -77,7 +78,6 @@ function Schedules({ schedules, subjects, groups, teachers, classRooms, settings
             day_of_week: schedule.day_of_week,
             class_index: schedule.class_index,
         });
-        // Open the form
         if (formRef.current && openBtnRef.current) {
             openBtnRef.current.style.opacity = '0';
             formRef.current.style.maxHeight = '1000px';
@@ -97,40 +97,29 @@ function Schedules({ schedules, subjects, groups, teachers, classRooms, settings
     const handleSubmit = (e) => {
         e.preventDefault();
         if (editingSchedule) {
-            router.put(`/admin/schedules/${editingSchedule.id}`, formData, {
+            form.put(`/admin/schedules/${editingSchedule.id}`, form.data, {
                 onSuccess: () => {
+                    setAlert({ type: 'success', message: 'Schedule updated successfully!' });
                     setEditingSchedule(null);
-                    setFormData({ class_room_id: '', group_id: '', teacher_id: '', subject_id: '', day_of_week: '', class_index: '' });
-                    // Collapse form
-                    if (formRef.current && openBtnRef.current) {
-                        formRef.current.style.opacity = '0';
-                        setTimeout(() => {
-                            formRef.current.style.maxHeight = '0';
-                            formRef.current.style.width = '0';
-                            openBtnRef.current.style.opacity = '1';
-                        }, 500);
-                    }
-                }
+                    form.reset();
+                },
+                onError: () => {
+                    setAlert({ type: 'error', message: 'Failed to update schedule.' });
+                },
             });
         } else {
-            router.post('/admin/schedules', formData, {
+            form.post('/admin/schedules', {
                 onSuccess: () => {
-                    setFormData({ class_room_id: '', group_id: '', teacher_id: '', subject_id: '', day_of_week: '', class_index: '' });
-                    // Collapse form
-                    if (formRef.current && openBtnRef.current) {
-                        formRef.current.style.opacity = '0';
-                        setTimeout(() => {
-                            formRef.current.style.maxHeight = '0';
-                            formRef.current.style.width = '0';
-                            openBtnRef.current.style.opacity = '1';
-                        }, 500);
-                    }
-                }
+                    setAlert({ type: 'success', message: 'Schedule added successfully!' });
+                    form.reset();
+                },
+                onError: () => {
+                    setAlert({ type: 'error', message: 'Failed to add schedule.' });
+                },
             });
         }
     };
 
-    const [settingsFormOpen, setSettingsFormOpen] = useState(false);
     const handleSettingsEdit = (e) => {
         e.preventDefault();
         setEditSettings(true);
@@ -138,15 +127,21 @@ function Schedules({ schedules, subjects, groups, teachers, classRooms, settings
     const handleSettingsCancel = (e) => {
         e.preventDefault();
         setEditSettings(false);
-        setSettingsForm({
+        settingsForm.setData({
             class_duration: settings?.class_duration || '',
             first_class_start_at: settings?.first_class_start_at || '',
         });
     };
     const handleSettingsSave = (e) => {
         e.preventDefault();
-        router.post('/admin/schedules/settings', settingsForm, {
-            onSuccess: () => setEditSettings(false)
+        settingsForm.post('/admin/schedules/settings', {
+            onSuccess: () => {
+                setEditSettings(false);
+                setAlert({ type: 'success', message: 'Scheduler settings updated successfully!' });
+            },
+            onError: () => {
+                setAlert({ type: 'error', message: 'Failed to update scheduler settings.' });
+            },
         });
     };
 
@@ -171,6 +166,9 @@ function Schedules({ schedules, subjects, groups, teachers, classRooms, settings
 
     return (
         <div className="container">
+            <Alert type="success" message={flash.success} />
+            <Alert type="error" message={flash.error} />
+            <Alert type={alert.type} message={alert.message} onClose={() => setAlert({})} />
             <div className="page-content">
                 <div className="page-header">
                     <div className="page-title">Schedules</div>
@@ -185,17 +183,19 @@ function Schedules({ schedules, subjects, groups, teachers, classRooms, settings
                                 <label htmlFor="first_class_start_at">First Class Start At: </label>
                                 <input type="time" name="first_class_start_at" id="first_class_start_at"
                                     disabled={!editSettings}
-                                    value={settingsForm.first_class_start_at}
-                                    onChange={e => setSettingsForm({ ...settingsForm, first_class_start_at: e.target.value })}
+                                    value={settingsForm.data.first_class_start_at}
+                                    onChange={e => settingsForm.setData('first_class_start_at', e.target.value)}
                                 />
+                                {settingsForm.errors.first_class_start_at && <div className="text-red-500 mt-2">{settingsForm.errors.first_class_start_at}</div>}
                             </div>
                             <div>
                                 <label htmlFor="class_duration">Class Duration: </label>
                                 <input type="number" name="class_duration" id="class_duration"
                                     disabled={!editSettings}
-                                    value={settingsForm.class_duration}
-                                    onChange={e => setSettingsForm({ ...settingsForm, class_duration: e.target.value })}
+                                    value={settingsForm.data.class_duration}
+                                    onChange={e => settingsForm.setData('class_duration', e.target.value)}
                                 />
+                                {settingsForm.errors.class_duration && <div className="text-red-500 mt-2">{settingsForm.errors.class_duration}</div>}
                             </div>
                             <div>
                                 {!editSettings ? (
@@ -203,16 +203,16 @@ function Schedules({ schedules, subjects, groups, teachers, classRooms, settings
                                 ) : (
                                     <>
                                         <button type="button" className="cancel-btn" onClick={handleSettingsCancel} style={{ marginRight: 10 }}>Cancel</button>
-                                        <button type="submit" className="btn">Save</button>
+                                        <button type="submit" className="btn" disabled={settingsForm.processing}>Save</button>
                                     </>
                                 )}
                             </div>
                         </form>
                         {errors && errors.error && (
-                            <div className="alert alert-danger">{errors.error}</div>
+                            <Alert type="error" message={errors.error} />
                         )}
                         {flash && flash.success && (
-                            <div className="alert alert-success">{flash.success}</div>
+                            <Alert type="success" message={flash.success} />
                         )}
                         <form
                             method="POST"
@@ -235,13 +235,8 @@ function Schedules({ schedules, subjects, groups, teachers, classRooms, settings
                                 <select
                                     id="class_room_id"
                                     name="class_room_id"
-                                    value={formData.class_room_id || ''}
-                                    onChange={e => {
-                                        setFormData(f => ({
-                                            ...f,
-                                            class_room_id: e.target.value
-                                        }));
-                                    }}
+                                    value={form.data.class_room_id || ''}
+                                    onChange={e => form.setData('class_room_id', e.target.value)}
                                     required
                                 >
                                     <option value="">Select Class Room</option>
@@ -251,66 +246,71 @@ function Schedules({ schedules, subjects, groups, teachers, classRooms, settings
                                         </option>
                                     ))}
                                 </select>
+                                {form.errors.class_room_id && <div className="text-red-500 mt-2">{form.errors.class_room_id}</div>}
                             </div>
                             <div className="input-wrapper">
                                 <label>Group:</label>
-                                <input type="text" className="selected_input" list="groups" placeholder="group" value={groups.find(g => g.id === formData.group_id) ? `L${groups.find(g => g.id === formData.group_id).level} ${groups.find(g => g.id === formData.group_id).speciality_name} Group ${groups.find(g => g.id === formData.group_id).group_number}` : ''} onChange={e => {
+                                <input type="text" className="selected_input" list="groups" placeholder="group" value={groups.find(g => g.id === form.data.group_id) ? `L${groups.find(g => g.id === form.data.group_id).level} ${groups.find(g => g.id === form.data.group_id).speciality_name} Group ${groups.find(g => g.id === form.data.group_id).group_number}` : ''} onChange={e => {
                                     const val = e.target.value;
                                     const found = groups.find(g => `L${g.level} ${g.speciality_name} Group ${g.group_number}` === val || g.id.toString() === val);
-                                    setFormData(f => ({ ...f, group_id: found ? found.id : '' }));
+                                    form.setData('group_id', found ? found.id : '');
                                 }} />
-                                <input type="hidden" className="hidden_selected_input" list="groups" id="group_id" name="group_id" value={formData.group_id} readOnly />
+                                <input type="hidden" className="hidden_selected_input" list="groups" id="group_id" name="group_id" value={form.data.group_id} readOnly />
                                 <datalist id="groups">
                                     {groups.map(g => (
                                         <option key={g.id} value={`L${g.level} ${g.speciality_name} Group ${g.group_number}`}>{`L${g.level} ${g.speciality_name} Group ${g.group_number}`}</option>
                                     ))}
                                 </datalist>
+                                {form.errors.group_id && <div className="text-red-500 mt-2">{form.errors.group_id}</div>}
                             </div>
                             <div className="input-wrapper">
                                 <label>Teacher:</label>
-                                <input type="text" className="selected_input" list="teachers" placeholder="teacher" value={teachers.find(t => t.id === formData.teacher_id) ? `${teachers.find(t => t.id === formData.teacher_id).first_name} ${teachers.find(t => t.id === formData.teacher_id).last_name}` : ''} onChange={e => {
+                                <input type="text" className="selected_input" list="teachers" placeholder="teacher" value={teachers.find(t => t.id === form.data.teacher_id) ? `${teachers.find(t => t.id === form.data.teacher_id).first_name} ${teachers.find(t => t.id === form.data.teacher_id).last_name}` : ''} onChange={e => {
                                     const val = e.target.value;
                                     const found = teachers.find(t => `${t.first_name} ${t.last_name}` === val || t.id.toString() === val);
-                                    setFormData(f => ({ ...f, teacher_id: found ? found.id : '' }));
+                                    form.setData('teacher_id', found ? found.id : '');
                                 }} />
-                                <input type="hidden" className="hidden_selected_input" list="teachers" id="teacher_id" name="teacher_id" value={formData.teacher_id} readOnly />
+                                <input type="hidden" className="hidden_selected_input" list="teachers" id="teacher_id" name="teacher_id" value={form.data.teacher_id} readOnly />
                                 <datalist id="teachers">
                                     {teachers.map(t => (
                                         <option key={t.id} value={`${t.first_name} ${t.last_name}`}>{`${t.first_name} ${t.last_name}`}</option>
                                     ))}
                                 </datalist>
+                                {form.errors.teacher_id && <div className="text-red-500 mt-2">{form.errors.teacher_id}</div>}
                             </div>
                             <div className="input-wrapper">
                                 <label>Subject:</label>
-                                <input type="text" className="selected_input" list="subjects" placeholder="subject" value={subjects.find(s => s.id === formData.subject_id) ? subjects.find(s => s.id === formData.subject_id).subject_name : ''} onChange={e => {
+                                <input type="text" className="selected_input" list="subjects" placeholder="subject" value={subjects.find(s => s.id === form.data.subject_id) ? subjects.find(s => s.id === form.data.subject_id).subject_name : ''} onChange={e => {
                                     const val = e.target.value;
                                     const found = subjects.find(s => s.subject_name === val || s.id.toString() === val);
-                                    setFormData(f => ({ ...f, subject_id: found ? found.id : '' }));
+                                    form.setData('subject_id', found ? found.id : '');
                                 }} />
-                                <input type="hidden" className="hidden_selected_input" list="subjects" id="subject_id" name="subject_id" value={formData.subject_id} readOnly />
+                                <input type="hidden" className="hidden_selected_input" list="subjects" id="subject_id" name="subject_id" value={form.data.subject_id} readOnly />
                                 <datalist id="subjects">
                                     {subjects.map(s => (
                                         <option key={s.id} value={s.subject_name}>{s.subject_name}</option>
                                     ))}
                                 </datalist>
+                                {form.errors.subject_id && <div className="text-red-500 mt-2">{form.errors.subject_id}</div>}
                             </div>
                             <div className="input-wrapper">
                                 <label>Day:</label>
-                                <input type="text" className="selected_input" list="days_of_week" value={formData.day_of_week !== '' ? weekDays[formData.day_of_week] : ''} onChange={e => {
+                                <input type="text" className="selected_input" list="days_of_week" value={form.data.day_of_week !== '' ? weekDays[form.data.day_of_week] : ''} onChange={e => {
                                     const val = e.target.value;
                                     const found = weekDays.findIndex(d => d === val);
-                                    setFormData(f => ({ ...f, day_of_week: found !== -1 ? found : '' }));
+                                    form.setData('day_of_week', found !== -1 ? found : '');
                                 }} />
-                                <input type="hidden" className="hidden_selected_input" list="days_of_week" id="day_of_week" name="day_of_week" value={formData.day_of_week} readOnly />
+                                <input type="hidden" className="hidden_selected_input" list="days_of_week" id="day_of_week" name="day_of_week" value={form.data.day_of_week} readOnly />
                                 <datalist id="days_of_week">
                                     {weekDays.map((d, idx) => (
                                         <option key={idx} value={d}>{d}</option>
                                     ))}
                                 </datalist>
+                                {form.errors.day_of_week && <div className="text-red-500 mt-2">{form.errors.day_of_week}</div>}
                             </div>
                             <div className="input-wrapper">
                                 <label>Start At:</label>
-                                <input type="text" className="selected_input" list="class_indexes" value={formData.class_index !== '' && settings ? (() => { const classDuration = settings.class_duration; const firstClassStartAt = parseInt(settings.first_class_start_at?.split(':')[0] || '8', 10); const opt = (() => { let i = 0, label = ''; while ((i * classDuration) < ((18 - firstClassStartAt) * 60)) { if (i.toString() === formData.class_index.toString()) { const totalMinutes = i * classDuration; const hours = Math.floor(totalMinutes / 60) + firstClassStartAt; const minutes = totalMinutes % 60; label = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`; break; } i += 1; } return label; })(); return opt; })() : ''} onChange={e => {
+                                <input type="text" className="selected_input" list="class_indexes" value={form.data.class_index !== '' && settings ? (() => { const classDuration = settings.class_duration; const firstClassStartAt = parseInt(settings.first_class_start_at?.split(':')[0] || '8', 10); const opt = (() => { let i = 0, label = ''; while ((i * classDuration) < ((18 - firstClassStartAt) * 60)) { if (i.toString() === form.data.class_index.toString()) { const totalMinutes = i * classDuration; const hours = Math.floor(totalMinutes / 60) + firstClassStartAt; const minutes = totalMinutes % 60; label = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`; break; } i += 1; } return label; })(); return opt; })() : ''} onChange={e => {
                                     const val = e.target.value;
                                     if (!settings) return;
                                     const classDuration = settings.class_duration;
@@ -324,12 +324,13 @@ function Schedules({ schedules, subjects, groups, teachers, classRooms, settings
                                         if (label === val || i.toString() === val) { found = i; break; }
                                         i += 1;
                                     }
-                                    setFormData(f => ({ ...f, class_index: found }));
+                                    form.setData('class_index', found);
                                 }} />
-                                <input type="hidden" className="hidden_selected_input" list="class_indexes" id="class_index" name="class_index" value={formData.class_index} readOnly />
+                                <input type="hidden" className="hidden_selected_input" list="class_indexes" id="class_index" name="class_index" value={form.data.class_index} readOnly />
                                 <datalist id="class_indexes">
                                     {settings && (() => { const opts = []; const classDuration = settings.class_duration; const firstClassStartAt = parseInt(settings.first_class_start_at?.split(':')[0] || '8', 10); let i = 0; while ((i * classDuration) < ((18 - firstClassStartAt) * 60)) { const totalMinutes = i * classDuration; const hours = Math.floor(totalMinutes / 60) + firstClassStartAt; const minutes = totalMinutes % 60; opts.push(<option key={i} value={`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`}>{`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`}</option>); i += 1; } return opts; })()}
                                 </datalist>
+                                {form.errors.class_index && <div className="text-red-500 mt-2">{form.errors.class_index}</div>}
                             </div>
                             <div className='flex item-center gap-4 '>
                                 <button
@@ -338,7 +339,7 @@ function Schedules({ schedules, subjects, groups, teachers, classRooms, settings
                                     type="button"
                                     ref={closeBtnRef}
                                 >Cancel</button>
-                                <button type="submit" className="btn">{editingSchedule ? 'Save' : 'Add'}</button>
+                                <button type="submit" className="btn" disabled={form.processing}>{editingSchedule ? 'Save' : 'Add'}</button>
                             </div>
                         </form>
                         <div className="list-control">

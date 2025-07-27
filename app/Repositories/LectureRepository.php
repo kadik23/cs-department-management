@@ -195,13 +195,4 @@ class LectureRepository extends BaseRepository
     /**
      * Get scheduler settings
      */
-    public function getSchedulerSettings(): array
-    {
-        $settings = SchedulerSetting::first();
-        
-        return [
-            'class_duration' => $settings ? $settings->class_duration : 60,
-            'first_class_start_at' => $settings ? $settings->first_class_start_at : '08:00'
-        ];
-    }
 } 

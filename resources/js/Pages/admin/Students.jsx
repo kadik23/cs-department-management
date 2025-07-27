@@ -1,12 +1,19 @@
 import React, { useState } from 'react';
-import { router } from '@inertiajs/react';
+import { router, useForm, usePage } from '@inertiajs/react';
+import Alert from '@/components/Alert';
 import "@css/students.css"
 
 function Students({ students, search }) {
+    const { flash } = usePage().props;
     const [showDialogue, setShowDialogue] = useState(false);
     const [selectedStudent, setSelectedStudent] = useState(null);
     const [groups, setGroups] = useState([]);
-    const [selectedGroupId, setSelectedGroupId] = useState('');
+    const [alert, setAlert] = useState({ type: '', message: '' });
+
+    const assignGroupForm = useForm({
+        student_id: '',
+        group_id: '',
+    });
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -20,33 +27,37 @@ function Students({ students, search }) {
     const openDialogue = async (student) => {
         setSelectedStudent(student);
         setShowDialogue(true);
-        
+        assignGroupForm.setData('student_id', student.id);
+        assignGroupForm.setData('group_id', '');
         try {
             const response = await fetch(`/admin/students/groups?academic_level_id=${student.academic_level_id}`);
             const groupsData = await response.json();
             setGroups(groupsData);
         } catch (error) {
-            console.error('Error fetching groups:', error);
+            setAlert({ type: 'error', message: 'Error fetching groups.' });
         }
     };
 
     const assignGroup = (e) => {
         e.preventDefault();
-        const formData = new FormData();
-        formData.append('student_id', selectedStudent.id);
-        formData.append('group_id', selectedGroupId);
-        
-        router.post('/admin/students/assign-group', formData, {
+        assignGroupForm.post('/admin/students/assign-group', {
             onSuccess: () => {
+                setAlert({ type: 'success', message: 'Group assigned successfully!' });
                 setShowDialogue(false);
                 setSelectedStudent(null);
-                setSelectedGroupId('');
-            }
+                assignGroupForm.reset();
+            },
+            onError: () => {
+                setAlert({ type: 'error', message: 'Failed to assign group.' });
+            },
         });
     };
 
     return (
         <div className="container">
+            <Alert type="success" message={flash.success} />
+            <Alert type="error" message={flash.error} />
+            <Alert type={alert.type} message={alert.message} onClose={() => setAlert({})} />
             <div className="page-content">
                 <div className="page-header">
                     <div className="page-title">Students</div>
@@ -66,7 +77,6 @@ function Students({ students, search }) {
                                 </div>
                             </form>
                         </div>
-                        
                         <div className="card-boxes-wrapper">
                             {students.map((student) => (
                                 <div key={student.id} className="card-box-outer">
@@ -124,12 +134,11 @@ function Students({ students, search }) {
                                                 className="selected_input"
                                                 list="groups-list"
                                                 placeholder="group"
-                                                value={groups.find(g => g.id === selectedGroupId) ? `L${groups.find(g => g.id === selectedGroupId).level} ${groups.find(g => g.id === selectedGroupId).speciality_name} Group ${groups.find(g => g.id === selectedGroupId).group_number}` : ''}
+                                                value={groups.find(g => g.id === assignGroupForm.data.group_id) ? `L${groups.find(g => g.id === assignGroupForm.data.group_id).level} ${groups.find(g => g.id === assignGroupForm.data.group_id).speciality_name} Group ${groups.find(g => g.id === assignGroupForm.data.group_id).group_number}` : ''}
                                                 onChange={e => {
-                                                    // Find the group by display value
                                                     const val = e.target.value;
                                                     const found = groups.find(g => `L${g.level} ${g.speciality_name} Group ${g.group_number}` === val);
-                                                    setSelectedGroupId(found ? found.id : '');
+                                                    assignGroupForm.setData('group_id', found ? found.id : '');
                                                 }}
                                                 required
                                             />
@@ -139,7 +148,7 @@ function Students({ students, search }) {
                                                 list="groups-list"
                                                 id="group_id"
                                                 name="group_id"
-                                                value={selectedGroupId}
+                                                value={assignGroupForm.data.group_id}
                                                 readOnly
                                             />
                                             <datalist id="groups-list">
@@ -150,8 +159,11 @@ function Students({ students, search }) {
                                         </div>
                                         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', width: 'calc(11/12*100%)' }}>
                                             <div className="cancel-btn dialogue-close-btn" onClick={() => setShowDialogue(false)}>Cancel</div>
-                                            <button form="assign-group-form" className="btn" type="submit" style={{ marginLeft: '10px' }}>Save</button>
+                                            <button form="assign-group-form" className="btn" type="submit" style={{ marginLeft: '10px' }} disabled={assignGroupForm.processing}>Save</button>
                                         </div>
+                                        {assignGroupForm.errors.group_id && (
+                                            <div className="text-red-500 mt-2">{assignGroupForm.errors.group_id}</div>
+                                        )}
                                     </form>
                                 </div>
                             </div>

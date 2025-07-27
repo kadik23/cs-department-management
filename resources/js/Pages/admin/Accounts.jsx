@@ -1,8 +1,15 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { router } from '@inertiajs/react';
+import React, { useRef, useEffect, useState } from 'react';
+import { useForm, usePage, router } from '@inertiajs/react';
+import Alert from '@/components/Alert';
 
 function Accounts({ users, search, groups = [] }) {
-    const [formData, setFormData] = useState({
+    const { flash } = usePage().props;
+    const [alert, setAlert] = useState({ type: '', message: '' });
+    const formRef = useRef();
+    const openBtnRef = useRef();
+    const closeBtnRef = useRef();
+
+    const form = useForm({
         username: '',
         email: '',
         password: '',
@@ -12,58 +19,35 @@ function Accounts({ users, search, groups = [] }) {
         academic_level_id: '',
         group_id: '',
     });
-    const formRef = useRef();
-    const openBtnRef = useRef();
-    const closeBtnRef = useRef();
 
     useEffect(() => {
         // Set initial collapsed styles
-        const form = formRef.current;
+        const formEl = formRef.current;
         const openBtn = openBtnRef.current;
-        if (form && openBtn) {
-            form.style.maxHeight = '0';
-            form.style.width = '0';
-            form.style.opacity = '0';
+        if (formEl && openBtn) {
+            formEl.style.maxHeight = '0';
+            formEl.style.width = '0';
+            formEl.style.opacity = '0';
             openBtn.style.opacity = '1';
         }
-        // Open form logic
         const openHandler = (ev) => {
             ev.preventDefault();
-            setFormData({
-                username: '',
-                email: '',
-                password: '',
-                role: 'student',
-                first_name: '',
-                last_name: '',
-                academic_level_id: '',
-                group_id: '',
-            });
+            form.reset();
             openBtn.style.opacity = '0';
-            form.style.maxHeight = '1000px';
-            form.style.width = 'calc(100%*1/2)';
+            formEl.style.maxHeight = '1000px';
+            formEl.style.width = 'calc(100%*1/2)';
             setTimeout(() => {
-                form.style.opacity = '1';
+                formEl.style.opacity = '1';
             }, 500);
         };
-        // Close form logic
         const closeHandler = (ev) => {
             ev.preventDefault();
-            form.style.opacity = '0';
+            formEl.style.opacity = '0';
             setTimeout(() => {
-                form.style.maxHeight = '0';
-                form.style.width = '0';
+                formEl.style.maxHeight = '0';
+                formEl.style.width = '0';
                 openBtn.style.opacity = '1';
-                setFormData({
-                    username: '',
-                    email: '',
-                    password: '',
-                    role: 'student',
-                    first_name: '',
-                    last_name: '',
-                    academic_level_id: '',
-                    group_id: '',
-                });
+                form.reset();
             }, 500);
         };
         if (openBtn) openBtn.addEventListener('click', openHandler);
@@ -85,19 +69,14 @@ function Accounts({ users, search, groups = [] }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        router.post('/admin/accounts', formData, {
+        form.post('/admin/accounts', {
             onSuccess: () => {
-                setFormData({
-                    username: '',
-                    email: '',
-                    password: '',
-                    role: 'student',
-                    first_name: '',
-                    last_name: '',
-                    academic_level_id: '',
-                    group_id: '',
-                });
-            }
+                setAlert({ type: 'success', message: 'Account created successfully!' });
+                form.reset();
+            },
+            onError: () => {
+                setAlert({ type: 'error', message: 'Failed to create account.' });
+            },
         });
     };
 
@@ -109,6 +88,9 @@ function Accounts({ users, search, groups = [] }) {
 
     return (
         <div className="container">
+            <Alert type="success" message={flash.success} />
+            <Alert type="error" message={flash.error} />
+            <Alert type={alert.type} message={alert.message} onClose={() => setAlert({})} />
             <div className="page-content">
                 <div className="page-header">
                     <div className="page-title">Accounts</div>
@@ -144,10 +126,11 @@ function Accounts({ users, search, groups = [] }) {
                                     type="text"
                                     id="username"
                                     name="username"
-                                    value={formData.username}
-                                    onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                                    value={form.data.username}
+                                    onChange={e => form.setData('username', e.target.value)}
                                     required
                                 />
+                                {form.errors.username && <div className="text-red-500 mt-2">{form.errors.username}</div>}
                             </div>
                             <div className="input-wrapper">
                                 <label htmlFor="email">Email:</label>
@@ -155,10 +138,11 @@ function Accounts({ users, search, groups = [] }) {
                                     type="email"
                                     id="email"
                                     name="email"
-                                    value={formData.email}
-                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                    value={form.data.email}
+                                    onChange={e => form.setData('email', e.target.value)}
                                     required
                                 />
+                                {form.errors.email && <div className="text-red-500 mt-2">{form.errors.email}</div>}
                             </div>
                             <div className="input-wrapper">
                                 <label htmlFor="password">Password:</label>
@@ -166,24 +150,26 @@ function Accounts({ users, search, groups = [] }) {
                                     type="password"
                                     id="password"
                                     name="password"
-                                    value={formData.password}
-                                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                    value={form.data.password}
+                                    onChange={e => form.setData('password', e.target.value)}
                                     required
                                 />
+                                {form.errors.password && <div className="text-red-500 mt-2">{form.errors.password}</div>}
                             </div>
                             <div className="input-wrapper">
                                 <label htmlFor="role">Role:</label>
                                 <select
                                     id="role"
                                     name="role"
-                                    value={formData.role}
-                                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                                    value={form.data.role}
+                                    onChange={e => form.setData('role', e.target.value)}
                                     required
                                 >
                                     <option value="student">Student</option>
                                     <option value="teacher">Teacher</option>
                                     <option value="administrator">Administrator</option>
                                 </select>
+                                {form.errors.role && <div className="text-red-500 mt-2">{form.errors.role}</div>}
                             </div>
                             <div className="input-wrapper">
                                 <label htmlFor="first_name">First Name:</label>
@@ -191,10 +177,11 @@ function Accounts({ users, search, groups = [] }) {
                                     type="text"
                                     id="first_name"
                                     name="first_name"
-                                    value={formData.first_name}
-                                    onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+                                    value={form.data.first_name}
+                                    onChange={e => form.setData('first_name', e.target.value)}
                                     required
                                 />
+                                {form.errors.first_name && <div className="text-red-500 mt-2">{form.errors.first_name}</div>}
                             </div>
                             <div className="input-wrapper">
                                 <label htmlFor="last_name">Last Name:</label>
@@ -202,28 +189,25 @@ function Accounts({ users, search, groups = [] }) {
                                     type="text"
                                     id="last_name"
                                     name="last_name"
-                                    value={formData.last_name}
-                                    onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+                                    value={form.data.last_name}
+                                    onChange={e => form.setData('last_name', e.target.value)}
                                     required
                                 />
+                                {form.errors.last_name && <div className="text-red-500 mt-2">{form.errors.last_name}</div>}
                             </div>
-                            {/* Group for students only */}
-                            {formData.role === 'student' && (
+                            {form.data.role === 'student' && (
                                 <>
                                     <div className="input-wrapper">
                                         <label htmlFor="group_id">Group:</label>
                                         <select
                                             id="group_id"
                                             name="group_id"
-                                            value={formData.group_id}
+                                            value={form.data.group_id}
                                             onChange={e => {
                                                 const groupId = e.target.value;
                                                 const group = groups.find(g => String(g.id) === groupId);
-                                                setFormData(f => ({
-                                                    ...f,
-                                                    group_id: groupId,
-                                                    academic_level_id: group ? group.academic_level_id : ''
-                                                }));
+                                                form.setData('group_id', groupId);
+                                                form.setData('academic_level_id', group ? group.academic_level_id : '');
                                             }}
                                             required
                                         >
@@ -238,13 +222,14 @@ function Accounts({ users, search, groups = [] }) {
                                                 <option value="" disabled>No groups available</option>
                                             )}
                                         </select>
+                                        {form.errors.group_id && <div className="text-red-500 mt-2">{form.errors.group_id}</div>}
                                     </div>
                                     {/* Hidden academic_level_id input */}
                                     <input
                                         type="hidden"
                                         id="academic_level_id"
                                         name="academic_level_id"
-                                        value={formData.academic_level_id}
+                                        value={form.data.academic_level_id}
                                         readOnly
                                         required
                                     />
@@ -257,7 +242,7 @@ function Accounts({ users, search, groups = [] }) {
                                     type="button"
                                     ref={closeBtnRef}
                                 >Cancel</button>
-                                <button type="submit" className="btn">Create</button>
+                                <button type="submit" className="btn" disabled={form.processing}>Create</button>
                             </div>
                         </form>
                         <div className="list-control">

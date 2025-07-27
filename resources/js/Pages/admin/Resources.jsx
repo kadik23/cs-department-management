@@ -1,48 +1,50 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { router } from '@inertiajs/react';
+import { useForm, usePage, router } from '@inertiajs/react';
+import Alert from '@/components/Alert';
 
 function Resources({ resources, search }) {
+    const { flash } = usePage().props;
+    const [alert, setAlert] = useState({ type: '', message: '' });
     const [editingResource, setEditingResource] = useState(null);
-    const [formData, setFormData] = useState({
-        resource_type: '',
-        resource_number: ''
-    });
     const [filterType, setFilterType] = useState('All');
     const formRef = useRef();
     const openBtnRef = useRef();
     const closeBtnRef = useRef();
 
+    const form = useForm({
+        resource_type: '',
+        resource_number: ''
+    });
+
     useEffect(() => {
-        const form = formRef.current;
+        const formEl = formRef.current;
         const openBtn = openBtnRef.current;
-        if (form && openBtn) {
-            form.style.maxHeight = '0';
-            form.style.width = '0';
-            form.style.opacity = '0';
+        if (formEl && openBtn) {
+            formEl.style.maxHeight = '0';
+            formEl.style.width = '0';
+            formEl.style.opacity = '0';
             openBtn.style.opacity = '1';
         }
-        // Open form logic
         const openHandler = (ev) => {
             ev.preventDefault();
             setEditingResource(null);
-            setFormData({ resource_type: '', resource_number: '' });
+            form.reset();
             openBtn.style.opacity = '0';
-            form.style.maxHeight = '1000px';
-            form.style.width = 'calc(100%*1/2)';
+            formEl.style.maxHeight = '1000px';
+            formEl.style.width = 'calc(100%*1/2)';
             setTimeout(() => {
-                form.style.opacity = '1';
+                formEl.style.opacity = '1';
             }, 500);
         };
-        // Close form logic
         const closeHandler = (ev) => {
             ev.preventDefault();
-            form.style.opacity = '0';
+            formEl.style.opacity = '0';
             setTimeout(() => {
-                form.style.maxHeight = '0';
-                form.style.width = '0';
+                formEl.style.maxHeight = '0';
+                formEl.style.width = '0';
                 openBtn.style.opacity = '1';
                 setEditingResource(null);
-                setFormData({ resource_type: '', resource_number: '' });
+                form.reset();
             }, 500);
         };
         if (openBtn) openBtn.addEventListener('click', openHandler);
@@ -64,46 +66,35 @@ function Resources({ resources, search }) {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (editingResource) {
-            router.put(`/admin/resources/${editingResource.id}`, formData, {
+            form.put(`/admin/resources/${editingResource.id}`, form.data, {
                 onSuccess: () => {
+                    setAlert({ type: 'success', message: 'Resource updated successfully!' });
                     setEditingResource(null);
-                    setFormData({ resource_type: '', resource_number: '' });
-                    // Collapse form
-                    if (formRef.current && openBtnRef.current) {
-                        formRef.current.style.opacity = '0';
-                        setTimeout(() => {
-                            formRef.current.style.maxHeight = '0';
-                            formRef.current.style.width = '0';
-                            openBtnRef.current.style.opacity = '1';
-                        }, 500);
-                    }
-                }
+                    form.reset();
+                },
+                onError: () => {
+                    setAlert({ type: 'error', message: 'Failed to update resource.' });
+                },
             });
         } else {
-            router.post('/admin/resources', formData, {
+            form.post('/admin/resources', {
                 onSuccess: () => {
-                    setFormData({ resource_type: '', resource_number: '' });
-                    // Collapse form
-                    if (formRef.current && openBtnRef.current) {
-                        formRef.current.style.opacity = '0';
-                        setTimeout(() => {
-                            formRef.current.style.maxHeight = '0';
-                            formRef.current.style.width = '0';
-                            openBtnRef.current.style.opacity = '1';
-                        }, 500);
-                    }
-                }
+                    setAlert({ type: 'success', message: 'Resource created successfully!' });
+                    form.reset();
+                },
+                onError: () => {
+                    setAlert({ type: 'error', message: 'Failed to create resource.' });
+                },
             });
         }
     };
 
     const handleEdit = (resource) => {
         setEditingResource(resource);
-        setFormData({
+        form.setData({
             resource_type: resource.resource_type,
             resource_number: resource.resource_number
         });
-        // Open the form
         if (formRef.current && openBtnRef.current) {
             openBtnRef.current.style.opacity = '0';
             formRef.current.style.maxHeight = '1000px';
@@ -122,6 +113,9 @@ function Resources({ resources, search }) {
 
     return (
         <div className="container">
+            <Alert type="success" message={flash.success} />
+            <Alert type="error" message={flash.error} />
+            <Alert type={alert.type} message={alert.message} onClose={() => setAlert({})} />
             <div className="page-content">
                 <div className="page-header">
                     <div className="page-title">Resources</div>
@@ -154,10 +148,11 @@ function Resources({ resources, search }) {
                                     name="resource_type"
                                     id="resource_type"
                                     placeholder="Resource type"
-                                    value={formData.resource_type}
-                                    onChange={e => setFormData({ ...formData, resource_type: e.target.value })}
+                                    value={form.data.resource_type}
+                                    onChange={e => form.setData('resource_type', e.target.value)}
                                     required
                                 />
+                                {form.errors.resource_type && <div className="text-red-500 mt-2">{form.errors.resource_type}</div>}
                             </div>
                             <div className="input-wrapper">
                                 <label htmlFor="resource_number">Resource Number/Reference:</label>
@@ -166,10 +161,11 @@ function Resources({ resources, search }) {
                                     name="resource_number"
                                     id="resource_number"
                                     placeholder="Resource number"
-                                    value={formData.resource_number}
-                                    onChange={e => setFormData({ ...formData, resource_number: e.target.value })}
+                                    value={form.data.resource_number}
+                                    onChange={e => form.setData('resource_number', e.target.value)}
                                     required
                                 />
+                                {form.errors.resource_number && <div className="text-red-500 mt-2">{form.errors.resource_number}</div>}
                             </div>
                             <div className='flex item-center gap-4 '>
                                 <button
@@ -178,7 +174,7 @@ function Resources({ resources, search }) {
                                     type="button"
                                     ref={closeBtnRef}
                                 >Cancel</button>
-                                <button type="submit" className="btn">{editingResource ? 'Save' : 'Create'}</button>
+                                <button type="submit" className="btn" disabled={form.processing}>{editingResource ? 'Save' : 'Create'}</button>
                             </div>
                         </form>
                         <div className="list-control">

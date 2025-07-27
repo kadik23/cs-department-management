@@ -1,44 +1,47 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { router } from '@inertiajs/react';
+import { useForm, usePage, router } from '@inertiajs/react';
+import Alert from '@/components/Alert';
 
 function Subjects({ subjects, search }) {
-    const [formData, setFormData] = useState({
-        subject_name: '',
-        coefficient: '',
-        credit: ''
-    });
+    const { flash } = usePage().props;
+    const [alert, setAlert] = useState({ type: '', message: '' });
     const formRef = useRef();
     const openBtnRef = useRef();
     const closeBtnRef = useRef();
 
+    const form = useForm({
+        subject_name: '',
+        coefficient: '',
+        credit: ''
+    });
+
     useEffect(() => {
-        // Set initial collapsed styles
-        const form = formRef.current;
+        const formEl = formRef.current;
         const openBtn = openBtnRef.current;
-        if (form && openBtn) {
-            form.style.maxHeight = '0';
-            form.style.width = '0';
-            form.style.opacity = '0';
+        if (formEl && openBtn) {
+            formEl.style.maxHeight = '0';
+            formEl.style.width = '0';
+            formEl.style.opacity = '0';
             openBtn.style.opacity = '1';
         }
-        // Open form logic
         const openHandler = (ev) => {
             ev.preventDefault();
+            form.reset();
             openBtn.style.opacity = '0';
-            form.style.maxHeight = '1000px';
-            form.style.width = 'calc(100%*1/2)';
+            formEl.style.maxHeight = '1000px';
+            formEl.style.width = 'calc(100%*1/2)';
             setTimeout(() => {
-                form.style.opacity = '1';
+                formEl.style.opacity = '1';
             }, 500);
         };
-        // Close form logic
         const closeHandler = (ev) => {
             ev.preventDefault();
-            form.style.opacity = '0';
+            formEl.style.opacity = '0';
             setTimeout(() => {
-                form.style.maxHeight = '0';
-                form.style.width = '0';
+                formEl.style.maxHeight = '0';
+                formEl.style.width = '0';
                 openBtn.style.opacity = '1';
+                form.reset();
             }, 500);
         };
         if (openBtn) openBtn.addEventListener('click', openHandler);
@@ -60,15 +63,22 @@ function Subjects({ subjects, search }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        router.post('/admin/subjects', formData, {
+        form.post('/admin/subjects', {
             onSuccess: () => {
-                setFormData({ subject_name: '', coefficient: '', credit: '' });
-            }
+                setAlert({ type: 'success', message: 'Subject created successfully!' });
+                form.reset();
+            },
+            onError: () => {
+                setAlert({ type: 'error', message: 'Failed to create subject.' });
+            },
         });
     };
 
     return (
         <div className="container">
+            <Alert type="success" message={flash.success} />
+            <Alert type="error" message={flash.error} />
+            <Alert type={alert.type} message={alert.message} onClose={() => setAlert({})} />
             <div className="page-content">
                 <div className="page-header">
                     <div className="page-title">Subjects</div>
@@ -98,9 +108,10 @@ function Subjects({ subjects, search }) {
                                         name="subject_name"
                                         id="subject_name"
                                         placeholder="Subject name"
-                                        value={formData.subject_name}
-                                        onChange={e => setFormData({ ...formData, subject_name: e.target.value })}
+                                        value={form.data.subject_name}
+                                        onChange={e => form.setData('subject_name', e.target.value)}
                                     />
+                                    {form.errors.subject_name && <div className="text-red-500 mt-2">{form.errors.subject_name}</div>}
                                 </div>
                                 <div className="input-wrapper">
                                     <label>Coefficient:</label>
@@ -109,9 +120,10 @@ function Subjects({ subjects, search }) {
                                         name="coefficient"
                                         id="coefficient"
                                         placeholder="coefficient"
-                                        value={formData.coefficient}
-                                        onChange={e => setFormData({ ...formData, coefficient: e.target.value })}
+                                        value={form.data.coefficient}
+                                        onChange={e => form.setData('coefficient', e.target.value)}
                                     />
+                                    {form.errors.coefficient && <div className="text-red-500 mt-2">{form.errors.coefficient}</div>}
                                 </div>
                                 <div className="input-wrapper">
                                     <label>Credit:</label>
@@ -120,9 +132,10 @@ function Subjects({ subjects, search }) {
                                         name="credit"
                                         id="credit"
                                         placeholder="credit"
-                                        value={formData.credit}
-                                        onChange={e => setFormData({ ...formData, credit: e.target.value })}
+                                        value={form.data.credit}
+                                        onChange={e => form.setData('credit', e.target.value)}
                                     />
+                                    {form.errors.credit && <div className="text-red-500 mt-2">{form.errors.credit}</div>}
                                 </div>
                                 <div className='flex item-center gap-4 '>
                                     <button
@@ -131,7 +144,7 @@ function Subjects({ subjects, search }) {
                                         type="button"
                                         ref={closeBtnRef}
                                     >Cancel</button>
-                                    <button type="submit" className="btn">Create</button>
+                                    <button type="submit" className="btn" disabled={form.processing}>Create</button>
                                 </div>
                             </form>
                             <button
