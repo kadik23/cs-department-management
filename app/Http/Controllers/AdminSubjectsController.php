@@ -4,29 +4,24 @@ namespace App\Http\Controllers;
 
 use App\Models\Subject;
 use App\Models\Teacher;
+use App\Repositories\SubjectRepository;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class AdminSubjectsController extends Controller
 {
+    protected $subjectRepository;
+
+    public function __construct(SubjectRepository $subjectRepository)
+    {
+        $this->subjectRepository = $subjectRepository;
+    }
+
     public function index(Request $request)
     {
         $search = $request->input('search');
         
-        $query = Subject::query();
-
-        if ($search) {
-            $query->where('subject_name', 'like', "%{$search}%");
-        }
-
-        $subjects = $query->get()->map(function($subject) {
-            return [
-                'id' => $subject->id,
-                'subject_name' => $subject->subject_name,
-                'coefficient' => $subject->coefficient,
-                'credit' => $subject->credit,
-            ];
-        });
+        $subjects = $this->subjectRepository->getSubjectsWithData($search);
 
         return Inertia::render('admin/Subjects', [
             'subjects' => $subjects,
@@ -42,7 +37,7 @@ class AdminSubjectsController extends Controller
             'credit' => 'required|integer',
         ]);
 
-        Subject::create([
+        $this->subjectRepository->create([
             'subject_name' => $request->subject_name,
             'coefficient' => $request->coefficient,
             'credit' => $request->credit,
@@ -59,8 +54,7 @@ class AdminSubjectsController extends Controller
             'credit' => 'required|integer',
         ]);
 
-        $subject = Subject::findOrFail($id);
-        $subject->update([
+        $this->subjectRepository->update($id, [
             'subject_name' => $request->subject_name,
             'coefficient' => $request->coefficient,
             'credit' => $request->credit,
@@ -71,8 +65,7 @@ class AdminSubjectsController extends Controller
 
     public function destroy($id)
     {
-        $subject = Subject::findOrFail($id);
-        $subject->delete();
+        $this->subjectRepository->delete($id);
 
         return redirect()->back()->with('success', 'Subject deleted successfully');
     }

@@ -3,29 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Models\Speciality;
+use App\Repositories\SpecialityRepository;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class AdminSpecialitiesController extends Controller
 {
+    protected $specialityRepository;
+
+    public function __construct(SpecialityRepository $specialityRepository)
+    {
+        $this->specialityRepository = $specialityRepository;
+    }
+
     public function index(Request $request)
     {
         $search = $request->input('search');
         
-        $query = Speciality::query();
-
-        if ($search) {
-            $query->where('name', 'like', "%{$search}%");
-        }
-
-        $specialities = $query->get()->map(function($speciality) {
-            return [
-                'id' => $speciality->id,
-                'name' => $speciality->speciality_name,
-                'description' => $speciality->description,
-                'created_at' => $speciality->created_at->format('Y-m-d')
-            ];
-        });
+        $specialities = $this->specialityRepository->getSpecialitiesWithData($search);
 
         return Inertia::render('admin/Specialities', [
             'specialities' => $specialities,
@@ -39,7 +34,7 @@ class AdminSpecialitiesController extends Controller
             'speciality_name' => 'required|string|unique:specialities,speciality_name',
         ]);
 
-        Speciality::create([
+        $this->specialityRepository->create([
             'speciality_name' => $request->speciality_name,
         ]);
 
@@ -52,8 +47,7 @@ class AdminSpecialitiesController extends Controller
             'speciality_name' => 'required|string|unique:specialities,speciality_name,' . $id,
         ]);
 
-        $speciality = Speciality::findOrFail($id);
-        $speciality->update([
+        $this->specialityRepository->update($id, [
             'speciality_name' => $request->speciality_name,
         ]);
 
@@ -62,8 +56,7 @@ class AdminSpecialitiesController extends Controller
 
     public function destroy($id)
     {
-        $speciality = Speciality::findOrFail($id);
-        $speciality->delete();
+        $this->specialityRepository->delete($id);
 
         return redirect()->back()->with('success', 'Speciality deleted successfully');
     }

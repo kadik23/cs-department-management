@@ -6,102 +6,44 @@ use App\Models\Lecture;
 use App\Models\Subject;
 use App\Models\Group;
 use App\Models\Teacher;
+use App\Repositories\LectureRepository;
+use App\Repositories\GroupRepository;
+use App\Repositories\SubjectRepository;
+use App\Repositories\UserRepository;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\SchedulerSetting;
 
 class AdminLecturesController extends Controller
 {
+    protected $lectureRepository;
+    protected $groupRepository;
+    protected $subjectRepository;
+    protected $userRepository;
+
+    public function __construct(
+        LectureRepository $lectureRepository,
+        GroupRepository $groupRepository,
+        SubjectRepository $subjectRepository,
+        UserRepository $userRepository
+    ) {
+        $this->lectureRepository = $lectureRepository;
+        $this->groupRepository = $groupRepository;
+        $this->subjectRepository = $subjectRepository;
+        $this->userRepository = $userRepository;
+    }
+
     public function index(Request $request)
     {
         $search = $request->input('search');
         
-        $query = Lecture::with(['subject', 'teacher', 'classRoom', 'academicLevel.speciality']);
-
-        if ($search) {
-            $query->whereHas('subject', function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%");
-            })->orWhereHas('teacher', function($q) use ($search) {
-                $q->where('first_name', 'like', "%{$search}%")
-                  ->orWhere('last_name', 'like', "%{$search}%");
-            });
-        }
-
-        $academicLevels = \App\Models\AcademicLevel::with('speciality')->get()->map(function($level) {
-            return [
-                'id' => $level->id,
-                'level' => $level->level,
-                'speciality_name' => $level->speciality ? $level->speciality->speciality_name : '',
-            ];
-        })->values();
-
-        $groups = Group::with('academicLevel.speciality')->get()->map(function($group) {
-            return [
-                'id' => $group->id,
-                'group_number' => $group->group_number,
-                'level' => $group->academicLevel ? $group->academicLevel->level : '',
-                'speciality_name' => $group->academicLevel && $group->academicLevel->speciality ? $group->academicLevel->speciality->speciality_name : '',
-            ];
-        });
-
-        $classRooms = \App\Models\Resource::get()->map(function($room) {
-            return [
-                'id' => $room->id,
-                'resource_type' => $room->resource_type,
-                'resource_number' => $room->resource_number
-            ];
-        })->values();
-
-        $subjects = Subject::all()->map(function($subject) {
-            return [
-                'id' => $subject->id,
-                'subject_name' => $subject->subject_name
-            ];
-        })->values();
-
-        $teachers = Teacher::with('user')->get()->map(function($teacher) {
-            return [
-                'id' => $teacher->id,
-                'first_name' => $teacher->user ? $teacher->user->first_name : '',
-                'last_name' => $teacher->user ? $teacher->user->last_name : '',
-            ];
-        })->values();
-
-        $settings = SchedulerSetting::first();
-        $class_duration = $settings ? $settings->class_duration : 60;
-        $first_class_start_at = $settings ? $settings->first_class_start_at : '08:00';
-
-        function calcTime($class_index, $duration, $first_start) {
-            [$h, $m] = explode(':', $first_start);
-            $total = ((int)$h) * 60 + ((int)$m) + $class_index * $duration;
-            $hours = floor($total / 60);
-            $minutes = $total % 60;
-            return sprintf('%02d:%02d', $hours, $minutes);
-        }
-
-        $lectures = Lecture::with(['subject', 'teacher.user', 'classRoom', 'academicLevel.speciality'])
-            ->get()
-            ->map(function($lecture) use ($class_duration, $first_class_start_at) {
-                return [
-                    'id' => $lecture->id,
-                    'class_room' => $lecture->classRoom ? $lecture->classRoom->resource_type : '',
-                    'class_room_number' => $lecture->classRoom ? $lecture->classRoom->resource_number : '',
-                    'subject_name' => $lecture->subject ? $lecture->subject->subject_name : '',
-                    'first_name' => $lecture->teacher && $lecture->teacher->user ? $lecture->teacher->user->first_name : '',
-                    'last_name' => $lecture->teacher && $lecture->teacher->user ? $lecture->teacher->user->last_name : '',
-                    'level' => $lecture->academicLevel ? $lecture->academicLevel->level : '',
-                    'speciality_name' => $lecture->academicLevel && $lecture->academicLevel->speciality ? $lecture->academicLevel->speciality->speciality_name : '',
-                    'day_of_week' => $lecture->day_of_week,
-                    'class_index' => $lecture->class_index,
-                    'start_time' => calcTime($lecture->class_index, $class_duration, $first_class_start_at),
-                    'end_time' => calcTime($lecture->class_index + 1, $class_duration, $first_class_start_at),
-                    'academic_level' => $lecture->academicLevel ? 'L' . $lecture->academicLevel->level . ' ' . ($lecture->academicLevel->speciality ? $lecture->academicLevel->speciality->speciality_name : '') : '',
-                    'academic_level_id' => $lecture->academic_level_id,
-                    'teacher_id' => $lecture->teacher_id,
-                    'subject_id' => $lecture->subject_id,
-                    'class_room_id' => $lecture->class_room_id,
-                ];
-            });
+        $lectures = $this->lectureRepository->getLecturesWithData($search);
+        $academicLevels = $this->lectureRepository->getAcademicLevelsWithSpecialities();
+        $groups = $this->lectureRepository->getGroupsWithAcademicLevels();
+        $classRooms = $this->lectureRepository->getClassroomResources();
+        $subjects = $this->lectureRepository->getSubjectsForSelection();
+        $teachers = $this->lectureRepository->getTeachersForSelection();
+        $settings = $this->lectureRepository->getSchedulerSettings();
 
         return Inertia::render('admin/Lectures', [
             'lectures' => $lectures,
@@ -126,7 +68,7 @@ class AdminLecturesController extends Controller
             'class_index' => 'required|integer|min:0'
         ]);
 
-        Lecture::create([
+        $this->lectureRepository->create([
             'subject_id' => $request->subject_id,
             'teacher_id' => $request->teacher_id,
             'class_room_id' => $request->class_room_id,
@@ -149,8 +91,7 @@ class AdminLecturesController extends Controller
             'class_index' => 'required|integer|min:0'
         ]);
 
-        $lecture = Lecture::findOrFail($id);
-        $lecture->update([
+        $this->lectureRepository->update($id, [
             'subject_id' => $request->subject_id,
             'teacher_id' => $request->teacher_id,
             'class_room_id' => $request->class_room_id,
@@ -164,8 +105,7 @@ class AdminLecturesController extends Controller
 
     public function destroy($id)
     {
-        $lecture = Lecture::findOrFail($id);
-        $lecture->delete();
+        $this->lectureRepository->delete($id);
 
         return redirect()->back()->with('success', 'Lecture deleted successfully');
     }

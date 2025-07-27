@@ -10,24 +10,39 @@ use App\Models\Lecture;
 use App\Models\Grade;
 use App\Models\Attendance;
 use App\Models\Semester;
+use App\Repositories\TeacherRepository;
+use App\Repositories\ScheduleRepository;
+use App\Repositories\LectureRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class TeacherController extends Controller
 {
+    protected $teacherRepository;
+    protected $scheduleRepository;
+    protected $lectureRepository;
+
+    public function __construct(
+        TeacherRepository $teacherRepository,
+        ScheduleRepository $scheduleRepository,
+        LectureRepository $lectureRepository
+    ) {
+        $this->teacherRepository = $teacherRepository;
+        $this->scheduleRepository = $scheduleRepository;
+        $this->lectureRepository = $lectureRepository;
+    }
+
     public function dashboard(Request $request)
     {
         $user = Auth::user();
-        $teacher = Teacher::with(['user'])->where('user_id', $user->id)->first();
+        $teacher = $this->teacherRepository->getTeacherWithProfile($user->id);
 
         if (!$teacher) {
             return redirect('/')->with('error', 'No teacher record found for this user.');
         }
 
-        $schedulesCount = Schedule::where('teacher_id', $teacher->id)->count();
-        
-        $lecturesCount = Lecture::where('teacher_id', $teacher->id)->count();
-        
+        $schedulesCount = $this->teacherRepository->getTeacherSchedulesCount($teacher->id);
+        $lecturesCount = $this->teacherRepository->getTeacherLecturesCount($teacher->id);
         $semester = Semester::whereRaw('CURRENT_DATE BETWEEN start_at AND end_at')->first();
 
         return Inertia::render('teacher/Dashboard', [
@@ -41,24 +56,17 @@ class TeacherController extends Controller
     public function courses(Request $request)
     {
         $user = Auth::user();
-        $teacher = Teacher::with(['user'])->where('user_id', $user->id)->first();
+        $teacher = $this->teacherRepository->getTeacherWithProfile($user->id);
 
         if (!$teacher) {
             return redirect('/')->with('error', 'No teacher record found for this user.');
         }
 
         // Get teacher's schedules with subjects, groups, and classrooms
-        $schedules = Schedule::with(['subject', 'group.academicLevel.speciality', 'classRoom'])
-            ->where('teacher_id', $teacher->id)
-            ->orderBy('day_of_week')
-            ->orderBy('class_index')
-            ->get();
+        $schedules = $this->teacherRepository->getTeacherSchedules($teacher->id);
 
         // Get teacher's lectures with subjects, academic levels, and classrooms
-        $lectures = Lecture::with(['subject', 'academicLevel.speciality', 'classRoom'])
-            ->where('teacher_id', $teacher->id)
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $lectures = $this->teacherRepository->getTeacherLectures($teacher->id);
 
         return Inertia::render('teacher/Courses', [
             'teacher' => $teacher,
@@ -70,19 +78,14 @@ class TeacherController extends Controller
     public function schedule(Request $request)
     {
         $user = Auth::user();
-        $teacher = Teacher::with(['user'])->where('user_id', $user->id)->first();
+        $teacher = $this->teacherRepository->getTeacherWithProfile($user->id);
 
         if (!$teacher) {
             return redirect('/')->with('error', 'No teacher record found for this user.');
         }
 
-        $schedule = Schedule::with(['subject', 'classRoom', 'group.academicLevel.speciality'])
-            ->where('teacher_id', $teacher->id)
-            ->orderBy('day_of_week')
-            ->orderBy('class_index')
-            ->get();
-        
-        $settings = \App\Models\SchedulerSetting::first();
+        $schedule = $this->teacherRepository->getTeacherSchedules($teacher->id);
+        $settings = $this->scheduleRepository->getSchedulerSettings();
         
         return Inertia::render('teacher/Schedule', [
             'teacher' => $teacher,
