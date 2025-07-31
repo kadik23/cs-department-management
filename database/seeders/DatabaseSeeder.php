@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -14,8 +15,9 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             // 1. Least dependent
-            AcademicLevelSeeder::class,
+            UserSeeder::class,
             SpecialitySeeder::class,
+            AcademicLevelSeeder::class,
             GroupSeeder::class,
             ResourceSeeder::class,
             SubjectSeeder::class,
