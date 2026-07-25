@@ -142,6 +142,62 @@ class AdminSchedulesController extends Controller
         return redirect()->back()->with('success', 'Scheduler settings updated successfully.');
     }
 
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'class_room_id' => 'required|exists:resources,id',
+            'group_id' => 'required|exists:groups,id',
+            'teacher_id' => 'required|exists:teachers,id',
+            'subject_id' => 'required|exists:subjects,id',
+            'day_of_week' => 'required|integer|min:0|max:6',
+            'class_index' => 'required|integer|min:0',
+        ]);
+
+        // Check for group conflict
+        $groupConflict = $this->scheduleRepository->checkGroupConflict(
+            $request->group_id, 
+            $request->class_index, 
+            $request->day_of_week,
+            $id
+        );
+        if ($groupConflict) {
+            return redirect()->back()->withErrors(['error' => 'This group already has another class at that time.']);
+        }
+        
+        // Check for teacher conflict
+        $teacherConflict = $this->scheduleRepository->checkTeacherConflict(
+            $request->teacher_id, 
+            $request->class_index, 
+            $request->day_of_week,
+            $id
+        );
+        if ($teacherConflict) {
+            return redirect()->back()->withErrors(['error' => 'This teacher already has another class at that time.']);
+        }
+        
+        // Check for class room conflict
+        $roomConflict = $this->scheduleRepository->checkClassroomConflict(
+            $request->class_room_id, 
+            $request->class_index, 
+            $request->day_of_week,
+            $id
+        );
+        if ($roomConflict) {
+            return redirect()->back()->withErrors(['error' => 'The class room is already reserved at that time.']);
+        }
+        
+        // Update schedule
+        $this->scheduleRepository->update($id, [
+            'class_room_id' => $request->class_room_id,
+            'group_id' => $request->group_id,
+            'teacher_id' => $request->teacher_id,
+            'subject_id' => $request->subject_id,
+            'day_of_week' => $request->day_of_week,
+            'class_index' => $request->class_index,
+        ]);
+        return redirect()->back()->with('success', 'Schedule updated successfully.');
+    }
+
     public function destroy($id)
     {
         $this->scheduleRepository->delete($id);

@@ -40,6 +40,8 @@ class GroupRepository extends BaseRepository
             return [
                 'id' => $group->id,
                 'group_number' => $group->group_number,
+                'academic_level_id' => $group->academic_level_id,
+                'responsible' => $group->responsible,
                 'speciality_name' => $group->academicLevel && $group->academicLevel->speciality ? $group->academicLevel->speciality->speciality_name : '',
                 'responsable' => $group->responsibleUser ? ($group->responsibleUser->first_name . ' ' . $group->responsibleUser->last_name) : '',
                 'total_students' => $group->students ? $group->students->count() : 0,

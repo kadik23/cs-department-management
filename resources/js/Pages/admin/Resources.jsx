@@ -66,7 +66,7 @@ function Resources({ resources, search }) {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (editingResource) {
-            form.put(`/admin/resources/${editingResource.id}`, form.data, {
+            form.put(`/admin/resources/${editingResource.id}`, {
                 onSuccess: () => {
                     setAlert({ type: 'success', message: 'Resource updated successfully!' });
                     setEditingResource(null);

@@ -58,12 +58,14 @@ class AdminGroupsController extends Controller
     {
         $request->validate([
             'group_number' => 'required|integer',
-            'academic_level_id' => 'required|exists:academic_levels,id'
+            'academic_level_id' => 'required|exists:academic_levels,id',
+            'responsible' => 'required|exists:users,id',
         ]);
 
         $this->groupRepository->update($id, [
             'group_number' => $request->group_number,
-            'academic_level_id' => $request->academic_level_id
+            'academic_level_id' => $request->academic_level_id,
+            'responsible' => $request->responsible,
         ]);
 
         return redirect()->back()->with('success', 'Group updated successfully');

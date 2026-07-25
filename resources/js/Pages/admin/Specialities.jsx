@@ -56,7 +56,7 @@ function Specialities({ specialities, search }) {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (editingSpeciality) {
-            form.put(`/admin/specialities/${editingSpeciality.id}`, form.data, {
+            form.put(`/admin/specialities/${editingSpeciality.id}`, {
                 onSuccess: () => {
                     setAlert({ type: 'success', message: 'Speciality updated successfully!' });
                     setEditingSpeciality(null);
@@ -184,7 +184,7 @@ function Specialities({ specialities, search }) {
                             <div className="list-body">
                                 {specialities.map((speciality) => (
                                     <div className="list-row" key={speciality.id}>
-                                        <div className="list-item">{speciality.name}</div>
+                                        <div className="list-item">{speciality.speciality_name}</div>
                                         <div className="list-item">{speciality.created_at}</div>
                                         <div className="list-item">
                                             <button 

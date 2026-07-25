@@ -19,6 +19,8 @@ class UserSeeder extends Seeder {
                 'phone_number' => '123-456-7890',
                 'location' => 'Location 1',
                 'password' => bcrypt('password'),
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'username' => 'student',
@@ -28,6 +30,8 @@ class UserSeeder extends Seeder {
                 'phone_number' => '123-456-7890',
                 'location' => 'Location 1',
                 'password' => bcrypt('password'),
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'username' => 'student1',
@@ -37,6 +41,8 @@ class UserSeeder extends Seeder {
                 'phone_number' => '123-456-7890',
                 'location' => 'Location 1',
                 'password' => bcrypt('password'),
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'username' => 'student2',
@@ -46,6 +52,8 @@ class UserSeeder extends Seeder {
                 'phone_number' => '123-456-7890',
                 'location' => 'Location 2',
                 'password' => bcrypt('password'),
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'username' => 'student3',
@@ -55,6 +63,8 @@ class UserSeeder extends Seeder {
                 'phone_number' => '123-456-7890',
                 'location' => 'Location 3',
                 'password' => bcrypt('password'),
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
              [
                 'username' => 'teacher1',
@@ -64,6 +74,8 @@ class UserSeeder extends Seeder {
                 'phone_number' => '123-456-7890',
                 'location' => 'Location 1',
                 'password' => bcrypt('password'),
+                'created_at' => now(),
+                'updated_at' => now(),
             ], 
             [
                 'username' => 'teacher2',
@@ -73,6 +85,8 @@ class UserSeeder extends Seeder {
                 'phone_number' => '123-456-7890',
                 'location' => 'Location 2',
                 'password' => bcrypt('password'),
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'username' => 'teacher3',
@@ -82,6 +96,8 @@ class UserSeeder extends Seeder {
                 'phone_number' => '123-456-7890',
                 'location' => 'Location 3',
                 'password' => bcrypt('password'),
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
         ]);
     }

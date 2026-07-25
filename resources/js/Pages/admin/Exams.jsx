@@ -69,7 +69,7 @@ function Exams({ exams, subjects, groups, settings, search, classRooms = [] }) {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (editingExam) {
-            form.put(`/admin/exams/${editingExam.id}`, form.data, {
+            form.put(`/admin/exams/${editingExam.id}`, {
                 onSuccess: () => {
                     setAlert({ type: 'success', message: 'Exam updated successfully!' });
                     setEditingExam(null);

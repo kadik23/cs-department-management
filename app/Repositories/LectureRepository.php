@@ -65,6 +65,8 @@ class LectureRepository extends BaseRepository
                 'academic_level' => $lecture->academicLevel ? 'L' . $lecture->academicLevel->level . ' ' . ($lecture->academicLevel->speciality ? $lecture->academicLevel->speciality->speciality_name : '') : '',
                 'academic_level_id' => $lecture->academic_level_id,
                 'teacher_id' => $lecture->teacher_id,
+                'subject_id' => $lecture->subject_id,
+                'class_room_id' => $lecture->class_room_id,
             ];
         })->toArray();
     }

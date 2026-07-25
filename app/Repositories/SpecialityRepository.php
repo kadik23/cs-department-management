@@ -28,7 +28,7 @@ class SpecialityRepository extends BaseRepository
         return $specialities->map(function($speciality) {
             return [
                 'id' => $speciality->id,
-                'name' => $speciality->speciality_name,
+                'speciality_name' => $speciality->speciality_name,
                 'description' => $speciality->description,
                 'created_at' => $speciality->created_at->format('Y-m-d')
             ];

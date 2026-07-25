@@ -87,17 +87,16 @@ function Students({ students, search }) {
                                             </div>
                                             <div className="student-info">
                                                 <div className="student-name">{student.first_name} {student.last_name}</div>
-                                                {student.group_number ? (
-                                                    <div className="student-group">Group {student.group_number}</div>
-                                                ) : (
+                                                <div className="student-group" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                                                    {student.group_number ? `Group ${student.group_number}` : 'No Group'}
                                                     <div 
                                                         className="small-btn open-dialogue-btn" 
                                                         onClick={() => openDialogue(student)}
-                                                        style={{ alignSelf: 'self-start', marginBottom: '4px' }}
+                                                        style={{ cursor: 'pointer', fontSize: '11px', padding: '2px 6px' }}
                                                     >
-                                                        Assign Group
+                                                        {student.group_number ? 'Edit' : 'Assign'}
                                                     </div>
-                                                )}
+                                                </div>
                                                 <div className="student-grade">{student.current_grade}</div>
                                                 <div className="student-absence">{student.absence} Absence</div>
                                             </div>

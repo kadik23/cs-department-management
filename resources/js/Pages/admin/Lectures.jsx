@@ -72,7 +72,7 @@ function Lectures({ lectures, subjects, teachers, academicLevels, classRooms, se
     const handleSubmit = (e) => {
         e.preventDefault();
         if (editingLecture) {
-            form.put(`/admin/lectures/${editingLecture.id}`, form.data, {
+            form.put(`/admin/lectures/${editingLecture.id}`, {
                 onSuccess: () => {
                     setAlert({ type: 'success', message: 'Lecture updated successfully!' });
                     setEditingLecture(null);

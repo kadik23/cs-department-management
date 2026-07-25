@@ -5,6 +5,7 @@ import Alert from '@/components/Alert';
 function Subjects({ subjects, search }) {
     const { flash } = usePage().props;
     const [alert, setAlert] = useState({ type: '', message: '' });
+    const [editingSubject, setEditingSubject] = useState(null);
     const formRef = useRef();
     const openBtnRef = useRef();
     const closeBtnRef = useRef();
@@ -26,8 +27,9 @@ function Subjects({ subjects, search }) {
         }
         const openHandler = (ev) => {
             ev.preventDefault();
+            setEditingSubject(null);
             form.reset();
-            openBtn.style.opacity = '0';
+            openBtnRef.current.style.opacity = '0';
             formEl.style.maxHeight = '1000px';
             formEl.style.width = 'calc(100%*1/2)';
             setTimeout(() => {
@@ -40,7 +42,8 @@ function Subjects({ subjects, search }) {
             setTimeout(() => {
                 formEl.style.maxHeight = '0';
                 formEl.style.width = '0';
-                openBtn.style.opacity = '1';
+                openBtnRef.current.style.opacity = '1';
+                setEditingSubject(null);
                 form.reset();
             }, 500);
         };
@@ -61,17 +64,47 @@ function Subjects({ subjects, search }) {
         });
     };
 
+    const handleEdit = (subject) => {
+        setEditingSubject(subject);
+        form.setData({
+            subject_name: subject.subject_name,
+            coefficient: subject.coefficient,
+            credit: subject.credit,
+        });
+        if (formRef.current && openBtnRef.current) {
+            openBtnRef.current.style.opacity = '0';
+            formRef.current.style.maxHeight = '1000px';
+            formRef.current.style.width = 'calc(100%*1/2)';
+            setTimeout(() => {
+                formRef.current.style.opacity = '1';
+            }, 500);
+        }
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        form.post('/admin/subjects', {
-            onSuccess: () => {
-                setAlert({ type: 'success', message: 'Subject created successfully!' });
-                form.reset();
-            },
-            onError: () => {
-                setAlert({ type: 'error', message: 'Failed to create subject.' });
-            },
-        });
+        if (editingSubject) {
+            form.put(`/admin/subjects/${editingSubject.id}`, {
+                onSuccess: () => {
+                    setAlert({ type: 'success', message: 'Subject updated successfully!' });
+                    setEditingSubject(null);
+                    form.reset();
+                },
+                onError: () => {
+                    setAlert({ type: 'error', message: 'Failed to update subject.' });
+                },
+            });
+        } else {
+            form.post('/admin/subjects', {
+                onSuccess: () => {
+                    setAlert({ type: 'success', message: 'Subject created successfully!' });
+                    form.reset();
+                },
+                onError: () => {
+                    setAlert({ type: 'error', message: 'Failed to create subject.' });
+                },
+            });
+        }
     };
 
     return (
@@ -144,7 +177,7 @@ function Subjects({ subjects, search }) {
                                         type="button"
                                         ref={closeBtnRef}
                                     >Cancel</button>
-                                    <button type="submit" className="btn" disabled={form.processing}>Create</button>
+                                    <button type="submit" className="btn" disabled={form.processing}>{editingSubject ? 'Save' : 'Create'}</button>
                                 </div>
                             </form>
                             <button
@@ -168,6 +201,7 @@ function Subjects({ subjects, search }) {
                                 <div className="list-header-item" style={{ flex: 3 }}>Subject Name</div>
                                 <div className="list-header-item">Coefficient</div>
                                 <div className="list-header-item">Credit</div>
+                                <div className="list-header-item">Actions</div>
                             </div>
                             <div className="list-body">
                                 {subjects.map(row => (
@@ -176,6 +210,9 @@ function Subjects({ subjects, search }) {
                                         <div className="list-item" style={{ flex: 3 }}>{row.subject_name}</div>
                                         <div className="list-item">{row.coefficient}</div>
                                         <div className="list-item">{row.credit}</div>
+                                        <div className="list-item">
+                                            <button className="btn btn-secondary" onClick={() => handleEdit(row)} style={{ marginRight: '10px' }}>Edit</button>
+                                        </div>
                                     </div>
                                 ))}
                             </div>

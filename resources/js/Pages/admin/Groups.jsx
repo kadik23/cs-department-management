@@ -67,7 +67,7 @@ function Groups({ groups, academicLevels, search, responsibles = [] }) {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (editingGroup) {
-            form.put(`/admin/groups/${editingGroup.id}`, form.data, {
+            form.put(`/admin/groups/${editingGroup.id}`, {
                 onSuccess: () => {
                     setAlert({ type: 'success', message: 'Group updated successfully!' });
                     setEditingGroup(null);

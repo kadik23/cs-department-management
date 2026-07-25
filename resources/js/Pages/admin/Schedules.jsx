@@ -97,7 +97,7 @@ function Schedules({ schedules, subjects, groups, teachers, classRooms, settings
     const handleSubmit = (e) => {
         e.preventDefault();
         if (editingSchedule) {
-            form.put(`/admin/schedules/${editingSchedule.id}`, form.data, {
+            form.put(`/admin/schedules/${editingSchedule.id}`, {
                 onSuccess: () => {
                     setAlert({ type: 'success', message: 'Schedule updated successfully!' });
                     setEditingSchedule(null);
