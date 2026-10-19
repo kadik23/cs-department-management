@@ -45,7 +45,7 @@ function Aside() {
 
     return (
         <aside>
-            <div className="user-profile-picture">
+            <div className="user-profile-pic">
                 <img src={'/assets/images/student.jpg'} alt="profile picture"/>
             </div>
             <div className="user-name">Student</div>

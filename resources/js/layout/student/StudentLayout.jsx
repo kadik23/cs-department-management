@@ -8,7 +8,9 @@ export function StudentLayout({ children }) {
     return (
         <div className="container">
             <Aside />
-            {children}
+            <div className="container">
+                {children}
+            </div>
         </div>
     );
 }
