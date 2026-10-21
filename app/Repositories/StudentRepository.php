@@ -50,7 +50,7 @@ class StudentRepository extends BaseRepository
         
         return $students->map(function($student) {
             $absenceCount = Attendance::where('student_id', $student->id)
-                                    ->where('student_state', 'absence')
+                                    ->whereIn('student_state', ['absence', 'absent'])
                                     ->count();
             
             $grade = Grade::where('student_id', $student->id)
@@ -111,11 +111,11 @@ class StudentRepository extends BaseRepository
     public function getStudentAttendanceStats(int $studentId): array
     {
         $totalAbsences = Attendance::where('student_id', $studentId)
-            ->where('student_state', 'absence')
+            ->whereIn('student_state', ['absence', 'absent'])
             ->count();
             
         $totalPresences = Attendance::where('student_id', $studentId)
-            ->where('student_state', 'presence')
+            ->whereIn('student_state', ['presence', 'present'])
             ->count();
             
         return [

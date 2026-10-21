@@ -1,6 +1,11 @@
 import React from "react";
 import TeacherLayout from "@/layout/teacher/TeacherLayout";
 
+const formatDate = (dateStr) => {
+    if (!dateStr) return '';
+    return typeof dateStr === 'string' ? dateStr.substring(0, 10) : dateStr;
+};
+
 export default function Dashboard({ teacher, schedulesCount, lecturesCount, semester }) {
     return (
         <div className="page-content">
@@ -52,8 +57,8 @@ export default function Dashboard({ teacher, schedulesCount, lecturesCount, seme
                             <div className="card-body_teacher">
                                 <div className="semester-info_teacher">
                                     <p><strong>Semester:</strong> {semester.semester_name}</p>
-                                    <p><strong>Start Date:</strong> {semester.start_at}</p>
-                                    <p><strong>End Date:</strong> {semester.end_at}</p>
+                                    <p><strong>Start Date:</strong> {formatDate(semester.start_at)}</p>
+                                    <p><strong>End Date:</strong> {formatDate(semester.end_at)}</p>
                                 </div>
                             </div>
                         </div>

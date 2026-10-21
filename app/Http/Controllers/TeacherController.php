@@ -32,10 +32,20 @@ class TeacherController extends Controller
         $this->lectureRepository = $lectureRepository;
     }
 
+    protected function getTeacherForUser($user)
+    {
+        $teacher = $this->teacherRepository->getTeacherWithProfile($user->id);
+        if (!$teacher) {
+            \App\Models\Teacher::create(['user_id' => $user->id]);
+            $teacher = $this->teacherRepository->getTeacherWithProfile($user->id);
+        }
+        return $teacher;
+    }
+
     public function dashboard(Request $request)
     {
         $user = Auth::user();
-        $teacher = $this->teacherRepository->getTeacherWithProfile($user->id);
+        $teacher = $this->getTeacherForUser($user);
 
         if (!$teacher) {
             return redirect('/')->with('error', 'No teacher record found for this user.');
@@ -44,6 +54,9 @@ class TeacherController extends Controller
         $schedulesCount = $this->teacherRepository->getTeacherSchedulesCount($teacher->id);
         $lecturesCount = $this->teacherRepository->getTeacherLecturesCount($teacher->id);
         $semester = Semester::whereRaw('CURRENT_DATE BETWEEN start_at AND end_at')->first();
+        if (!$semester) {
+            $semester = Semester::latest()->first();
+        }
 
         return Inertia::render('teacher/Dashboard', [
             'teacher' => $teacher,
@@ -56,7 +69,7 @@ class TeacherController extends Controller
     public function courses(Request $request)
     {
         $user = Auth::user();
-        $teacher = $this->teacherRepository->getTeacherWithProfile($user->id);
+        $teacher = $this->getTeacherForUser($user);
 
         if (!$teacher) {
             return redirect('/')->with('error', 'No teacher record found for this user.');
@@ -78,7 +91,7 @@ class TeacherController extends Controller
     public function schedule(Request $request)
     {
         $user = Auth::user();
-        $teacher = $this->teacherRepository->getTeacherWithProfile($user->id);
+        $teacher = $this->getTeacherForUser($user);
 
         if (!$teacher) {
             return redirect('/')->with('error', 'No teacher record found for this user.');
@@ -97,13 +110,16 @@ class TeacherController extends Controller
     public function grades(Request $request)
     {
         $user = Auth::user();
-        $teacher = Teacher::with(['user'])->where('user_id', $user->id)->first();
+        $teacher = $this->getTeacherForUser($user);
 
         if (!$teacher) {
             return redirect('/')->with('error', 'No teacher record found for this user.');
         }
 
         $semester = Semester::whereRaw('CURRENT_DATE BETWEEN start_at AND end_at')->first();
+        if (!$semester) {
+            $semester = Semester::latest()->first();
+        }
         
         // Get grades for subjects taught by this teacher
         $grades = Grade::with(['student.user', 'subject'])
@@ -125,7 +141,7 @@ class TeacherController extends Controller
     public function attendance(Request $request)
     {
         $user = Auth::user();
-        $teacher = Teacher::with(['user'])->where('user_id', $user->id)->first();
+        $teacher = $this->getTeacherForUser($user);
 
         if (!$teacher) {
             return redirect('/')->with('error', 'No teacher record found for this user.');

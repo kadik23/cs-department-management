@@ -1,6 +1,11 @@
 import React from "react";
 import TeacherLayout from "@/layout/teacher/TeacherLayout";
 
+const formatDate = (dateStr) => {
+    if (!dateStr) return '';
+    return typeof dateStr === 'string' ? dateStr.substring(0, 10) : dateStr;
+};
+
 export default function Grades({ grades, semester }) {
     return (
         <div className="page-content">
@@ -15,7 +20,7 @@ export default function Grades({ grades, semester }) {
                                 <h3>Current Semester: {semester.semester_name}</h3>
                             </div>
                             <div className="card-body_teacher">
-                                <p><strong>Period:</strong> {semester.start_at} to {semester.end_at}</p>
+                                <p><strong>Period:</strong> {formatDate(semester.start_at)} to {formatDate(semester.end_at)}</p>
                             </div>
                         </div>
                     )}

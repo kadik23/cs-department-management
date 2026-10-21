@@ -15,20 +15,46 @@ use Illuminate\Support\Facades\Auth;
 
 class StudentController extends Controller
 {
+    protected function getStudentForUser($user)
+    {
+        $student = Student::with(['user', 'group.academicLevel.speciality', 'academicLevel'])->where('user_id', $user->id)->first();
+
+        if (!$student) {
+            $academicLevel = \App\Models\AcademicLevel::first();
+            $group = \App\Models\Group::first();
+            if ($academicLevel && $group) {
+                $student = Student::create([
+                    'user_id' => $user->id,
+                    'academic_level_id' => $academicLevel->id,
+                    'group_id' => $group->id,
+                ]);
+                $student->load(['user', 'group.academicLevel.speciality', 'academicLevel']);
+            }
+        }
+
+        return $student;
+    }
+
     public function dashboard(Request $request)
     {
         $user = Auth::user();
-        $student = Student::with(['user', 'group.academicLevel.speciality'])->where('user_id', $user->id)->first();
+        $student = $this->getStudentForUser($user);
 
         if (!$student) {
             return redirect('/')->with('error', 'No student record found for this user.');
         }
 
-        $colleagues = User::join('students', 'users.id', '=', 'students.user_id')
-            ->where('students.group_id', $student->group_id)
-            ->where('users.id', '!=', $user->id)
-            ->get(['users.first_name', 'users.last_name']);
+        $colleagues = collect();
+        if ($student->group_id) {
+            $colleagues = User::join('students', 'users.id', '=', 'students.user_id')
+                ->where('students.group_id', $student->group_id)
+                ->where('users.id', '!=', $user->id)
+                ->get(['users.first_name', 'users.last_name']);
+        }
         $semester = Semester::whereRaw('CURRENT_DATE BETWEEN start_at AND end_at')->first();
+        if (!$semester) {
+            $semester = Semester::latest()->first();
+        }
         return Inertia::render('student/Dashboard', [
             'student' => $student,
             'colleagues' => $colleagues,
@@ -39,7 +65,7 @@ class StudentController extends Controller
     public function schedule(Request $request)
     {
         $user = Auth::user();
-        $student = Student::with(['user', 'group.academicLevel.speciality'])->where('user_id', $user->id)->first();
+        $student = $this->getStudentForUser($user);
 
         if (!$student) {
             return redirect('/')->with('error', 'No student record found for this user.');
@@ -62,13 +88,16 @@ class StudentController extends Controller
     public function notes(Request $request)
     {
         $user = Auth::user();
-        $student = Student::with(['user', 'group.academicLevel.speciality'])->where('user_id', $user->id)->first();
+        $student = $this->getStudentForUser($user);
 
         if (!$student) {
             return redirect('/')->with('error', 'No student record found for this user.');
         }
 
         $semester = Semester::whereRaw('CURRENT_DATE BETWEEN start_at AND end_at')->first();
+        if (!$semester) {
+            $semester = Semester::latest()->first();
+        }
         $grades = Grade::with('subject')
             ->where('semester_id', $semester ? $semester->id : null)
             ->where('student_id', $student->id)
@@ -76,13 +105,14 @@ class StudentController extends Controller
         return Inertia::render('student/Notes', [
             'student' => $student,
             'grades' => $grades,
+            'semester' => $semester,
         ]);
     }
 
     public function exams(Request $request)
     {
         $user = Auth::user();
-        $student = Student::with(['user', 'group.academicLevel.speciality'])->where('user_id', $user->id)->first();
+        $student = $this->getStudentForUser($user);
 
         if (!$student) {
             return redirect('/')->with('error', 'No student record found for this user.');

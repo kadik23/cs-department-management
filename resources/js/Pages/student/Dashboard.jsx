@@ -24,7 +24,10 @@ export default function Dashboard({ student, colleagues, semester }) {
                     <div className="card-box">
                         <div className="card-title">Study Year</div>
                         <div className="card-content">
-                            {student.level > 3 ? student.level % 3 : student.level} Year {student.level > 3 ? "Master " : "License "}{student.group?.academic_level?.speciality?.speciality_name}
+                            {(() => {
+                                const level = student.academic_level?.level ?? student.group?.academic_level?.level ?? student.level ?? 1;
+                                return `${level > 3 ? level % 3 : level} Year ${level > 3 ? "Master " : "License "} ${student.group?.academic_level?.speciality?.speciality_name || ''}`;
+                            })()}
                         </div>
                     </div>
                 </div>

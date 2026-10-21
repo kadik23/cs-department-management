@@ -16,8 +16,8 @@ class Semester extends Model
     ];
 
     protected $casts = [
-        'start_at' => 'date',
-        'end_at' => 'date',
+        'start_at' => 'date:Y-m-d',
+        'end_at' => 'date:Y-m-d',
     ];
 
     // Relationships

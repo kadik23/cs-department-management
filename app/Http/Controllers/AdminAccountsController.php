@@ -36,7 +36,7 @@ class AdminAccountsController extends Controller
                 'username' => $user->username,
                 'email' => $user->email,
                 'role' => $role,
-                'created_at' => $user->created_at->format('Y-m-d')
+                'created_at' => $user->created_at ? $user->created_at->format('Y-m-d') : null
             ];
         });
 

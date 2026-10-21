@@ -22,7 +22,7 @@ class GroupRepository extends BaseRepository
 
         if ($search) {
             $query->whereHas('academicLevel.speciality', function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%");
+                $q->where('speciality_name', 'like', "%{$search}%");
             })->orWhere('group_number', 'like', "%{$search}%");
         }
 

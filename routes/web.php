@@ -7,6 +7,16 @@ use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\AuthController;
 
 Route::get('/', function () {
+    if (\Illuminate\Support\Facades\Auth::check()) {
+        $user = \Illuminate\Support\Facades\Auth::user();
+        if ($user->administrator) {
+            return redirect()->route('admin.dashboard');
+        } elseif ($user->teacher) {
+            return redirect()->route('teacher.dashboard');
+        } else {
+            return redirect()->route('student.dashboard');
+        }
+    }
     return Inertia::render('Home');
 })->name('home');
 
@@ -80,7 +90,10 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Auth routes
-Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::get('/login', function () {
+    return redirect()->route('home');
+})->name('login');
+Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 Route::get('/me', [AuthController::class, 'me'])->middleware('auth')->name('me');
 

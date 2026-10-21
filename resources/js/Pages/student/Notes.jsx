@@ -1,7 +1,12 @@
 import React from "react";
 import StudentLayout from "@/layout/student/StudentLayout";
 
-export default function Notes({ student, grades }) {
+const formatDate = (dateStr) => {
+    if (!dateStr) return '';
+    return typeof dateStr === 'string' ? dateStr.substring(0, 10) : dateStr;
+};
+
+export default function Notes({ student, grades, semester }) {
     return (
         <div className="page-content">
             <div className="page-header">
@@ -9,6 +14,11 @@ export default function Notes({ student, grades }) {
             </div>
             <div className="section-wrapper">
                 <div className="section-content">
+                    {semester && (
+                        <div style={{ marginBottom: "15px", padding: "10px 14px", backgroundColor: "#f8fafc", borderRadius: "8px", border: "1px solid #e2e8f0", fontSize: "14px", color: "#334155" }}>
+                            <strong>Current Semester:</strong> {semester.semester_name} &nbsp;|&nbsp; <strong>Period:</strong> {formatDate(semester.start_at)} to {formatDate(semester.end_at)}
+                        </div>
+                    )}
                     <div className="list-control">
                         <div className="search">
                             <input type="text" placeholder="search..." />

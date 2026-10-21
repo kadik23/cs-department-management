@@ -20,6 +20,40 @@ class Attendance extends Model
         'date' => 'date:Y-m-d',
     ];
 
+    protected $appends = [
+        'status',
+        'notes',
+    ];
+
+    public function getStatusAttribute(): string
+    {
+        $state = strtolower($this->student_state ?? '');
+        if ($state === 'absence' || $state === 'absent') {
+            return self::STATE_ABSENT;
+        }
+        if ($state === 'presence' || $state === 'present') {
+            return self::STATE_PRESENT;
+        }
+        if ($state === 'late' || $state === 'retard') {
+            return self::STATE_LATE;
+        }
+        if ($state === 'excused' || $state === 'justifie') {
+            return self::STATE_EXCUSED;
+        }
+        return $state ?: self::STATE_PRESENT;
+    }
+
+    public function getNotesAttribute(): string
+    {
+        return match ($this->status) {
+            self::STATE_PRESENT => 'Attended class',
+            self::STATE_LATE => 'Arrived 15m late',
+            self::STATE_EXCUSED => 'Medical certificate',
+            self::STATE_ABSENT => 'Unjustified absence',
+            default => 'Regular session',
+        };
+    }
+
     // Relationships
     public function student()
     {

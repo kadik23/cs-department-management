@@ -17,10 +17,12 @@ export default function Home({ flash, auth }) {
     const [error, setError] = useState("");
     const inertiaAuth = auth && auth.user;
 
-    // Hydrate Redux from Inertia shared props
+    // Hydrate Redux from Inertia shared props and redirect if already logged in
     useEffect(() => {
         if (inertiaAuth) {
             dispatch(loginAction(inertiaAuth));
+            const role = inertiaAuth.role || 'student';
+            window.location.href = `/${role}`;
         }
     }, [inertiaAuth, dispatch]);
 
@@ -45,10 +47,10 @@ export default function Home({ flash, auth }) {
             dispatch(loginAction(data.user));
             setUsername("");
             setPassword("");
-            let role = 'admin';
+            let role = 'student';
             if (data.user && data.user.role === 'teacher') role = 'teacher';
-            else if (data.user && data.user.role == 'student') role = 'student';
-            else if (data.user && data.user.role == 'admin') role = 'admin';
+            else if (data.user && data.user.role === 'admin') role = 'admin';
+            else if (data.user && data.user.role === 'student') role = 'student';
             window.location.href = `/${role}`;
         } catch (err) {
             setError("Login failed");
@@ -99,12 +101,33 @@ export default function Home({ flash, auth }) {
                     />
                 </div>
                 <div className="wrapper">
+                    {flash?.error && (
+                        <div style={{ color: "#ef4444", marginBottom: "12px", fontSize: "14px" }}>
+                            {flash.error}
+                        </div>
+                    )}
+                    {error && (
+                        <div style={{ color: "#ef4444", marginBottom: "12px", fontSize: "14px" }}>
+                            {error}
+                        </div>
+                    )}
                     {isAuthenticated ? (
                         <div>
-                            <p>Welcome, {user.first_name} {user.last_name}!</p>
-                            <button className="btn" onClick={handleLogout}>
-                                Logout
-                            </button>
+                            <p style={{ marginBottom: "15px", fontSize: "16px", fontWeight: "600" }}>
+                                Welcome, {user?.first_name} {user?.last_name}!
+                            </p>
+                            <div style={{ display: "flex", gap: "10px" }}>
+                                <a 
+                                    href={`/${user?.role || inertiaAuth?.role || 'student'}`} 
+                                    className="btn" 
+                                    style={{ textDecoration: "none", textAlign: "center", display: "inline-block" }}
+                                >
+                                    Go to Dashboard
+                                </a>
+                                <button className="cancel-btn btn" onClick={handleLogout}>
+                                    Logout
+                                </button>
+                            </div>
                         </div>
                     ) : (
                         <form onSubmit={handleLogin}>

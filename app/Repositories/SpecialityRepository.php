@@ -20,7 +20,7 @@ class SpecialityRepository extends BaseRepository
         $query = $this->model->query();
 
         if ($search) {
-            $query->where('name', 'like', "%{$search}%");
+            $query->where('speciality_name', 'like', "%{$search}%");
         }
 
         $specialities = $query->get();
@@ -30,7 +30,7 @@ class SpecialityRepository extends BaseRepository
                 'id' => $speciality->id,
                 'speciality_name' => $speciality->speciality_name,
                 'description' => $speciality->description,
-                'created_at' => $speciality->created_at->format('Y-m-d')
+                'created_at' => $speciality->created_at ? $speciality->created_at->format('Y-m-d') : null
             ];
         })->toArray();
     }
