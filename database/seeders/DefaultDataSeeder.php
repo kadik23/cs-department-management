@@ -18,15 +18,18 @@ class DefaultDataSeeder extends Seeder
     public function run(): void
     {
         // Create admin user if not exists
-        $adminUser = User::firstOrCreate(
-            ['email' => 'admin@univ-medea.dz'],
-            [
-                'first_name' => 'admin',
-                'last_name' => 'admin',
-                'username' => 'admin',
-                'password' => Hash::make('password'),
-            ]
-        );
+        $adminUser = User::where('username', 'admin')->first();
+        if (!$adminUser) {
+            $adminUser = User::firstOrCreate(
+                ['email' => 'admin@univ-medea.dz'],
+                [
+                    'first_name' => 'admin',
+                    'last_name' => 'admin',
+                    'username' => 'admin',
+                    'password' => Hash::make('password'),
+                ]
+            );
+        }
 
         // Create administrator record if not exists
         Administrator::firstOrCreate([
