@@ -9,6 +9,8 @@ function Accounts({ users, search, groups = [] }) {
     const openBtnRef = useRef();
     const closeBtnRef = useRef();
 
+    const [isFormOpen, setIsFormOpen] = useState(false);
+
     const form = useForm({
         username: '',
         email: '',
@@ -20,43 +22,17 @@ function Accounts({ users, search, groups = [] }) {
         group_id: '',
     });
 
-    useEffect(() => {
-        // Set initial collapsed styles
-        const formEl = formRef.current;
-        const openBtn = openBtnRef.current;
-        if (formEl && openBtn) {
-            formEl.style.maxHeight = '0';
-            formEl.style.width = '0';
-            formEl.style.opacity = '0';
-            openBtn.style.opacity = '1';
-        }
-        const openHandler = (ev) => {
-            ev.preventDefault();
-            form.reset();
-            openBtn.style.opacity = '0';
-            formEl.style.maxHeight = '1000px';
-            formEl.style.width = 'calc(100%*1/2)';
-            setTimeout(() => {
-                formEl.style.opacity = '1';
-            }, 500);
-        };
-        const closeHandler = (ev) => {
-            ev.preventDefault();
-            formEl.style.opacity = '0';
-            setTimeout(() => {
-                formEl.style.maxHeight = '0';
-                formEl.style.width = '0';
-                openBtn.style.opacity = '1';
-                form.reset();
-            }, 500);
-        };
-        if (openBtn) openBtn.addEventListener('click', openHandler);
-        if (closeBtnRef.current) closeBtnRef.current.addEventListener('click', closeHandler);
-        return () => {
-            if (openBtn) openBtn.removeEventListener('click', openHandler);
-            if (closeBtnRef.current) closeBtnRef.current.removeEventListener('click', closeHandler);
-        };
-    }, []);
+    const openForm = (ev) => {
+        if (ev) ev.preventDefault();
+        form.reset();
+        setIsFormOpen(true);
+    };
+
+    const closeForm = (ev) => {
+        if (ev) ev.preventDefault();
+        setIsFormOpen(false);
+        form.reset();
+    };
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -70,12 +46,14 @@ function Accounts({ users, search, groups = [] }) {
     const handleSubmit = (e) => {
         e.preventDefault();
         form.post('/admin/accounts', {
+            preserveScroll: true,
             onSuccess: () => {
                 setAlert({ type: 'success', message: 'Account created successfully!' });
-                form.reset();
+                closeForm();
             },
-            onError: () => {
-                setAlert({ type: 'error', message: 'Failed to create account.' });
+            onError: (errors) => {
+                const firstError = Object.values(errors)[0];
+                setAlert({ type: 'error', message: firstError || 'Failed to create account.' });
             },
         });
     };
@@ -99,7 +77,12 @@ function Accounts({ users, search, groups = [] }) {
                             id="open_create_spec"
                             className="btn"
                             ref={openBtnRef}
-                            style={{ opacity: 1, transition: 'opacity 0.5s' }}
+                            onClick={openForm}
+                            style={{
+                                opacity: isFormOpen ? 0 : 1,
+                                pointerEvents: isFormOpen ? 'none' : 'auto',
+                                transition: 'opacity 0.5s',
+                            }}
                         >Add Account</button>
                     </div>
                 </div>
@@ -112,12 +95,13 @@ function Accounts({ users, search, groups = [] }) {
                             ref={formRef}
                             onSubmit={handleSubmit}
                             style={{
-                                maxHeight: 0,
-                                width: 0,
-                                opacity: 0,
+                                maxHeight: isFormOpen ? '1500px' : 0,
+                                width: isFormOpen ? 'calc(100%*1/2)' : 0,
+                                opacity: isFormOpen ? 1 : 0,
                                 overflow: 'hidden',
-                                transition: 'all 0.5s',
+                                transition: 'all 0.5s ease-in-out',
                                 position: 'relative',
+                                marginBottom: isFormOpen ? '20px' : 0,
                             }}
                         >
                             <div className="input-wrapper">
@@ -206,8 +190,11 @@ function Accounts({ users, search, groups = [] }) {
                                             onChange={e => {
                                                 const groupId = e.target.value;
                                                 const group = groups.find(g => String(g.id) === groupId);
-                                                form.setData('group_id', groupId);
-                                                form.setData('academic_level_id', group ? group.academic_level_id : '');
+                                                form.setData(data => ({
+                                                    ...data,
+                                                    group_id: groupId,
+                                                    academic_level_id: group ? group.academic_level_id : ''
+                                                }));
                                             }}
                                             required
                                         >
@@ -223,16 +210,8 @@ function Accounts({ users, search, groups = [] }) {
                                             )}
                                         </select>
                                         {form.errors.group_id && <div className="text-red-500 mt-2">{form.errors.group_id}</div>}
+                                        {form.errors.academic_level_id && <div className="text-red-500 mt-2">{form.errors.academic_level_id}</div>}
                                     </div>
-                                    {/* Hidden academic_level_id input */}
-                                    <input
-                                        type="hidden"
-                                        id="academic_level_id"
-                                        name="academic_level_id"
-                                        value={form.data.academic_level_id}
-                                        readOnly
-                                        required
-                                    />
                                 </>
                             )}
                             <div className='flex item-center gap-4 '>
@@ -241,6 +220,7 @@ function Accounts({ users, search, groups = [] }) {
                                     className="cancel-btn btn"
                                     type="button"
                                     ref={closeBtnRef}
+                                    onClick={closeForm}
                                 >Cancel</button>
                                 <button type="submit" className="btn" disabled={form.processing}>Create</button>
                             </div>

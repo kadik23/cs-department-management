@@ -14,6 +14,9 @@ export default defineConfig({
             jsxImportSource: 'react',
         })
     ],
+    server: {
+        cors: true,
+    },
     resolve: {
         alias: {
             "@": "/resources/js",

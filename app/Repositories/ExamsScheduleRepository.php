@@ -46,7 +46,7 @@ class ExamsScheduleRepository extends BaseRepository
         return $exams->map(function($exam) use ($exam_duration, $first_exam_start_at) {
             return [
                 'id' => $exam->id,
-                'date' => $exam->date,
+                'date' => $exam->date ? ($exam->date instanceof \Carbon\Carbon ? $exam->date->format('Y-m-d') : substr((string)$exam->date, 0, 10)) : null,
                 'class_index' => $exam->class_index,
                 'start_time' => $this->calcTime($exam->class_index, $exam_duration, $first_exam_start_at),
                 'end_time' => $this->calcTime($exam->class_index + 1, $exam_duration, $first_exam_start_at),

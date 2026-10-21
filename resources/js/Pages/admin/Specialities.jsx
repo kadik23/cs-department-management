@@ -10,70 +10,50 @@ function Specialities({ specialities, search }) {
     const openBtnRef = useRef();
     const closeBtnRef = useRef();
 
+    const [isFormOpen, setIsFormOpen] = useState(false);
+
     const form = useForm({
         speciality_name: '',
     });
 
-    useEffect(() => {
-        const formEl = formRef.current;
-        const openBtn = openBtnRef.current;
-        if (formEl && openBtn) {
-            formEl.style.maxHeight = '0';
-            formEl.style.width = '0';
-            formEl.style.opacity = '0';
-            openBtn.style.opacity = '1';
-        }
-        const openHandler = (ev) => {
-            ev.preventDefault();
-            setEditingSpeciality(null);
-            form.reset();
-            openBtn.style.opacity = '0';
-            formEl.style.maxHeight = '1000px';
-            formEl.style.width = 'calc(100%*1/2)';
-            setTimeout(() => {
-                formEl.style.opacity = '1';
-            }, 500);
-        };
-        const closeHandler = (ev) => {
-            ev.preventDefault();
-            formEl.style.opacity = '0';
-            setTimeout(() => {
-                formEl.style.maxHeight = '0';
-                formEl.style.width = '0';
-                openBtn.style.opacity = '1';
-                setEditingSpeciality(null);
-                form.reset();
-            }, 500);
-        };
-        if (openBtn) openBtn.addEventListener('click', openHandler);
-        if (closeBtnRef.current) closeBtnRef.current.addEventListener('click', closeHandler);
-        return () => {
-            if (openBtn) openBtn.removeEventListener('click', openHandler);
-            if (closeBtnRef.current) closeBtnRef.current.removeEventListener('click', closeHandler);
-        };
-    }, []);
+    const openForm = (ev) => {
+        if (ev) ev.preventDefault();
+        setEditingSpeciality(null);
+        form.reset();
+        setIsFormOpen(true);
+    };
+
+    const closeForm = (ev) => {
+        if (ev) ev.preventDefault();
+        setIsFormOpen(false);
+        setEditingSpeciality(null);
+        form.reset();
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
         if (editingSpeciality) {
             form.put(`/admin/specialities/${editingSpeciality.id}`, {
+                preserveScroll: true,
                 onSuccess: () => {
                     setAlert({ type: 'success', message: 'Speciality updated successfully!' });
-                    setEditingSpeciality(null);
-                    form.reset();
+                    closeForm();
                 },
-                onError: () => {
-                    setAlert({ type: 'error', message: 'Failed to update speciality.' });
+                onError: (errors) => {
+                    const firstError = Object.values(errors)[0];
+                    setAlert({ type: 'error', message: firstError || 'Failed to update speciality.' });
                 },
             });
         } else {
             form.post('/admin/specialities', {
+                preserveScroll: true,
                 onSuccess: () => {
                     setAlert({ type: 'success', message: 'Speciality added successfully!' });
-                    form.reset();
+                    closeForm();
                 },
-                onError: () => {
-                    setAlert({ type: 'error', message: 'Failed to add speciality.' });
+                onError: (errors) => {
+                    const firstError = Object.values(errors)[0];
+                    setAlert({ type: 'error', message: firstError || 'Failed to add speciality.' });
                 },
             });
         }
@@ -84,14 +64,7 @@ function Specialities({ specialities, search }) {
         form.setData({
             speciality_name: speciality.speciality_name,
         });
-        if (formRef.current && openBtnRef.current) {
-            openBtnRef.current.style.opacity = '0';
-            formRef.current.style.maxHeight = '1000px';
-            formRef.current.style.width = 'calc(100%*1/2)';
-            setTimeout(() => {
-                formRef.current.style.opacity = '1';
-            }, 500);
-        }
+        setIsFormOpen(true);
     };
 
     const handleDelete = (id) => {
@@ -118,7 +91,17 @@ function Specialities({ specialities, search }) {
                 <div className="page-header">
                     <div className="page-title">Specialities</div>
                     <div className="page-actions">
-                        <button id="open_create_spec" className="btn" ref={openBtnRef} style={{ opacity: 1, transition: 'opacity 0.5s' }}>Add Speciality</button>
+                        <button
+                            id="open_create_spec"
+                            className="btn"
+                            ref={openBtnRef}
+                            onClick={openForm}
+                            style={{
+                                opacity: isFormOpen ? 0 : 1,
+                                pointerEvents: isFormOpen ? 'none' : 'auto',
+                                transition: 'opacity 0.5s',
+                            }}
+                        >Add Speciality</button>
                     </div>
                 </div>
                 <div className="section-wrapper">
@@ -130,13 +113,13 @@ function Specialities({ specialities, search }) {
                             ref={formRef}
                             onSubmit={handleSubmit}
                             style={{
-                                maxHeight: 0,
-                                width: 0,
-                                opacity: 0,
+                                maxHeight: isFormOpen ? '1000px' : 0,
+                                width: isFormOpen ? 'calc(100%*1/2)' : 0,
+                                opacity: isFormOpen ? 1 : 0,
                                 overflow: 'hidden',
-                                transition: 'all 0.5s',
+                                transition: 'all 0.5s ease-in-out',
                                 position: 'relative',
-                                marginBottom: '20px',
+                                marginBottom: isFormOpen ? '20px' : 0,
                             }}
                         >
                             <div className="input-wrapper">
@@ -158,6 +141,7 @@ function Specialities({ specialities, search }) {
                                     className="cancel-btn btn"
                                     type="button"
                                     ref={closeBtnRef}
+                                    onClick={closeForm}
                                 >Cancel</button>
                                 <button type="submit" className="btn" disabled={form.processing}>{editingSpeciality ? 'Save' : 'Add'}</button>
                             </div>

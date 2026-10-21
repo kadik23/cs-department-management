@@ -18,7 +18,7 @@ class ExamsSchedule extends Model
     ];
 
     protected $casts = [
-        'date' => 'date',
+        'date' => 'date:Y-m-d',
     ];
 
     // Relationships

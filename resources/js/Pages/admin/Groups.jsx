@@ -10,50 +10,27 @@ function Groups({ groups, academicLevels, search, responsibles = [] }) {
     const openBtnRef = useRef();
     const closeBtnRef = useRef();
 
+    const [isFormOpen, setIsFormOpen] = useState(false);
+
     const form = useForm({
         group_number: '',
         academic_level_id: '',
         responsible: '',
     });
 
-    useEffect(() => {
-        const formEl = formRef.current;
-        const openBtn = openBtnRef.current;
-        if (formEl && openBtn) {
-            formEl.style.maxHeight = '0';
-            formEl.style.width = '0';
-            formEl.style.opacity = '0';
-            openBtn.style.opacity = '1';
-        }
-        const openHandler = (ev) => {
-            ev.preventDefault();
-            setEditingGroup(null);
-            form.reset();
-            openBtn.style.opacity = '0';
-            formEl.style.maxHeight = '1000px';
-            formEl.style.width = 'calc(100%*1/2)';
-            setTimeout(() => {
-                formEl.style.opacity = '1';
-            }, 500);
-        };
-        const closeHandler = (ev) => {
-            ev.preventDefault();
-            formEl.style.opacity = '0';
-            setTimeout(() => {
-                formEl.style.maxHeight = '0';
-                formEl.style.width = '0';
-                openBtn.style.opacity = '1';
-                setEditingGroup(null);
-                form.reset();
-            }, 500);
-        };
-        if (openBtn) openBtn.addEventListener('click', openHandler);
-        if (closeBtnRef.current) closeBtnRef.current.addEventListener('click', closeHandler);
-        return () => {
-            if (openBtn) openBtn.removeEventListener('click', openHandler);
-            if (closeBtnRef.current) closeBtnRef.current.removeEventListener('click', closeHandler);
-        };
-    }, []);
+    const openForm = (ev) => {
+        if (ev) ev.preventDefault();
+        setEditingGroup(null);
+        form.reset();
+        setIsFormOpen(true);
+    };
+
+    const closeForm = (ev) => {
+        if (ev) ev.preventDefault();
+        setIsFormOpen(false);
+        setEditingGroup(null);
+        form.reset();
+    };
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -68,23 +45,26 @@ function Groups({ groups, academicLevels, search, responsibles = [] }) {
         e.preventDefault();
         if (editingGroup) {
             form.put(`/admin/groups/${editingGroup.id}`, {
+                preserveScroll: true,
                 onSuccess: () => {
                     setAlert({ type: 'success', message: 'Group updated successfully!' });
-                    setEditingGroup(null);
-                    form.reset();
+                    closeForm();
                 },
-                onError: () => {
-                    setAlert({ type: 'error', message: 'Failed to update group.' });
+                onError: (errors) => {
+                    const firstError = Object.values(errors)[0];
+                    setAlert({ type: 'error', message: firstError || 'Failed to update group.' });
                 },
             });
         } else {
             form.post('/admin/groups', {
+                preserveScroll: true,
                 onSuccess: () => {
                     setAlert({ type: 'success', message: 'Group created successfully!' });
-                    form.reset();
+                    closeForm();
                 },
-                onError: () => {
-                    setAlert({ type: 'error', message: 'Failed to create group.' });
+                onError: (errors) => {
+                    const firstError = Object.values(errors)[0];
+                    setAlert({ type: 'error', message: firstError || 'Failed to create group.' });
                 },
             });
         }
@@ -97,14 +77,7 @@ function Groups({ groups, academicLevels, search, responsibles = [] }) {
             academic_level_id: group.academic_level_id,
             responsible: group.responsible || '',
         });
-        const formEl = formRef.current;
-        const openBtn = openBtnRef.current;
-        openBtn.style.opacity = '0';
-        formEl.style.maxHeight = '1000px';
-        formEl.style.width = 'calc(100%*1/2)';
-        setTimeout(() => {
-            formEl.style.opacity = '1';
-        }, 500);
+        setIsFormOpen(true);
     };
 
     const handleDelete = (id) => {
@@ -126,7 +99,12 @@ function Groups({ groups, academicLevels, search, responsibles = [] }) {
                             id="open_create_spec"
                             className="btn"
                             ref={openBtnRef}
-                            style={{ opacity: 1, transition: 'opacity 0.5s' }}
+                            onClick={openForm}
+                            style={{
+                                opacity: isFormOpen ? 0 : 1,
+                                pointerEvents: isFormOpen ? 'none' : 'auto',
+                                transition: 'opacity 0.5s',
+                            }}
                         >Add Group</button>
                     </div>
                 </div>
@@ -139,12 +117,13 @@ function Groups({ groups, academicLevels, search, responsibles = [] }) {
                             ref={formRef}
                             onSubmit={handleSubmit}
                             style={{
-                                maxHeight: 0,
-                                width: 0,
-                                opacity: 0,
+                                maxHeight: isFormOpen ? '1000px' : 0,
+                                width: isFormOpen ? 'calc(100%*1/2)' : 0,
+                                opacity: isFormOpen ? 1 : 0,
                                 overflow: 'hidden',
-                                transition: 'all 0.5s',
+                                transition: 'all 0.5s ease-in-out',
                                 position: 'relative',
+                                marginBottom: isFormOpen ? '20px' : 0,
                             }}
                         >
                             <div className="input-wrapper">
@@ -199,6 +178,7 @@ function Groups({ groups, academicLevels, search, responsibles = [] }) {
                                     className="cancel-btn btn"
                                     type="button"
                                     ref={closeBtnRef}
+                                    onClick={closeForm}
                                 >Cancel</button>
                                 <button type="submit" className="btn" disabled={form.processing}>{editingGroup ? 'Save' : 'Create'}</button>
                             </div>

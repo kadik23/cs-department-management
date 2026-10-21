@@ -160,7 +160,8 @@ class ScheduleRepository extends BaseRepository
         return $subjects->map(function($subject) {
             return [
                 'id' => $subject->id,
-                'name' => $subject->subject_name
+                'name' => $subject->subject_name,
+                'subject_name' => $subject->subject_name,
             ];
         })->toArray();
     }

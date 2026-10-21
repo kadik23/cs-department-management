@@ -1,6 +1,11 @@
 import React from "react";
 import TeacherLayout from "@/layout/teacher/TeacherLayout";
 
+function formatDate(dateStr) {
+    if (!dateStr) return "";
+    return dateStr.split("T")[0];
+}
+
 export default function Attendance({ attendance }) {
     return (
         <div className="page-content">
@@ -35,7 +40,7 @@ export default function Attendance({ attendance }) {
                                                 {record.subject?.subject_name}
                                             </div>
                                             <div className="list-item_teacher">
-                                                {record.date}
+                                                {formatDate(record.date)}
                                             </div>
                                             <div className="list-item_teacher">
                                                 <span className={`status-badge_teacher ${record.status === 'present' ? 'present' : 'absent'}`}>

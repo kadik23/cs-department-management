@@ -17,7 +17,7 @@ class AdminAccountsController extends Controller
     {
         $search = $request->input('search');
         
-        $query = User::with(['student', 'teacher', 'administrator']);
+        $query = User::with(['student', 'teacher', 'administrator'])->latest();
 
         if ($search) {
             $query->where(function($q) use ($search) {
@@ -59,6 +59,13 @@ class AdminAccountsController extends Controller
 
     public function store(Request $request)
     {
+        if ($request->role === 'student' && $request->filled('group_id')) {
+            $group = Group::find($request->group_id);
+            if ($group && !$request->filled('academic_level_id')) {
+                $request->merge(['academic_level_id' => $group->academic_level_id]);
+            }
+        }
+
         $request->validate([
             'username' => 'required|unique:users,username',
             'email' => 'required|email|unique:users,email',

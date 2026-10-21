@@ -41,6 +41,7 @@ function Students({ students, search }) {
     const assignGroup = (e) => {
         e.preventDefault();
         assignGroupForm.post('/admin/students/assign-group', {
+            preserveScroll: true,
             onSuccess: () => {
                 setAlert({ type: 'success', message: 'Group assigned successfully!' });
                 setShowDialogue(false);
@@ -128,33 +129,20 @@ function Students({ students, search }) {
                                     <form id="assign-group-form" name="assign-group-form" onSubmit={assignGroup}>
                                         <div className="input-wrapper">
                                             <label htmlFor="group_id">Groups:</label>
-                                            <input
-                                                type="text"
-                                                className="selected_input"
-                                                list="groups-list"
-                                                placeholder="group"
-                                                value={groups.find(g => g.id === assignGroupForm.data.group_id) ? `L${groups.find(g => g.id === assignGroupForm.data.group_id).level} ${groups.find(g => g.id === assignGroupForm.data.group_id).speciality_name} Group ${groups.find(g => g.id === assignGroupForm.data.group_id).group_number}` : ''}
-                                                onChange={e => {
-                                                    const val = e.target.value;
-                                                    const found = groups.find(g => `L${g.level} ${g.speciality_name} Group ${g.group_number}` === val);
-                                                    assignGroupForm.setData('group_id', found ? found.id : '');
-                                                }}
-                                                required
-                                            />
-                                            <input
-                                                type="hidden"
-                                                className="hidden_selected_input"
-                                                list="groups-list"
+                                            <select
                                                 id="group_id"
                                                 name="group_id"
                                                 value={assignGroupForm.data.group_id}
-                                                readOnly
-                                            />
-                                            <datalist id="groups-list">
+                                                onChange={e => assignGroupForm.setData('group_id', e.target.value)}
+                                                required
+                                            >
+                                                <option value="">Select Group</option>
                                                 {groups.map((group) => (
-                                                    <option key={group.id} value={`L${group.level} ${group.speciality_name} Group ${group.group_number}`}></option>
+                                                    <option key={group.id} value={group.id}>
+                                                        {`L${group.level} ${group.speciality_name} Group ${group.group_number}`}
+                                                    </option>
                                                 ))}
-                                            </datalist>
+                                            </select>
                                         </div>
                                         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', width: 'calc(11/12*100%)' }}>
                                             <div className="cancel-btn dialogue-close-btn" onClick={() => setShowDialogue(false)}>Cancel</div>

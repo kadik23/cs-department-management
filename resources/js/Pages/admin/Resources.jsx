@@ -11,49 +11,26 @@ function Resources({ resources, search }) {
     const openBtnRef = useRef();
     const closeBtnRef = useRef();
 
+    const [isFormOpen, setIsFormOpen] = useState(false);
+
     const form = useForm({
         resource_type: '',
         resource_number: ''
     });
 
-    useEffect(() => {
-        const formEl = formRef.current;
-        const openBtn = openBtnRef.current;
-        if (formEl && openBtn) {
-            formEl.style.maxHeight = '0';
-            formEl.style.width = '0';
-            formEl.style.opacity = '0';
-            openBtn.style.opacity = '1';
-        }
-        const openHandler = (ev) => {
-            ev.preventDefault();
-            setEditingResource(null);
-            form.reset();
-            openBtn.style.opacity = '0';
-            formEl.style.maxHeight = '1000px';
-            formEl.style.width = 'calc(100%*1/2)';
-            setTimeout(() => {
-                formEl.style.opacity = '1';
-            }, 500);
-        };
-        const closeHandler = (ev) => {
-            ev.preventDefault();
-            formEl.style.opacity = '0';
-            setTimeout(() => {
-                formEl.style.maxHeight = '0';
-                formEl.style.width = '0';
-                openBtn.style.opacity = '1';
-                setEditingResource(null);
-                form.reset();
-            }, 500);
-        };
-        if (openBtn) openBtn.addEventListener('click', openHandler);
-        if (closeBtnRef.current) closeBtnRef.current.addEventListener('click', closeHandler);
-        return () => {
-            if (openBtn) openBtn.removeEventListener('click', openHandler);
-            if (closeBtnRef.current) closeBtnRef.current.removeEventListener('click', closeHandler);
-        };
-    }, []);
+    const openForm = (ev) => {
+        if (ev) ev.preventDefault();
+        setEditingResource(null);
+        form.reset();
+        setIsFormOpen(true);
+    };
+
+    const closeForm = (ev) => {
+        if (ev) ev.preventDefault();
+        setIsFormOpen(false);
+        setEditingResource(null);
+        form.reset();
+    };
 
     const handleFilter = (e) => {
         e.preventDefault();
@@ -67,23 +44,26 @@ function Resources({ resources, search }) {
         e.preventDefault();
         if (editingResource) {
             form.put(`/admin/resources/${editingResource.id}`, {
+                preserveScroll: true,
                 onSuccess: () => {
                     setAlert({ type: 'success', message: 'Resource updated successfully!' });
-                    setEditingResource(null);
-                    form.reset();
+                    closeForm();
                 },
-                onError: () => {
-                    setAlert({ type: 'error', message: 'Failed to update resource.' });
+                onError: (errors) => {
+                    const firstError = Object.values(errors)[0];
+                    setAlert({ type: 'error', message: firstError || 'Failed to update resource.' });
                 },
             });
         } else {
             form.post('/admin/resources', {
+                preserveScroll: true,
                 onSuccess: () => {
                     setAlert({ type: 'success', message: 'Resource created successfully!' });
-                    form.reset();
+                    closeForm();
                 },
-                onError: () => {
-                    setAlert({ type: 'error', message: 'Failed to create resource.' });
+                onError: (errors) => {
+                    const firstError = Object.values(errors)[0];
+                    setAlert({ type: 'error', message: firstError || 'Failed to create resource.' });
                 },
             });
         }
@@ -95,14 +75,7 @@ function Resources({ resources, search }) {
             resource_type: resource.resource_type,
             resource_number: resource.resource_number
         });
-        if (formRef.current && openBtnRef.current) {
-            openBtnRef.current.style.opacity = '0';
-            formRef.current.style.maxHeight = '1000px';
-            formRef.current.style.width = 'calc(100%*1/2)';
-            setTimeout(() => {
-                formRef.current.style.opacity = '1';
-            }, 500);
-        }
+        setIsFormOpen(true);
     };
 
     const handleDelete = (id) => {
@@ -120,7 +93,17 @@ function Resources({ resources, search }) {
                 <div className="page-header">
                     <div className="page-title">Resources</div>
                     <div className="page-actions">
-                        <button id="open_create_spec" className="btn" ref={openBtnRef} style={{ opacity: 1, transition: 'opacity 0.5s' }}>Add Resource</button>
+                        <button
+                            id="open_create_spec"
+                            className="btn"
+                            ref={openBtnRef}
+                            onClick={openForm}
+                            style={{
+                                opacity: isFormOpen ? 0 : 1,
+                                pointerEvents: isFormOpen ? 'none' : 'auto',
+                                transition: 'opacity 0.5s',
+                            }}
+                        >Add Resource</button>
                     </div>
                 </div>
                 <div className="section-wrapper">
@@ -132,13 +115,13 @@ function Resources({ resources, search }) {
                             ref={formRef}
                             onSubmit={handleSubmit}
                             style={{
-                                maxHeight: 0,
-                                width: 0,
-                                opacity: 0,
+                                maxHeight: isFormOpen ? '1000px' : 0,
+                                width: isFormOpen ? 'calc(100%*1/2)' : 0,
+                                opacity: isFormOpen ? 1 : 0,
                                 overflow: 'hidden',
-                                transition: 'all 0.5s',
+                                transition: 'all 0.5s ease-in-out',
                                 position: 'relative',
-                                marginBottom: '20px',
+                                marginBottom: isFormOpen ? '20px' : 0,
                             }}
                         >
                             <div className="input-wrapper">
@@ -173,6 +156,7 @@ function Resources({ resources, search }) {
                                     className="cancel-btn btn"
                                     type="button"
                                     ref={closeBtnRef}
+                                    onClick={closeForm}
                                 >Cancel</button>
                                 <button type="submit" className="btn" disabled={form.processing}>{editingResource ? 'Save' : 'Create'}</button>
                             </div>

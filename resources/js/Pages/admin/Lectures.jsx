@@ -13,6 +13,8 @@ function Lectures({ lectures, subjects, teachers, academicLevels, classRooms, se
     const closeBtnRef = useRef();
     const [filterAcademicLevel, setFilterAcademicLevel] = useState('');
 
+    const [isFormOpen, setIsFormOpen] = useState(false);
+
     const form = useForm({
         subject_id: '',
         teacher_id: '',
@@ -22,44 +24,19 @@ function Lectures({ lectures, subjects, teachers, academicLevels, classRooms, se
         class_index: '',
     });
 
-    useEffect(() => {
-        const formEl = formRef.current;
-        const openBtn = openBtnRef.current;
-        if (formEl && openBtn) {
-            formEl.style.maxHeight = '0';
-            formEl.style.width = '0';
-            formEl.style.opacity = '0';
-            openBtn.style.opacity = '1';
-        }
-        const openHandler = (ev) => {
-            ev.preventDefault();
-            setEditingLecture(null);
-            form.reset();
-            openBtn.style.opacity = '0';
-            formEl.style.maxHeight = '1000px';
-            formEl.style.width = 'calc(100%*1/2)';
-            setTimeout(() => {
-                formEl.style.opacity = '1';
-            }, 500);
-        };
-        const closeHandler = (ev) => {
-            ev.preventDefault();
-            formEl.style.opacity = '0';
-            setTimeout(() => {
-                formEl.style.maxHeight = '0';
-                formEl.style.width = '0';
-                openBtn.style.opacity = '1';
-                setEditingLecture(null);
-                form.reset();
-            }, 500);
-        };
-        if (openBtn) openBtn.addEventListener('click', openHandler);
-        if (closeBtnRef.current) closeBtnRef.current.addEventListener('click', closeHandler);
-        return () => {
-            if (openBtn) openBtn.removeEventListener('click', openHandler);
-            if (closeBtnRef.current) closeBtnRef.current.removeEventListener('click', closeHandler);
-        };
-    }, []);
+    const openForm = (ev) => {
+        if (ev) ev.preventDefault();
+        setEditingLecture(null);
+        form.reset();
+        setIsFormOpen(true);
+    };
+
+    const closeForm = (ev) => {
+        if (ev) ev.preventDefault();
+        setIsFormOpen(false);
+        setEditingLecture(null);
+        form.reset();
+    };
 
     const handleFilter = (e) => {
         e.preventDefault();
@@ -73,23 +50,26 @@ function Lectures({ lectures, subjects, teachers, academicLevels, classRooms, se
         e.preventDefault();
         if (editingLecture) {
             form.put(`/admin/lectures/${editingLecture.id}`, {
+                preserveScroll: true,
                 onSuccess: () => {
                     setAlert({ type: 'success', message: 'Lecture updated successfully!' });
-                    setEditingLecture(null);
-                    form.reset();
+                    closeForm();
                 },
-                onError: () => {
-                    setAlert({ type: 'error', message: 'Failed to update lecture.' });
+                onError: (errors) => {
+                    const firstError = Object.values(errors)[0];
+                    setAlert({ type: 'error', message: firstError || 'Failed to update lecture.' });
                 },
             });
         } else {
             form.post('/admin/lectures', {
+                preserveScroll: true,
                 onSuccess: () => {
                     setAlert({ type: 'success', message: 'Lecture created successfully!' });
-                    form.reset();
+                    closeForm();
                 },
-                onError: () => {
-                    setAlert({ type: 'error', message: 'Failed to create lecture.' });
+                onError: (errors) => {
+                    const firstError = Object.values(errors)[0];
+                    setAlert({ type: 'error', message: firstError || 'Failed to create lecture.' });
                 },
             });
         }
@@ -105,14 +85,7 @@ function Lectures({ lectures, subjects, teachers, academicLevels, classRooms, se
             day_of_week: lecture.day_of_week,
             class_index: lecture.class_index,
         });
-        const formEl = formRef.current;
-        const openBtn = openBtnRef.current;
-        openBtn.style.opacity = '0';
-        formEl.style.maxHeight = '1000px';
-        formEl.style.width = 'calc(100%*1/2)';
-        setTimeout(() => {
-            formEl.style.opacity = '1';
-        }, 500);
+        setIsFormOpen(true);
     };
 
     return (
@@ -124,7 +97,17 @@ function Lectures({ lectures, subjects, teachers, academicLevels, classRooms, se
                 <div className="page-header">
                     <div className="page-title">Lectures</div>
                     <div className="page-actions">
-                        <button id="open_create_spec" className="btn" ref={openBtnRef} style={{ opacity: 1, transition: 'opacity 0.5s' }}>Add New Lecture</button>
+                        <button
+                            id="open_create_spec"
+                            className="btn"
+                            ref={openBtnRef}
+                            onClick={openForm}
+                            style={{
+                                opacity: isFormOpen ? 0 : 1,
+                                pointerEvents: isFormOpen ? 'none' : 'auto',
+                                transition: 'opacity 0.5s',
+                            }}
+                        >Add New Lecture</button>
                     </div>
                 </div>
                 <div className="section-wrapper">
@@ -136,12 +119,13 @@ function Lectures({ lectures, subjects, teachers, academicLevels, classRooms, se
                             ref={formRef}
                             onSubmit={handleSubmit}
                             style={{
-                                maxHeight: 0,
-                                width: 0,
-                                opacity: 0,
+                                maxHeight: isFormOpen ? '1000px' : 0,
+                                width: isFormOpen ? 'calc(100%*1/2)' : 0,
+                                opacity: isFormOpen ? 1 : 0,
                                 overflow: 'hidden',
-                                transition: 'all 0.5s',
+                                transition: 'all 0.5s ease-in-out',
                                 position: 'relative',
+                                marginBottom: isFormOpen ? '20px' : 0,
                             }}
                         >
                             <div className="input-wrapper">
@@ -233,27 +217,31 @@ function Lectures({ lectures, subjects, teachers, academicLevels, classRooms, se
                                 {form.errors.day_of_week && <div className="text-red-500 mt-2">{form.errors.day_of_week}</div>}
                             </div>
                             <div className="input-wrapper">
-                                <label>Start At:</label>
-                                <input type="text" className="selected_input" list="class_indexes" value={form.data.class_index !== '' && settings ? (() => { const classDuration = settings.class_duration; const firstClassStartAt = parseInt(settings.first_class_start_at?.split(':')[0] || '8', 10); const opt = (() => { let i = 0, label = ''; while ((i * classDuration) < ((18 - firstClassStartAt) * 60)) { if (i.toString() === form.data.class_index.toString()) { const totalMinutes = i * classDuration; const hours = Math.floor(totalMinutes / 60) + firstClassStartAt; const minutes = totalMinutes % 60; label = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`; break; } i += 1; } return label; })(); return opt; })() : ''} onChange={e => {
-                                    const val = e.target.value;
-                                    if (!settings) return;
-                                    const classDuration = settings.class_duration;
-                                    const firstClassStartAt = parseInt(settings.first_class_start_at?.split(':')[0] || '8', 10);
-                                    let i = 0, found = '';
-                                    while ((i * classDuration) < ((18 - firstClassStartAt) * 60)) {
-                                        const totalMinutes = i * classDuration;
-                                        const hours = Math.floor(totalMinutes / 60) + firstClassStartAt;
-                                        const minutes = totalMinutes % 60;
-                                        const label = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-                                        if (label === val || i.toString() === val) { found = i; break; }
-                                        i += 1;
-                                    }
-                                    form.setData('class_index', found);
-                                }} />
-                                <input type="hidden" className="hidden_selected_input" list="class_indexes" id="class_index" name="class_index" value={form.data.class_index} readOnly />
-                                <datalist id="class_indexes">
-                                    {settings && (() => { const opts = []; const classDuration = settings.class_duration; const firstClassStartAt = parseInt(settings.first_class_start_at?.split(':')[0] || '8', 10); let i = 0; while ((i * classDuration) < ((18 - firstClassStartAt) * 60)) { const totalMinutes = i * classDuration; const hours = Math.floor(totalMinutes / 60) + firstClassStartAt; const minutes = totalMinutes % 60; opts.push(<option key={i} value={`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`}>{`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`}</option>); i += 1; } return opts; })()}
-                                </datalist>
+                                <label htmlFor="class_index">Start At:</label>
+                                <select
+                                    id="class_index"
+                                    name="class_index"
+                                    value={form.data.class_index !== '' ? form.data.class_index : ''}
+                                    onChange={e => form.setData('class_index', e.target.value)}
+                                    required
+                                >
+                                    <option value="">Select Start Time</option>
+                                    {settings && (() => {
+                                        const opts = [];
+                                        const classDuration = settings.class_duration;
+                                        const firstClassStartAt = parseInt(settings.first_class_start_at?.split(':')[0] || '8', 10);
+                                        let i = 0;
+                                        while ((i * classDuration) < ((18 - firstClassStartAt) * 60)) {
+                                            const totalMinutes = i * classDuration;
+                                            const hours = Math.floor(totalMinutes / 60) + firstClassStartAt;
+                                            const minutes = totalMinutes % 60;
+                                            const label = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+                                            opts.push(<option key={i} value={i}>{label}</option>);
+                                            i += 1;
+                                        }
+                                        return opts;
+                                    })()}
+                                </select>
                                 {form.errors.class_index && <div className="text-red-500 mt-2">{form.errors.class_index}</div>}
                             </div>
                             <div className='flex item-center gap-4 '>
@@ -262,6 +250,7 @@ function Lectures({ lectures, subjects, teachers, academicLevels, classRooms, se
                                     className="cancel-btn btn"
                                     type="button"
                                     ref={closeBtnRef}
+                                    onClick={closeForm}
                                 >Cancel</button>
                                 <button type="submit" className="btn" disabled={form.processing}>{editingLecture ? 'Save' : 'Create'}</button>
                             </div>

@@ -2,6 +2,11 @@ import React, { useRef, useState, useEffect } from 'react';
 import { useForm, usePage, router } from '@inertiajs/react';
 import Alert from '@/components/Alert';
 
+function formatDate(dateStr) {
+    if (!dateStr) return "";
+    return dateStr.split("T")[0];
+}
+
 function Exams({ exams, subjects, groups, settings, search, classRooms = [] }) {
     const { flash } = usePage().props;
     const [alert, setAlert] = useState({ type: '', message: '' });
@@ -9,6 +14,8 @@ function Exams({ exams, subjects, groups, settings, search, classRooms = [] }) {
     const formRef = useRef();
     const openBtnRef = useRef();
     const closeBtnRef = useRef();
+
+    const [isFormOpen, setIsFormOpen] = useState(false);
 
     const form = useForm({
         date: '',
@@ -18,44 +25,19 @@ function Exams({ exams, subjects, groups, settings, search, classRooms = [] }) {
         class_index: '',
     });
 
-    useEffect(() => {
-        const formEl = formRef.current;
-        const openBtn = openBtnRef.current;
-        if (formEl && openBtn) {
-            formEl.style.maxHeight = '0';
-            formEl.style.width = '0';
-            formEl.style.opacity = '0';
-            openBtn.style.opacity = '1';
-        }
-        const openHandler = (ev) => {
-            ev.preventDefault();
-            setEditingExam(null);
-            form.reset();
-            openBtn.style.opacity = '0';
-            formEl.style.maxHeight = '1000px';
-            formEl.style.width = 'calc(100%*1/2)';
-            setTimeout(() => {
-                formEl.style.opacity = '1';
-            }, 500);
-        };
-        const closeHandler = (ev) => {
-            ev.preventDefault();
-            formEl.style.opacity = '0';
-            setTimeout(() => {
-                formEl.style.maxHeight = '0';
-                formEl.style.width = '0';
-                openBtn.style.opacity = '1';
-                setEditingExam(null);
-                form.reset();
-            }, 500);
-        };
-        if (openBtn) openBtn.addEventListener('click', openHandler);
-        if (closeBtnRef.current) closeBtnRef.current.addEventListener('click', closeHandler);
-        return () => {
-            if (openBtn) openBtn.removeEventListener('click', openHandler);
-            if (closeBtnRef.current) closeBtnRef.current.removeEventListener('click', closeHandler);
-        };
-    }, []);
+    const openForm = (ev) => {
+        if (ev) ev.preventDefault();
+        setEditingExam(null);
+        form.reset();
+        setIsFormOpen(true);
+    };
+
+    const closeForm = (ev) => {
+        if (ev) ev.preventDefault();
+        setIsFormOpen(false);
+        setEditingExam(null);
+        form.reset();
+    };
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -70,23 +52,26 @@ function Exams({ exams, subjects, groups, settings, search, classRooms = [] }) {
         e.preventDefault();
         if (editingExam) {
             form.put(`/admin/exams/${editingExam.id}`, {
+                preserveScroll: true,
                 onSuccess: () => {
                     setAlert({ type: 'success', message: 'Exam updated successfully!' });
-                    setEditingExam(null);
-                    form.reset();
+                    closeForm();
                 },
-                onError: () => {
-                    setAlert({ type: 'error', message: 'Failed to update exam.' });
+                onError: (errors) => {
+                    const firstError = Object.values(errors)[0];
+                    setAlert({ type: 'error', message: firstError || 'Failed to update exam.' });
                 },
             });
         } else {
             form.post('/admin/exams', {
+                preserveScroll: true,
                 onSuccess: () => {
                     setAlert({ type: 'success', message: 'Exam created successfully!' });
-                    form.reset();
+                    closeForm();
                 },
-                onError: () => {
-                    setAlert({ type: 'error', message: 'Failed to create exam.' });
+                onError: (errors) => {
+                    const firstError = Object.values(errors)[0];
+                    setAlert({ type: 'error', message: firstError || 'Failed to create exam.' });
                 },
             });
         }
@@ -95,20 +80,13 @@ function Exams({ exams, subjects, groups, settings, search, classRooms = [] }) {
     const handleEdit = (exam) => {
         setEditingExam(exam);
         form.setData({
-            date: exam.date,
+            date: formatDate(exam.date),
             subject_id: exam.subject_id,
             group_id: exam.group_id,
             class_room_id: exam.class_room_id || '',
             class_index: exam.class_index || '',
         });
-        const formEl = formRef.current;
-        const openBtn = openBtnRef.current;
-        openBtn.style.opacity = '0';
-        formEl.style.maxHeight = '1000px';
-        formEl.style.width = 'calc(100%*1/2)';
-        setTimeout(() => {
-            formEl.style.opacity = '1';
-        }, 500);
+        setIsFormOpen(true);
     };
 
     const handleDelete = (id) => {
@@ -130,7 +108,12 @@ function Exams({ exams, subjects, groups, settings, search, classRooms = [] }) {
                             id="open_create_spec"
                             className="btn"
                             ref={openBtnRef}
-                            style={{ opacity: 1, transition: 'opacity 0.5s' }}
+                            onClick={openForm}
+                            style={{
+                                opacity: isFormOpen ? 0 : 1,
+                                pointerEvents: isFormOpen ? 'none' : 'auto',
+                                transition: 'opacity 0.5s',
+                            }}
                         >Add Exam</button>
                     </div>
                 </div>
@@ -143,12 +126,13 @@ function Exams({ exams, subjects, groups, settings, search, classRooms = [] }) {
                             ref={formRef}
                             onSubmit={handleSubmit}
                             style={{
-                                maxHeight: 0,
-                                width: 0,
-                                opacity: 0,
+                                maxHeight: isFormOpen ? '1000px' : 0,
+                                width: isFormOpen ? 'calc(100%*1/2)' : 0,
+                                opacity: isFormOpen ? 1 : 0,
                                 overflow: 'hidden',
-                                transition: 'all 0.5s',
+                                transition: 'all 0.5s ease-in-out',
                                 position: 'relative',
+                                marginBottom: isFormOpen ? '20px' : 0,
                             }}
                         >
                             <div className="input-wrapper">
@@ -252,6 +236,7 @@ function Exams({ exams, subjects, groups, settings, search, classRooms = [] }) {
                                     className="cancel-btn btn"
                                     type="button"
                                     ref={closeBtnRef}
+                                    onClick={closeForm}
                                 >Cancel</button>
                                 <button type="submit" className="btn" disabled={form.processing}>{editingExam ? 'Save' : 'Create'}</button>
                             </div>
@@ -281,7 +266,7 @@ function Exams({ exams, subjects, groups, settings, search, classRooms = [] }) {
                             <div className="list-body">
                                 {exams.map((exam) => (
                                     <div className="list-row" key={exam.id}>
-                                        <div className="list-item">{exam.date}</div>
+                                        <div className="list-item">{formatDate(exam.date)}</div>
                                         <div className="list-item">{exam.start_time}</div>
                                         <div className="list-item">{exam.end_time}</div>
                                         <div className="list-item" style={{ flex: 2 }}>{exam.subject_name}</div>

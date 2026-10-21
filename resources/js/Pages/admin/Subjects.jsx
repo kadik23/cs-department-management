@@ -10,50 +10,27 @@ function Subjects({ subjects, search }) {
     const openBtnRef = useRef();
     const closeBtnRef = useRef();
 
+    const [isFormOpen, setIsFormOpen] = useState(false);
+
     const form = useForm({
         subject_name: '',
         coefficient: '',
         credit: ''
     });
 
-    useEffect(() => {
-        const formEl = formRef.current;
-        const openBtn = openBtnRef.current;
-        if (formEl && openBtn) {
-            formEl.style.maxHeight = '0';
-            formEl.style.width = '0';
-            formEl.style.opacity = '0';
-            openBtn.style.opacity = '1';
-        }
-        const openHandler = (ev) => {
-            ev.preventDefault();
-            setEditingSubject(null);
-            form.reset();
-            openBtnRef.current.style.opacity = '0';
-            formEl.style.maxHeight = '1000px';
-            formEl.style.width = 'calc(100%*1/2)';
-            setTimeout(() => {
-                formEl.style.opacity = '1';
-            }, 500);
-        };
-        const closeHandler = (ev) => {
-            ev.preventDefault();
-            formEl.style.opacity = '0';
-            setTimeout(() => {
-                formEl.style.maxHeight = '0';
-                formEl.style.width = '0';
-                openBtnRef.current.style.opacity = '1';
-                setEditingSubject(null);
-                form.reset();
-            }, 500);
-        };
-        if (openBtn) openBtn.addEventListener('click', openHandler);
-        if (closeBtnRef.current) closeBtnRef.current.addEventListener('click', closeHandler);
-        return () => {
-            if (openBtn) openBtn.removeEventListener('click', openHandler);
-            if (closeBtnRef.current) closeBtnRef.current.removeEventListener('click', closeHandler);
-        };
-    }, []);
+    const openForm = (ev) => {
+        if (ev) ev.preventDefault();
+        setEditingSubject(null);
+        form.reset();
+        setIsFormOpen(true);
+    };
+
+    const closeForm = (ev) => {
+        if (ev) ev.preventDefault();
+        setIsFormOpen(false);
+        setEditingSubject(null);
+        form.reset();
+    };
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -71,37 +48,33 @@ function Subjects({ subjects, search }) {
             coefficient: subject.coefficient,
             credit: subject.credit,
         });
-        if (formRef.current && openBtnRef.current) {
-            openBtnRef.current.style.opacity = '0';
-            formRef.current.style.maxHeight = '1000px';
-            formRef.current.style.width = 'calc(100%*1/2)';
-            setTimeout(() => {
-                formRef.current.style.opacity = '1';
-            }, 500);
-        }
+        setIsFormOpen(true);
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
         if (editingSubject) {
             form.put(`/admin/subjects/${editingSubject.id}`, {
+                preserveScroll: true,
                 onSuccess: () => {
                     setAlert({ type: 'success', message: 'Subject updated successfully!' });
-                    setEditingSubject(null);
-                    form.reset();
+                    closeForm();
                 },
-                onError: () => {
-                    setAlert({ type: 'error', message: 'Failed to update subject.' });
+                onError: (errors) => {
+                    const firstError = Object.values(errors)[0];
+                    setAlert({ type: 'error', message: firstError || 'Failed to update subject.' });
                 },
             });
         } else {
             form.post('/admin/subjects', {
+                preserveScroll: true,
                 onSuccess: () => {
                     setAlert({ type: 'success', message: 'Subject created successfully!' });
-                    form.reset();
+                    closeForm();
                 },
-                onError: () => {
-                    setAlert({ type: 'error', message: 'Failed to create subject.' });
+                onError: (errors) => {
+                    const firstError = Object.values(errors)[0];
+                    setAlert({ type: 'error', message: firstError || 'Failed to create subject.' });
                 },
             });
         }
@@ -126,12 +99,13 @@ function Subjects({ subjects, search }) {
                                 ref={formRef}
                                 onSubmit={handleSubmit}
                                 style={{
-                                    maxHeight: 0,
-                                    width: 0,
-                                    opacity: 0,
+                                    maxHeight: isFormOpen ? '1000px' : 0,
+                                    width: isFormOpen ? 'calc(100%*1/2)' : 0,
+                                    opacity: isFormOpen ? 1 : 0,
                                     overflow: 'hidden',
-                                    transition: 'all 0.5s',
+                                    transition: 'all 0.5s ease-in-out',
                                     position: 'relative',
+                                    marginBottom: isFormOpen ? '20px' : 0,
                                 }}
                             >
                                 <div className="input-wrapper">
@@ -176,6 +150,7 @@ function Subjects({ subjects, search }) {
                                         className="cancel-btn btn"
                                         type="button"
                                         ref={closeBtnRef}
+                                        onClick={closeForm}
                                     >Cancel</button>
                                     <button type="submit" className="btn" disabled={form.processing}>{editingSubject ? 'Save' : 'Create'}</button>
                                 </div>
@@ -184,7 +159,12 @@ function Subjects({ subjects, search }) {
                                 id="open_create_spec"
                                 className="btn"
                                 ref={openBtnRef}
-                                style={{ opacity: 1, transition: 'opacity 0.5s' }}
+                                onClick={openForm}
+                                style={{
+                                    opacity: isFormOpen ? 0 : 1,
+                                    pointerEvents: isFormOpen ? 'none' : 'auto',
+                                    transition: 'opacity 0.5s',
+                                }}
                             >Create Subject</button>
                         </div>
                         <div className="list-control">

@@ -7,6 +7,11 @@ function parseTime(minutes, firstHour = 8, firstMinute = 0) {
     return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`;
 }
 
+function formatDate(dateStr) {
+    if (!dateStr) return "";
+    return dateStr.split("T")[0];
+}
+
 export default function Exams({ student, exams, settings }) {
     const firstExamStart = settings.first_exam_start_at ? settings.first_exam_start_at.split(":").map(Number) : [8,0];
     return (
@@ -34,7 +39,7 @@ export default function Exams({ student, exams, settings }) {
                             return (
                                 <div className="list-row" key={idx}>
                                     <div className="list-item">{row.class_room?.resource_type} {row.class_room?.resource_number}</div>
-                                    <div className="list-item">{row.date}</div>
+                                    <div className="list-item">{formatDate(row.date)}</div>
                                     <div className="list-item">{`${fromHours.toString().padStart(2,"0")}:${fromMinutes.toString().padStart(2,"0")}`}</div>
                                     <div className="list-item">{`${toHours.toString().padStart(2,"0")}:${toMinutes.toString().padStart(2,"0")}`}</div>
                                     <div className="list-item" style={{flex: 2}}>{row.subject?.subject_name}</div>

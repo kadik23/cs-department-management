@@ -28,45 +28,21 @@ function Schedules({ schedules, subjects, groups, teachers, classRooms, settings
     });
     const [editSettings, setEditSettings] = useState(false);
     const [settingsFormOpen, setSettingsFormOpen] = useState(false);
+    const [isFormOpen, setIsFormOpen] = useState(false);
 
-    useEffect(() => {
-        const formEl = formRef.current;
-        const openBtn = openBtnRef.current;
-        if (formEl && openBtn) {
-            formEl.style.maxHeight = '0';
-            formEl.style.width = '0';
-            formEl.style.opacity = '0';
-            openBtn.style.opacity = '1';
-        }
-        const openHandler = (ev) => {
-            ev.preventDefault();
-            setEditingSchedule(null);
-            form.reset();
-            openBtn.style.opacity = '0';
-            formEl.style.maxHeight = '1000px';
-            formEl.style.width = 'calc(100%*1/2)';
-            setTimeout(() => {
-                formEl.style.opacity = '1';
-            }, 500);
-        };
-        const closeHandler = (ev) => {
-            ev.preventDefault();
-            formEl.style.opacity = '0';
-            setTimeout(() => {
-                formEl.style.maxHeight = '0';
-                formEl.style.width = '0';
-                openBtn.style.opacity = '1';
-                setEditingSchedule(null);
-                form.reset();
-            }, 500);
-        };
-        if (openBtn) openBtn.addEventListener('click', openHandler);
-        if (closeBtnRef.current) closeBtnRef.current.addEventListener('click', closeHandler);
-        return () => {
-            if (openBtn) openBtn.removeEventListener('click', openHandler);
-            if (closeBtnRef.current) closeBtnRef.current.removeEventListener('click', closeHandler);
-        };
-    }, []);
+    const openForm = (ev) => {
+        if (ev) ev.preventDefault();
+        setEditingSchedule(null);
+        form.reset();
+        setIsFormOpen(true);
+    };
+
+    const closeForm = (ev) => {
+        if (ev) ev.preventDefault();
+        setIsFormOpen(false);
+        setEditingSchedule(null);
+        form.reset();
+    };
 
     const handleEdit = (schedule) => {
         setEditingSchedule(schedule);
@@ -78,14 +54,7 @@ function Schedules({ schedules, subjects, groups, teachers, classRooms, settings
             day_of_week: schedule.day_of_week,
             class_index: schedule.class_index,
         });
-        if (formRef.current && openBtnRef.current) {
-            openBtnRef.current.style.opacity = '0';
-            formRef.current.style.maxHeight = '1000px';
-            formRef.current.style.width = 'calc(100%*1/2)';
-            setTimeout(() => {
-                formRef.current.style.opacity = '1';
-            }, 500);
-        }
+        setIsFormOpen(true);
     };
 
     const handleDelete = (id) => {
@@ -98,23 +67,26 @@ function Schedules({ schedules, subjects, groups, teachers, classRooms, settings
         e.preventDefault();
         if (editingSchedule) {
             form.put(`/admin/schedules/${editingSchedule.id}`, {
+                preserveScroll: true,
                 onSuccess: () => {
                     setAlert({ type: 'success', message: 'Schedule updated successfully!' });
-                    setEditingSchedule(null);
-                    form.reset();
+                    closeForm();
                 },
-                onError: () => {
-                    setAlert({ type: 'error', message: 'Failed to update schedule.' });
+                onError: (errors) => {
+                    const firstError = Object.values(errors)[0];
+                    setAlert({ type: 'error', message: firstError || 'Failed to update schedule.' });
                 },
             });
         } else {
             form.post('/admin/schedules', {
+                preserveScroll: true,
                 onSuccess: () => {
                     setAlert({ type: 'success', message: 'Schedule added successfully!' });
-                    form.reset();
+                    closeForm();
                 },
-                onError: () => {
-                    setAlert({ type: 'error', message: 'Failed to add schedule.' });
+                onError: (errors) => {
+                    const firstError = Object.values(errors)[0];
+                    setAlert({ type: 'error', message: firstError || 'Failed to add schedule.' });
                 },
             });
         }
@@ -173,7 +145,17 @@ function Schedules({ schedules, subjects, groups, teachers, classRooms, settings
                 <div className="page-header">
                     <div className="page-title">Schedules</div>
                     <div className="page-actions">
-                        <button id="open_create_spec" className="btn" ref={openBtnRef} style={{ opacity: 1, transition: 'opacity 0.5s' }}>Add Schedule</button>
+                        <button
+                            id="open_create_spec"
+                            className="btn"
+                            ref={openBtnRef}
+                            onClick={openForm}
+                            style={{
+                                opacity: isFormOpen ? 0 : 1,
+                                pointerEvents: isFormOpen ? 'none' : 'auto',
+                                transition: 'opacity 0.5s',
+                            }}
+                        >Add Schedule</button>
                     </div>
                 </div>
                 <div className="section-wrapper">
@@ -221,13 +203,13 @@ function Schedules({ schedules, subjects, groups, teachers, classRooms, settings
                             ref={formRef}
                             onSubmit={handleSubmit}
                             style={{
-                                maxHeight: 0,
-                                width: 0,
-                                opacity: 0,
+                                maxHeight: isFormOpen ? '1000px' : 0,
+                                width: isFormOpen ? 'calc(100%*1/2)' : 0,
+                                opacity: isFormOpen ? 1 : 0,
                                 overflow: 'hidden',
-                                transition: 'all 0.5s',
+                                transition: 'all 0.5s ease-in-out',
                                 position: 'relative',
-                                marginBottom: '20px',
+                                marginBottom: isFormOpen ? '20px' : 0,
                             }}
                         >
                             <div className="input-wrapper">
@@ -249,87 +231,101 @@ function Schedules({ schedules, subjects, groups, teachers, classRooms, settings
                                 {form.errors.class_room_id && <div className="text-red-500 mt-2">{form.errors.class_room_id}</div>}
                             </div>
                             <div className="input-wrapper">
-                                <label>Group:</label>
-                                <input type="text" className="selected_input" list="groups" placeholder="group" value={groups.find(g => g.id === form.data.group_id) ? `L${groups.find(g => g.id === form.data.group_id).level} ${groups.find(g => g.id === form.data.group_id).speciality_name} Group ${groups.find(g => g.id === form.data.group_id).group_number}` : ''} onChange={e => {
-                                    const val = e.target.value;
-                                    const found = groups.find(g => `L${g.level} ${g.speciality_name} Group ${g.group_number}` === val || g.id.toString() === val);
-                                    form.setData('group_id', found ? found.id : '');
-                                }} />
-                                <input type="hidden" className="hidden_selected_input" list="groups" id="group_id" name="group_id" value={form.data.group_id} readOnly />
-                                <datalist id="groups">
+                                <label htmlFor="group_id">Group:</label>
+                                <select
+                                    id="group_id"
+                                    name="group_id"
+                                    value={form.data.group_id}
+                                    onChange={e => form.setData('group_id', e.target.value)}
+                                    required
+                                >
+                                    <option value="">Select Group</option>
                                     {groups.map(g => (
-                                        <option key={g.id} value={`L${g.level} ${g.speciality_name} Group ${g.group_number}`}>{`L${g.level} ${g.speciality_name} Group ${g.group_number}`}</option>
+                                        <option key={g.id} value={g.id}>
+                                            {`L${g.level} ${g.speciality_name} Group ${g.group_number}`}
+                                        </option>
                                     ))}
-                                </datalist>
+                                </select>
                                 {form.errors.group_id && <div className="text-red-500 mt-2">{form.errors.group_id}</div>}
                             </div>
                             <div className="input-wrapper">
-                                <label>Teacher:</label>
-                                <input type="text" className="selected_input" list="teachers" placeholder="teacher" value={teachers.find(t => t.id === form.data.teacher_id) ? `${teachers.find(t => t.id === form.data.teacher_id).first_name} ${teachers.find(t => t.id === form.data.teacher_id).last_name}` : ''} onChange={e => {
-                                    const val = e.target.value;
-                                    const found = teachers.find(t => `${t.first_name} ${t.last_name}` === val || t.id.toString() === val);
-                                    form.setData('teacher_id', found ? found.id : '');
-                                }} />
-                                <input type="hidden" className="hidden_selected_input" list="teachers" id="teacher_id" name="teacher_id" value={form.data.teacher_id} readOnly />
-                                <datalist id="teachers">
+                                <label htmlFor="teacher_id">Teacher:</label>
+                                <select
+                                    id="teacher_id"
+                                    name="teacher_id"
+                                    value={form.data.teacher_id}
+                                    onChange={e => form.setData('teacher_id', e.target.value)}
+                                    required
+                                >
+                                    <option value="">Select Teacher</option>
                                     {teachers.map(t => (
-                                        <option key={t.id} value={`${t.first_name} ${t.last_name}`}>{`${t.first_name} ${t.last_name}`}</option>
+                                        <option key={t.id} value={t.id}>
+                                            {`${t.first_name} ${t.last_name}`}
+                                        </option>
                                     ))}
-                                </datalist>
+                                </select>
                                 {form.errors.teacher_id && <div className="text-red-500 mt-2">{form.errors.teacher_id}</div>}
                             </div>
                             <div className="input-wrapper">
-                                <label>Subject:</label>
-                                <input type="text" className="selected_input" list="subjects" placeholder="subject" value={subjects.find(s => s.id === form.data.subject_id) ? subjects.find(s => s.id === form.data.subject_id).subject_name : ''} onChange={e => {
-                                    const val = e.target.value;
-                                    const found = subjects.find(s => s.subject_name === val || s.id.toString() === val);
-                                    form.setData('subject_id', found ? found.id : '');
-                                }} />
-                                <input type="hidden" className="hidden_selected_input" list="subjects" id="subject_id" name="subject_id" value={form.data.subject_id} readOnly />
-                                <datalist id="subjects">
+                                <label htmlFor="subject_id">Subject:</label>
+                                <select
+                                    id="subject_id"
+                                    name="subject_id"
+                                    value={form.data.subject_id}
+                                    onChange={e => form.setData('subject_id', e.target.value)}
+                                    required
+                                >
+                                    <option value="">Select Subject</option>
                                     {subjects.map(s => (
-                                        <option key={s.id} value={s.subject_name}>{s.subject_name}</option>
+                                        <option key={s.id} value={s.id}>
+                                            {s.name || s.subject_name}
+                                        </option>
                                     ))}
-                                </datalist>
+                                </select>
                                 {form.errors.subject_id && <div className="text-red-500 mt-2">{form.errors.subject_id}</div>}
                             </div>
                             <div className="input-wrapper">
-                                <label>Day:</label>
-                                <input type="text" className="selected_input" list="days_of_week" value={form.data.day_of_week !== '' ? weekDays[form.data.day_of_week] : ''} onChange={e => {
-                                    const val = e.target.value;
-                                    const found = weekDays.findIndex(d => d === val);
-                                    form.setData('day_of_week', found !== -1 ? found : '');
-                                }} />
-                                <input type="hidden" className="hidden_selected_input" list="days_of_week" id="day_of_week" name="day_of_week" value={form.data.day_of_week} readOnly />
-                                <datalist id="days_of_week">
+                                <label htmlFor="day_of_week">Day:</label>
+                                <select
+                                    id="day_of_week"
+                                    name="day_of_week"
+                                    value={form.data.day_of_week !== '' ? form.data.day_of_week : ''}
+                                    onChange={e => form.setData('day_of_week', e.target.value)}
+                                    required
+                                >
+                                    <option value="">Select Day</option>
                                     {weekDays.map((d, idx) => (
-                                        <option key={idx} value={d}>{d}</option>
+                                        <option key={idx} value={idx}>{d}</option>
                                     ))}
-                                </datalist>
+                                </select>
                                 {form.errors.day_of_week && <div className="text-red-500 mt-2">{form.errors.day_of_week}</div>}
                             </div>
                             <div className="input-wrapper">
-                                <label>Start At:</label>
-                                <input type="text" className="selected_input" list="class_indexes" value={form.data.class_index !== '' && settings ? (() => { const classDuration = settings.class_duration; const firstClassStartAt = parseInt(settings.first_class_start_at?.split(':')[0] || '8', 10); const opt = (() => { let i = 0, label = ''; while ((i * classDuration) < ((18 - firstClassStartAt) * 60)) { if (i.toString() === form.data.class_index.toString()) { const totalMinutes = i * classDuration; const hours = Math.floor(totalMinutes / 60) + firstClassStartAt; const minutes = totalMinutes % 60; label = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`; break; } i += 1; } return label; })(); return opt; })() : ''} onChange={e => {
-                                    const val = e.target.value;
-                                    if (!settings) return;
-                                    const classDuration = settings.class_duration;
-                                    const firstClassStartAt = parseInt(settings.first_class_start_at?.split(':')[0] || '8', 10);
-                                    let i = 0, found = '';
-                                    while ((i * classDuration) < ((18 - firstClassStartAt) * 60)) {
-                                        const totalMinutes = i * classDuration;
-                                        const hours = Math.floor(totalMinutes / 60) + firstClassStartAt;
-                                        const minutes = totalMinutes % 60;
-                                        const label = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-                                        if (label === val || i.toString() === val) { found = i; break; }
-                                        i += 1;
-                                    }
-                                    form.setData('class_index', found);
-                                }} />
-                                <input type="hidden" className="hidden_selected_input" list="class_indexes" id="class_index" name="class_index" value={form.data.class_index} readOnly />
-                                <datalist id="class_indexes">
-                                    {settings && (() => { const opts = []; const classDuration = settings.class_duration; const firstClassStartAt = parseInt(settings.first_class_start_at?.split(':')[0] || '8', 10); let i = 0; while ((i * classDuration) < ((18 - firstClassStartAt) * 60)) { const totalMinutes = i * classDuration; const hours = Math.floor(totalMinutes / 60) + firstClassStartAt; const minutes = totalMinutes % 60; opts.push(<option key={i} value={`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`}>{`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`}</option>); i += 1; } return opts; })()}
-                                </datalist>
+                                <label htmlFor="class_index">Start At:</label>
+                                <select
+                                    id="class_index"
+                                    name="class_index"
+                                    value={form.data.class_index !== '' ? form.data.class_index : ''}
+                                    onChange={e => form.setData('class_index', e.target.value)}
+                                    required
+                                >
+                                    <option value="">Select Start Time</option>
+                                    {settings && (() => {
+                                        const opts = [];
+                                        const classDuration = settings.class_duration;
+                                        const firstClassStartAt = parseInt(settings.first_class_start_at?.split(':')[0] || '8', 10);
+                                        let i = 0;
+                                        while ((i * classDuration) < ((18 - firstClassStartAt) * 60)) {
+                                            const totalMinutes = i * classDuration;
+                                            const hours = Math.floor(totalMinutes / 60) + firstClassStartAt;
+                                            const minutes = totalMinutes % 60;
+                                            const label = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+                                            opts.push(<option key={i} value={i}>{label}</option>);
+                                            i += 1;
+                                        }
+                                        return opts;
+                                    })()}
+                                </select>
                                 {form.errors.class_index && <div className="text-red-500 mt-2">{form.errors.class_index}</div>}
                             </div>
                             <div className='flex item-center gap-4 '>
@@ -338,6 +334,7 @@ function Schedules({ schedules, subjects, groups, teachers, classRooms, settings
                                     className="cancel-btn btn"
                                     type="button"
                                     ref={closeBtnRef}
+                                    onClick={closeForm}
                                 >Cancel</button>
                                 <button type="submit" className="btn" disabled={form.processing}>{editingSchedule ? 'Save' : 'Add'}</button>
                             </div>
