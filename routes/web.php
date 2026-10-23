@@ -73,6 +73,16 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/exams', [App\Http\Controllers\AdminExamsController::class, 'store'])->name('admin.exams.store');
     Route::put('/exams/{id}', [App\Http\Controllers\AdminExamsController::class, 'update'])->name('admin.exams.update');
     Route::delete('/exams/{id}', [App\Http\Controllers\AdminExamsController::class, 'destroy'])->name('admin.exams.destroy');
+
+    Route::get('/semesters', [App\Http\Controllers\AdminSemestersController::class, 'index'])->name('admin.semesters');
+    Route::post('/semesters', [App\Http\Controllers\AdminSemestersController::class, 'store'])->name('admin.semesters.store');
+    Route::put('/semesters/{id}', [App\Http\Controllers\AdminSemestersController::class, 'update'])->name('admin.semesters.update');
+    Route::delete('/semesters/{id}', [App\Http\Controllers\AdminSemestersController::class, 'destroy'])->name('admin.semesters.destroy');
+
+    Route::get('/academic-levels', [App\Http\Controllers\AdminAcademicLevelsController::class, 'index'])->name('admin.academic-levels');
+    Route::post('/academic-levels', [App\Http\Controllers\AdminAcademicLevelsController::class, 'store'])->name('admin.academic-levels.store');
+    Route::put('/academic-levels/{id}', [App\Http\Controllers\AdminAcademicLevelsController::class, 'update'])->name('admin.academic-levels.update');
+    Route::delete('/academic-levels/{id}', [App\Http\Controllers\AdminAcademicLevelsController::class, 'destroy'])->name('admin.academic-levels.destroy');
 });
 
 // Student routes

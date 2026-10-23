@@ -21,6 +21,14 @@ function Aside() {
             title: "Accounts",
         },
         {
+            path: "/admin/semesters",
+            title: "Semesters",
+        },
+        {
+            path: "/admin/academic-levels",
+            title: "Academic Levels",
+        },
+        {
             path: "/admin/schedules",
             title: "Schedules",
         },
