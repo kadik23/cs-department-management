@@ -29,7 +29,7 @@ Route::get('/counter', function () {
 });
 
 
-Route::prefix('admin')->middleware(['auth'])->group(function () { 
+Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () { 
     Route::get('/', [App\Http\Controllers\AdminController::class, 'index'])->name('admin.dashboard');
     Route::get('/accounts', [App\Http\Controllers\AdminAccountsController::class, 'index'])->name('admin.accounts');
     Route::post('/accounts', [App\Http\Controllers\AdminAccountsController::class, 'store'])->name('admin.accounts.store');
@@ -75,20 +75,23 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::delete('/exams/{id}', [App\Http\Controllers\AdminExamsController::class, 'destroy'])->name('admin.exams.destroy');
 });
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/student', [StudentController::class, 'dashboard'])->name('student.dashboard');
-    Route::get('/student/schedule', [StudentController::class, 'schedule'])->name('student.schedule');
-    Route::get('/student/notes', [StudentController::class, 'notes'])->name('student.notes');
-    Route::get('/student/exams', [StudentController::class, 'exams'])->name('student.exams');
-    
-    // Teacher routes
-    Route::get('/teacher', [TeacherController::class, 'dashboard'])->name('teacher.dashboard');
-    Route::get('/teacher/courses', [TeacherController::class, 'courses'])->name('teacher.courses');
-    Route::get('/teacher/schedule', [TeacherController::class, 'schedule'])->name('teacher.schedule');
-    Route::get('/teacher/grades', [TeacherController::class, 'grades'])->name('teacher.grades');
-    Route::post('/teacher/grades', [TeacherController::class, 'saveGrade'])->name('teacher.grades.save');
-    Route::get('/teacher/attendance', [TeacherController::class, 'attendance'])->name('teacher.attendance');
-    Route::post('/teacher/attendance', [TeacherController::class, 'saveAttendance'])->name('teacher.attendance.save');
+// Student routes
+Route::prefix('student')->middleware(['auth', 'student'])->group(function () {
+    Route::get('/', [StudentController::class, 'dashboard'])->name('student.dashboard');
+    Route::get('/schedule', [StudentController::class, 'schedule'])->name('student.schedule');
+    Route::get('/notes', [StudentController::class, 'notes'])->name('student.notes');
+    Route::get('/exams', [StudentController::class, 'exams'])->name('student.exams');
+});
+
+// Teacher routes
+Route::prefix('teacher')->middleware(['auth', 'teacher'])->group(function () {
+    Route::get('/', [TeacherController::class, 'dashboard'])->name('teacher.dashboard');
+    Route::get('/courses', [TeacherController::class, 'courses'])->name('teacher.courses');
+    Route::get('/schedule', [TeacherController::class, 'schedule'])->name('teacher.schedule');
+    Route::get('/grades', [TeacherController::class, 'grades'])->name('teacher.grades');
+    Route::post('/grades', [TeacherController::class, 'saveGrade'])->name('teacher.grades.save');
+    Route::get('/attendance', [TeacherController::class, 'attendance'])->name('teacher.attendance');
+    Route::post('/attendance', [TeacherController::class, 'saveAttendance'])->name('teacher.attendance.save');
 });
 
 // Auth routes
