@@ -10,6 +10,7 @@ use App\Models\Lecture;
 use App\Models\Grade;
 use App\Models\Attendance;
 use App\Models\Semester;
+use App\Models\Student;
 use App\Repositories\TeacherRepository;
 use App\Repositories\ScheduleRepository;
 use App\Repositories\LectureRepository;
@@ -42,6 +43,51 @@ class TeacherController extends Controller
         return $teacher;
     }
 
+    protected function getTeacherContextData($teacher, $semester = null)
+    {
+        if (!$semester) {
+            $semester = Semester::whereRaw('CURRENT_DATE BETWEEN start_at AND end_at')->first();
+            if (!$semester) {
+                $semester = Semester::latest()->first();
+            }
+        }
+
+        // Distinct subjects taught by teacher via schedules or lectures
+        $scheduleSubjects = Schedule::where('teacher_id', $teacher->id)->with('subject')->get()->pluck('subject');
+        $lectureSubjects = Lecture::where('teacher_id', $teacher->id)->with('subject')->get()->pluck('subject');
+        $subjects = $scheduleSubjects->concat($lectureSubjects)->filter()->unique('id')->values();
+
+        // If no schedules yet, fallback to all subjects so teacher can still test
+        if ($subjects->isEmpty()) {
+            $subjects = \App\Models\Subject::all();
+        }
+
+        // Groups taught by teacher via schedules
+        $groups = Schedule::where('teacher_id', $teacher->id)
+            ->with(['group.academicLevel.speciality'])
+            ->get()
+            ->pluck('group')
+            ->filter()
+            ->unique('id')
+            ->values();
+
+        // Enrolled students in teacher's groups, or fallback to all active students
+        $groupIds = $groups->pluck('id');
+        $studentsQuery = Student::with(['user', 'group.academicLevel.speciality', 'grades', 'attendances']);
+        if ($groupIds->isNotEmpty()) {
+            $students = $studentsQuery->whereIn('group_id', $groupIds)->get();
+        } else {
+            $students = $studentsQuery->take(50)->get();
+        }
+
+        return [
+            'subjects' => $subjects,
+            'groups' => $groups,
+            'students' => $students,
+            'semester' => $semester,
+        ];
+    }
+
     public function dashboard(Request $request)
     {
         $user = Auth::user();
@@ -53,16 +99,16 @@ class TeacherController extends Controller
 
         $schedulesCount = $this->teacherRepository->getTeacherSchedulesCount($teacher->id);
         $lecturesCount = $this->teacherRepository->getTeacherLecturesCount($teacher->id);
-        $semester = Semester::whereRaw('CURRENT_DATE BETWEEN start_at AND end_at')->first();
-        if (!$semester) {
-            $semester = Semester::latest()->first();
-        }
+        $context = $this->getTeacherContextData($teacher);
 
         return Inertia::render('teacher/Dashboard', [
             'teacher' => $teacher,
             'schedulesCount' => $schedulesCount,
             'lecturesCount' => $lecturesCount,
-            'semester' => $semester,
+            'semester' => $context['semester'],
+            'teacherSubjects' => $context['subjects'],
+            'teacherGroups' => $context['groups'],
+            'students' => $context['students'],
         ]);
     }
 
@@ -116,10 +162,8 @@ class TeacherController extends Controller
             return redirect('/')->with('error', 'No teacher record found for this user.');
         }
 
-        $semester = Semester::whereRaw('CURRENT_DATE BETWEEN start_at AND end_at')->first();
-        if (!$semester) {
-            $semester = Semester::latest()->first();
-        }
+        $context = $this->getTeacherContextData($teacher);
+        $semester = $context['semester'];
         
         // Get grades for subjects taught by this teacher
         $grades = Grade::with(['student.user', 'subject'])
@@ -131,10 +175,20 @@ class TeacherController extends Controller
             ->where('semester_id', $semester ? $semester->id : null)
             ->get();
 
+        // If no grades found through schedule relationship, query by semester
+        if ($grades->isEmpty() && $semester) {
+            $grades = Grade::with(['student.user', 'subject'])
+                ->where('semester_id', $semester->id)
+                ->get();
+        }
+
         return Inertia::render('teacher/Grades', [
             'teacher' => $teacher,
             'grades' => $grades,
             'semester' => $semester,
+            'teacherSubjects' => $context['subjects'],
+            'teacherGroups' => $context['groups'],
+            'students' => $context['students'],
         ]);
     }
 
@@ -147,6 +201,8 @@ class TeacherController extends Controller
             return redirect('/')->with('error', 'No teacher record found for this user.');
         }
 
+        $context = $this->getTeacherContextData($teacher);
+
         // Get attendance records for subjects taught by this teacher
         $attendance = Attendance::with(['student.user', 'subject'])
             ->whereHas('subject', function($query) use ($teacher) {
@@ -157,9 +213,95 @@ class TeacherController extends Controller
             ->orderBy('date', 'desc')
             ->get();
 
+        // If no attendance found through schedule relation, fallback to recent attendances
+        if ($attendance->isEmpty()) {
+            $attendance = Attendance::with(['student.user', 'subject'])
+                ->orderBy('date', 'desc')
+                ->take(50)
+                ->get();
+        }
+
         return Inertia::render('teacher/Attendance', [
             'teacher' => $teacher,
             'attendance' => $attendance,
+            'teacherSubjects' => $context['subjects'],
+            'teacherGroups' => $context['groups'],
+            'students' => $context['students'],
+            'semester' => $context['semester'],
         ]);
+    }
+
+    public function saveGrade(Request $request)
+    {
+        $request->validate([
+            'student_id' => 'required|exists:students,id',
+            'subject_id' => 'required|exists:subjects,id',
+            'semester_id' => 'nullable|exists:semesters,id',
+            'control_note' => 'nullable|numeric|min:0|max:20',
+            'exam_note' => 'nullable|numeric|min:0|max:20',
+        ]);
+
+        $semesterId = $request->semester_id;
+        if (!$semesterId) {
+            $semester = Semester::whereRaw('CURRENT_DATE BETWEEN start_at AND end_at')->first() ?? Semester::latest()->first();
+            $semesterId = $semester ? $semester->id : null;
+        }
+
+        $grade = Grade::updateOrCreate(
+            [
+                'student_id' => $request->student_id,
+                'subject_id' => $request->subject_id,
+                'semester_id' => $semesterId,
+            ],
+            [
+                'control_note' => ($request->control_note !== null && $request->control_note !== '') ? (float)$request->control_note : null,
+                'exam_note' => ($request->exam_note !== null && $request->exam_note !== '') ? (float)$request->exam_note : null,
+            ]
+        );
+
+        $grade->load(['student.user', 'subject']);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Grade saved successfully!',
+                'grade' => $grade,
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Grade saved successfully!');
+    }
+
+    public function saveAttendance(Request $request)
+    {
+        $request->validate([
+            'student_id' => 'required|exists:students,id',
+            'subject_id' => 'required|exists:subjects,id',
+            'date' => 'required|date',
+            'student_state' => 'required|string',
+        ]);
+
+        $attendance = Attendance::updateOrCreate(
+            [
+                'student_id' => $request->student_id,
+                'subject_id' => $request->subject_id,
+                'date' => $request->date,
+            ],
+            [
+                'student_state' => $request->student_state,
+            ]
+        );
+
+        $attendance->load(['student.user', 'subject']);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Attendance recorded successfully!',
+                'attendance' => $attendance,
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Attendance recorded successfully!');
     }
 } 

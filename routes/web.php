@@ -86,7 +86,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/teacher/courses', [TeacherController::class, 'courses'])->name('teacher.courses');
     Route::get('/teacher/schedule', [TeacherController::class, 'schedule'])->name('teacher.schedule');
     Route::get('/teacher/grades', [TeacherController::class, 'grades'])->name('teacher.grades');
+    Route::post('/teacher/grades', [TeacherController::class, 'saveGrade'])->name('teacher.grades.save');
     Route::get('/teacher/attendance', [TeacherController::class, 'attendance'])->name('teacher.attendance');
+    Route::post('/teacher/attendance', [TeacherController::class, 'saveAttendance'])->name('teacher.attendance.save');
 });
 
 // Auth routes

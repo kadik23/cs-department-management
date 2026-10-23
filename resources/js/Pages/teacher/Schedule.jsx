@@ -18,11 +18,11 @@ export default function Schedule({ schedule, settings }) {
     
     return (
         <div className="page-content">
-            <div className="page-header_teacher">
-                <div className="page-title_teacher">My Schedule</div>
+            <div className="page-header">
+                <div className="page-title">My Schedule</div>
             </div>
-            <div className="section-wrapper_teacher">
-                <div className="section-content_teacher">
+            <div className="section-wrapper">
+                <div className="section-content">
                     <div className="table-head">
                         <div className="table-head-item">Days</div>
                         {[0,1,2,3,4].map(i => (
