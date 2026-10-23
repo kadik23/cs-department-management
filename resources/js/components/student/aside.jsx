@@ -26,6 +26,10 @@ function Aside() {
             title: "Notes",
         },
         {
+            path: "/student/attendance",
+            title: "Attendance",
+        },
+        {
             path: "/student/exams",
             title: "Exams",
         }
@@ -50,15 +54,18 @@ function Aside() {
             </div>
             <div className="user-name">Student</div>
             <nav>
-                {aside_links.map((link, index) => (
-                    <Link 
-                        key={index}
-                        className={url === link.path ? "aside-selected-link" : ""}
-                        href={link.path}
-                    >
-                        {link.title}
-                    </Link>
-                ))}
+                {aside_links.map((link, index) => {
+                    const isSelected = url === link.path || (link.path === "/student/" && (url === "/student" || url === "/student/"));
+                    return (
+                        <Link 
+                            key={index}
+                            className={isSelected ? "aside-selected-link" : ""}
+                            href={link.path}
+                        >
+                            {link.title}
+                        </Link>
+                    );
+                })}
                 <button className="btn" onClick={handleLogout}>
                     Logout
                 </button>

@@ -90,6 +90,7 @@ Route::prefix('student')->middleware(['auth', 'student'])->group(function () {
     Route::get('/', [StudentController::class, 'dashboard'])->name('student.dashboard');
     Route::get('/schedule', [StudentController::class, 'schedule'])->name('student.schedule');
     Route::get('/notes', [StudentController::class, 'notes'])->name('student.notes');
+    Route::get('/attendance', [StudentController::class, 'attendance'])->name('student.attendance');
     Route::get('/exams', [StudentController::class, 'exams'])->name('student.exams');
 });
 
