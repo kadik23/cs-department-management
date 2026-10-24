@@ -551,7 +551,7 @@ export default function StudentCardSliderModal({
                                         <img
                                             src="/assets/icons/teacher.svg"
                                             alt=""
-                                            style={{ width: "16px", height: "16px" }}
+                                            style={{ width: "16px", height: "16px", filter: "brightness(0) invert(1)" }}
                                         />
                                         Student Grades (0 - 20)
                                     </div>
@@ -651,7 +651,7 @@ export default function StudentCardSliderModal({
                                         <img
                                             src="/assets/icons/students.svg"
                                             alt=""
-                                            style={{ width: "16px", height: "16px" }}
+                                            style={{ width: "16px", height: "16px", filter: "brightness(0) invert(1)" }}
                                         />
                                         Attendance Status
                                     </div>
@@ -672,9 +672,16 @@ export default function StudentCardSliderModal({
                                                     studentState === "present" ? "#16a34a" : "transparent",
                                                 color: studentState === "present" ? "#ffffff" : "#bbf7d0",
                                                 transition: "all 0.2s",
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                                gap: "6px",
                                             }}
                                         >
-                                            ✓ Present
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                                <polyline points="20 6 9 17 4 12" />
+                                            </svg>
+                                            Present
                                         </button>
 
                                         <button
@@ -691,9 +698,17 @@ export default function StudentCardSliderModal({
                                                     studentState === "absent" ? "#dc2626" : "transparent",
                                                 color: studentState === "absent" ? "#ffffff" : "#fecaca",
                                                 transition: "all 0.2s",
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                                gap: "6px",
                                             }}
                                         >
-                                            ✗ Absent
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                                <line x1="18" y1="6" x2="6" y2="18" />
+                                                <line x1="6" y1="6" x2="18" y2="18" />
+                                            </svg>
+                                            Absent
                                         </button>
 
                                         <button
@@ -710,9 +725,17 @@ export default function StudentCardSliderModal({
                                                     studentState === "late" ? "#d97706" : "transparent",
                                                 color: studentState === "late" ? "#ffffff" : "#fef08a",
                                                 transition: "all 0.2s",
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                                gap: "6px",
                                             }}
                                         >
-                                            ⏰ Late
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                                <circle cx="12" cy="12" r="10" />
+                                                <polyline points="12 6 12 12 16 14" />
+                                            </svg>
+                                            Late
                                         </button>
 
                                         <button
@@ -729,9 +752,19 @@ export default function StudentCardSliderModal({
                                                     studentState === "excused" ? "#0284c7" : "transparent",
                                                 color: studentState === "excused" ? "#ffffff" : "#bae6fd",
                                                 transition: "all 0.2s",
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                                gap: "6px",
                                             }}
                                         >
-                                            📋 Excused
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                                <polyline points="14 2 14 8 20 8" />
+                                                <line x1="16" y1="13" x2="8" y2="13" />
+                                                <line x1="16" y1="17" x2="8" y2="17" />
+                                            </svg>
+                                            Excused
                                         </button>
                                     </div>
 

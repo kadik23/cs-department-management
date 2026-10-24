@@ -56,10 +56,12 @@ class StudentController extends Controller
         if (!$semester) {
             $semester = Semester::latest()->first();
         }
+        $collegeYear = Semester::getActiveCollegeYear();
         return Inertia::render('student/Dashboard', [
             'student' => $student,
             'colleagues' => $colleagues,
             'semester' => $semester,
+            'collegeYear' => $collegeYear,
         ]);
     }
 

@@ -51,6 +51,7 @@ class HandleInertiaRequests extends Middleware
                 'success' => fn () => $request->session()->get('success') ?? $request->session()->get('message'),
                 'error' => fn () => $request->session()->get('error') ?? $request->session()->get('failed'),
             ],
+            'collegeYear' => fn () => \App\Models\Semester::getActiveCollegeYear(),
         ]);
     }
 }

@@ -1,7 +1,7 @@
 import React from "react";
 import StudentLayout from "@/layout/student/StudentLayout";
 
-export default function Dashboard({ student, colleagues, semester }) {
+export default function Dashboard({ student, colleagues, semester, collegeYear }) {
     return (
         <div className="page-content">
             <div className="page-header">
@@ -34,7 +34,7 @@ export default function Dashboard({ student, colleagues, semester }) {
                 <div className="card-box-wrapper">
                     <div className="card-box">
                         <div className="card-title">College Year</div>
-                        <div className="card-content">2022/2023</div>
+                        <div className="card-content">{collegeYear || "2026/2027"}</div>
                     </div>
                 </div>
             </div>

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import TeacherLayout from "@/layout/teacher/TeacherLayout";
 import StudentCardSliderModal from "@/components/teacher/StudentCardSliderModal";
+import { exportToCsv } from "@/utils/exportCsv";
 
 const formatDate = (dateStr) => {
     if (!dateStr) return '';
@@ -63,18 +64,65 @@ export default function Grades({
         return true;
     });
 
+    const handleExport = () => {
+        const headers = ["Student ID", "Student Name", "Subject", "Coefficient", "Credit", "Control Note", "Exam Note", "Average"];
+        const rows = filteredGrades.map((grade) => {
+            const studentId = grade.student?.id || grade.student_id || "";
+            const studentName = grade.student?.user
+                ? `${grade.student.user.first_name} ${grade.student.user.last_name}`
+                : grade.student_name || `Student #${studentId}`;
+            const subjectName = grade.subject?.subject_name || "N/A";
+            const coef = grade.subject?.coefficient ?? "";
+            const credit = grade.subject?.credit ?? "";
+            const cNote = grade.control_note != null ? grade.control_note : "";
+            const eNote = grade.exam_note != null ? grade.exam_note : "";
+            let avg = "";
+            if (grade.control_note != null && grade.exam_note != null) {
+                avg = ((Number(grade.control_note) + Number(grade.exam_note)) / 2).toFixed(2);
+            }
+            return [studentId, studentName, subjectName, coef, credit, cNote, eNote, avg];
+        });
+
+        const semName = semester?.semester_name ? semester.semester_name.replace(/[^a-zA-Z0-9_-]/g, '_') : 'semester';
+        const dateStr = new Date().toISOString().slice(0, 10);
+        exportToCsv(`grades_${semName}_${dateStr}.csv`, headers, rows);
+    };
+
     return (
         <div className="page-content">
             <div className="page-header" style={{ justifyContent: "space-between" }}>
                 <div className="page-title">Grades</div>
-                <button
-                    type="button"
-                    className="btn"
-                    onClick={() => setIsModalOpen(true)}
-                    style={{ fontSize: "13px", padding: "8px 20px" }}
-                >
-                    + Enter Grades & Attendance
-                </button>
+                <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                    <button
+                        type="button"
+                        onClick={handleExport}
+                        className="btn"
+                        style={{
+                            fontSize: "13px",
+                            padding: "8px 16px",
+                            backgroundColor: "#0284c7",
+                            borderColor: "#0284c7",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "6px"
+                        }}
+                    >
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "6px" }}>
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="7 10 12 15 17 10" />
+                            <line x1="12" y1="15" x2="12" y2="3" />
+                        </svg>
+                        Export CSV/Excel
+                    </button>
+                    <button
+                        type="button"
+                        className="btn"
+                        onClick={() => setIsModalOpen(true)}
+                        style={{ fontSize: "13px", padding: "8px 20px" }}
+                    >
+                        + Enter Grades & Attendance
+                    </button>
+                </div>
             </div>
 
             <div className="row-wrapper">

@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react";
 import StudentLayout from "@/layout/student/StudentLayout";
+import { exportToCsv } from "@/utils/exportCsv";
 
 const formatDate = (dateStr) => {
     if (!dateStr) return '';
@@ -76,10 +77,46 @@ export default function Attendance({ student, attendances = [], semester, summar
         }
     };
 
+    const handleExport = () => {
+        const headers = ["Subject", "Date", "Status", "Remark / Notes"];
+        const rows = filteredAttendances.map((item) => {
+            const subject = item.subject?.subject_name || "N/A";
+            const date = formatDate(item.date);
+            const status = item.status;
+            const notes = item.notes || "";
+            return [subject, date, status, notes];
+        });
+
+        const semName = semester?.semester_name ? semester.semester_name.replace(/[^a-zA-Z0-9_-]/g, '_') : 'semester';
+        const dateStr = new Date().toISOString().slice(0, 10);
+        exportToCsv(`my_attendance_${semName}_${dateStr}.csv`, headers, rows);
+    };
+
     return (
         <div className="page-content">
-            <div className="page-header">
+            <div className="page-header" style={{ justifyContent: "space-between" }}>
                 <div className="page-title">Attendance</div>
+                <button
+                    type="button"
+                    onClick={handleExport}
+                    className="btn"
+                    style={{
+                        fontSize: "13px",
+                        padding: "8px 16px",
+                        backgroundColor: "#0284c7",
+                        borderColor: "#0284c7",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "6px"
+                    }}
+                >
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "6px" }}>
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="7 10 12 15 17 10" />
+                        <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                    Export CSV/Excel
+                </button>
             </div>
 
             {semester && (

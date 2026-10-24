@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import TeacherLayout from "@/layout/teacher/TeacherLayout";
 import StudentCardSliderModal from "@/components/teacher/StudentCardSliderModal";
+import { exportToCsv } from "@/utils/exportCsv";
 
 function formatDate(dateStr) {
     if (!dateStr) return "";
@@ -104,18 +105,60 @@ export default function Attendance({
         return true;
     });
 
+    const handleExport = () => {
+        const headers = ["Student ID", "Student Name", "Subject", "Date", "Status", "Remarks / Notes"];
+        const rows = filteredAttendance.map((rec) => {
+            const studentId = rec.student?.id || rec.student_id || "";
+            const studentName = rec.student?.user
+                ? `${rec.student.user.first_name} ${rec.student.user.last_name}`
+                : rec.student_name || `Student #${studentId}`;
+            const subjectName = rec.subject?.subject_name || "N/A";
+            const date = formatDate(rec.date);
+            const status = getStatus(rec);
+            const notes = getNotes(rec);
+            return [studentId, studentName, subjectName, date, status, notes];
+        });
+
+        const semName = semester?.semester_name ? semester.semester_name.replace(/[^a-zA-Z0-9_-]/g, '_') : 'semester';
+        const dateStr = new Date().toISOString().slice(0, 10);
+        exportToCsv(`attendance_${semName}_${dateStr}.csv`, headers, rows);
+    };
+
     return (
         <div className="page-content">
             <div className="page-header" style={{ justifyContent: "space-between" }}>
                 <div className="page-title">Attendance</div>
-                <button
-                    type="button"
-                    className="btn"
-                    onClick={() => setIsModalOpen(true)}
-                    style={{ fontSize: "13px", padding: "8px 20px" }}
-                >
-                    + Register Attendance & Grades
-                </button>
+                <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                    <button
+                        type="button"
+                        onClick={handleExport}
+                        className="btn"
+                        style={{
+                            fontSize: "13px",
+                            padding: "8px 16px",
+                            backgroundColor: "#0284c7",
+                            borderColor: "#0284c7",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "6px"
+                        }}
+                    >
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "6px" }}>
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="7 10 12 15 17 10" />
+                            <line x1="12" y1="15" x2="12" y2="3" />
+                        </svg>
+                        Export CSV/Excel
+                    </button>
+                    <button
+                        type="button"
+                        className="btn"
+                        onClick={() => setIsModalOpen(true)}
+                        style={{ fontSize: "13px", padding: "8px 20px" }}
+                    >
+                        + Register Attendance & Grades
+                    </button>
+                </div>
             </div>
 
             <div className="row-wrapper">
