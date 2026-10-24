@@ -12,6 +12,7 @@ use App\Models\Attendance;
 use App\Models\Semester;
 use App\Models\Student;
 use App\Models\CourseMaterial;
+use App\Models\Announcement;
 use App\Models\AcademicLevel;
 use App\Models\Group;
 use App\Repositories\TeacherRepository;
@@ -104,6 +105,12 @@ class TeacherController extends Controller
         $schedulesCount = $this->teacherRepository->getTeacherSchedulesCount($teacher->id);
         $lecturesCount = $this->teacherRepository->getTeacherLecturesCount($teacher->id);
         $context = $this->getTeacherContextData($teacher);
+        $recentAnnouncements = Announcement::with('author')
+            ->active()
+            ->forTeacher()
+            ->pinnedFirst()
+            ->take(4)
+            ->get();
 
         return Inertia::render('teacher/Dashboard', [
             'teacher' => $teacher,
@@ -113,6 +120,7 @@ class TeacherController extends Controller
             'teacherSubjects' => $context['subjects'],
             'teacherGroups' => $context['groups'],
             'students' => $context['students'],
+            'recentAnnouncements' => $recentAnnouncements,
         ]);
     }
 
@@ -422,6 +430,70 @@ class TeacherController extends Controller
         return Storage::disk('local')->response($material->file_path, $material->file_name, [
             'Content-Type' => $material->file_mime ?: 'application/pdf',
             'Content-Disposition' => 'inline; filename="' . $material->file_name . '"',
+        ]);
+    }
+
+    public function announcements(Request $request)
+    {
+        $user = Auth::user();
+        $teacher = $this->getTeacherForUser($user);
+
+        if (!$teacher) {
+            return redirect('/')->with('error', 'No teacher record found for this user.');
+        }
+
+        $query = Announcement::with('author')
+            ->active()
+            ->forTeacher();
+
+        if ($request->filled('category') && $request->category !== 'all') {
+            $query->where('category', $request->category);
+        }
+
+        if ($request->filled('priority') && $request->priority !== 'all') {
+            $query->where('priority', $request->priority);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('content', 'like', "%{$search}%");
+            });
+        }
+
+        $announcements = $query->pinnedFirst()->paginate(10)->withQueryString();
+
+        return Inertia::render('teacher/Announcements', [
+            'teacher' => $teacher,
+            'announcements' => $announcements,
+            'filters' => $request->only(['search', 'category', 'priority']),
+        ]);
+    }
+
+    public function downloadAnnouncementAttachment($id)
+    {
+        $announcement = Announcement::active()->forTeacher()->findOrFail($id);
+
+        if (!$announcement->attachment_path || !Storage::disk('public')->exists($announcement->attachment_path)) {
+            abort(404, 'File not found');
+        }
+
+        return Storage::disk('public')->download($announcement->attachment_path, $announcement->attachment_name);
+    }
+
+    public function previewAnnouncementAttachment($id)
+    {
+        $announcement = Announcement::active()->forTeacher()->findOrFail($id);
+
+        if (!$announcement->attachment_path || !Storage::disk('public')->exists($announcement->attachment_path)) {
+            abort(404, 'File not found');
+        }
+
+        $filePath = Storage::disk('public')->path($announcement->attachment_path);
+        return response()->file($filePath, [
+            'Content-Type' => $announcement->attachment_mime ?? 'application/pdf',
+            'Content-Disposition' => 'inline; filename="' . $announcement->attachment_name . '"',
         ]);
     }
 } 

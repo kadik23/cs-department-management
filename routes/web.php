@@ -83,11 +83,22 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/academic-levels', [App\Http\Controllers\AdminAcademicLevelsController::class, 'store'])->name('admin.academic-levels.store');
     Route::put('/academic-levels/{id}', [App\Http\Controllers\AdminAcademicLevelsController::class, 'update'])->name('admin.academic-levels.update');
     Route::delete('/academic-levels/{id}', [App\Http\Controllers\AdminAcademicLevelsController::class, 'destroy'])->name('admin.academic-levels.destroy');
+
+    Route::get('/announcements', [App\Http\Controllers\AdminAnnouncementsController::class, 'index'])->name('admin.announcements');
+    Route::post('/announcements', [App\Http\Controllers\AdminAnnouncementsController::class, 'store'])->name('admin.announcements.store');
+    Route::put('/announcements/{id}', [App\Http\Controllers\AdminAnnouncementsController::class, 'update'])->name('admin.announcements.update');
+    Route::delete('/announcements/{id}', [App\Http\Controllers\AdminAnnouncementsController::class, 'destroy'])->name('admin.announcements.destroy');
+    Route::post('/announcements/{id}/toggle-pin', [App\Http\Controllers\AdminAnnouncementsController::class, 'togglePin'])->name('admin.announcements.toggle-pin');
+    Route::get('/announcements/{id}/download', [App\Http\Controllers\AdminAnnouncementsController::class, 'downloadAttachment'])->name('admin.announcements.download');
+    Route::get('/announcements/{id}/preview', [App\Http\Controllers\AdminAnnouncementsController::class, 'previewAttachment'])->name('admin.announcements.preview');
 });
 
 // Student routes
 Route::prefix('student')->middleware(['auth', 'student'])->group(function () {
     Route::get('/', [StudentController::class, 'dashboard'])->name('student.dashboard');
+    Route::get('/announcements', [StudentController::class, 'announcements'])->name('student.announcements');
+    Route::get('/announcements/{id}/download', [StudentController::class, 'downloadAnnouncementAttachment'])->name('student.announcements.download');
+    Route::get('/announcements/{id}/preview', [StudentController::class, 'previewAnnouncementAttachment'])->name('student.announcements.preview');
     Route::get('/courses', [StudentController::class, 'courses'])->name('student.courses');
     Route::get('/courses/{material}/download', [StudentController::class, 'downloadMaterial'])->name('student.courses.download');
     Route::get('/courses/{material}/preview', [StudentController::class, 'previewMaterial'])->name('student.courses.preview');
@@ -100,6 +111,9 @@ Route::prefix('student')->middleware(['auth', 'student'])->group(function () {
 // Teacher routes
 Route::prefix('teacher')->middleware(['auth', 'teacher'])->group(function () {
     Route::get('/', [TeacherController::class, 'dashboard'])->name('teacher.dashboard');
+    Route::get('/announcements', [TeacherController::class, 'announcements'])->name('teacher.announcements');
+    Route::get('/announcements/{id}/download', [TeacherController::class, 'downloadAnnouncementAttachment'])->name('teacher.announcements.download');
+    Route::get('/announcements/{id}/preview', [TeacherController::class, 'previewAnnouncementAttachment'])->name('teacher.announcements.preview');
     Route::get('/courses', [TeacherController::class, 'courses'])->name('teacher.courses');
     Route::post('/courses/materials', [TeacherController::class, 'uploadMaterial'])->name('teacher.courses.materials.upload');
     Route::delete('/courses/materials/{material}', [TeacherController::class, 'deleteMaterial'])->name('teacher.courses.materials.delete');

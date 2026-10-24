@@ -17,6 +17,10 @@ class AdminController extends Controller
         $totalTeachers = Teacher::count();
         $totalUsers = User::count();
         $collegeYear = Semester::getActiveCollegeYear();
+        $recentAnnouncements = \App\Models\Announcement::with(['author', 'academicLevel.speciality'])
+            ->pinnedFirst()
+            ->take(5)
+            ->get();
 
         return Inertia::render('admin/AdminHome', [
             'stats' => [
@@ -24,7 +28,8 @@ class AdminController extends Controller
                 'totalTeachers' => $totalTeachers,
                 'totalUsers' => $totalUsers,
                 'collegeYear' => $collegeYear,
-            ]
+            ],
+            'recentAnnouncements' => $recentAnnouncements,
         ]);
     }
 } 

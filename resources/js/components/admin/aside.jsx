@@ -17,6 +17,10 @@ function Aside() {
             title: "Dashboard",
         },
         {
+            path: "/admin/announcements",
+            title: "Announcements",
+        },
+        {
             path: "/admin/accounts",
             title: "Accounts",
         },

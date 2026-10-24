@@ -14,6 +14,7 @@ use App\Models\Schedule;
 use App\Models\Lecture;
 use App\Models\Attendance;
 use App\Models\CourseMaterial;
+use App\Models\Announcement;
 use App\Models\Subject;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -61,11 +62,19 @@ class StudentController extends Controller
             $semester = Semester::latest()->first();
         }
         $collegeYear = Semester::getActiveCollegeYear();
+        $recentAnnouncements = Announcement::with('author')
+            ->active()
+            ->forStudent($student)
+            ->pinnedFirst()
+            ->take(4)
+            ->get();
+
         return Inertia::render('student/Dashboard', [
             'student' => $student,
             'colleagues' => $colleagues,
             'semester' => $semester,
             'collegeYear' => $collegeYear,
+            'recentAnnouncements' => $recentAnnouncements,
         ]);
     }
 
@@ -266,6 +275,74 @@ class StudentController extends Controller
         return Storage::disk('local')->response($material->file_path, $material->file_name, [
             'Content-Type' => $material->file_mime ?: 'application/pdf',
             'Content-Disposition' => 'inline; filename="' . $material->file_name . '"',
+        ]);
+    }
+
+    public function announcements(Request $request)
+    {
+        $user = Auth::user();
+        $student = $this->getStudentForUser($user);
+
+        if (!$student) {
+            return redirect('/')->with('error', 'No student record found for this user.');
+        }
+
+        $query = Announcement::with('author')
+            ->active()
+            ->forStudent($student);
+
+        if ($request->filled('category') && $request->category !== 'all') {
+            $query->where('category', $request->category);
+        }
+
+        if ($request->filled('priority') && $request->priority !== 'all') {
+            $query->where('priority', $request->priority);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('content', 'like', "%{$search}%");
+            });
+        }
+
+        $announcements = $query->pinnedFirst()->paginate(10)->withQueryString();
+
+        return Inertia::render('student/Announcements', [
+            'student' => $student,
+            'announcements' => $announcements,
+            'filters' => $request->only(['search', 'category', 'priority']),
+        ]);
+    }
+
+    public function downloadAnnouncementAttachment($id)
+    {
+        $user = Auth::user();
+        $student = $this->getStudentForUser($user);
+        $announcement = Announcement::active()->forStudent($student)->findOrFail($id);
+
+        if (!$announcement->attachment_path || !Storage::disk('public')->exists($announcement->attachment_path)) {
+            abort(404, 'File not found');
+        }
+
+        return Storage::disk('public')->download($announcement->attachment_path, $announcement->attachment_name);
+    }
+
+    public function previewAnnouncementAttachment($id)
+    {
+        $user = Auth::user();
+        $student = $this->getStudentForUser($user);
+        $announcement = Announcement::active()->forStudent($student)->findOrFail($id);
+
+        if (!$announcement->attachment_path || !Storage::disk('public')->exists($announcement->attachment_path)) {
+            abort(404, 'File not found');
+        }
+
+        $filePath = Storage::disk('public')->path($announcement->attachment_path);
+        return response()->file($filePath, [
+            'Content-Type' => $announcement->attachment_mime ?? 'application/pdf',
+            'Content-Disposition' => 'inline; filename="' . $announcement->attachment_name . '"',
         ]);
     }
 } 
