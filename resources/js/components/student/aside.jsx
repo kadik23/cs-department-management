@@ -18,6 +18,10 @@ function Aside() {
             title: "Dashboard",
         },
         {
+            path: "/student/courses",
+            title: "Courses",
+        },
+        {
             path: "/student/schedule",
             title: "Schedule",
         },

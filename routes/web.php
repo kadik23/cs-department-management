@@ -88,6 +88,9 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 // Student routes
 Route::prefix('student')->middleware(['auth', 'student'])->group(function () {
     Route::get('/', [StudentController::class, 'dashboard'])->name('student.dashboard');
+    Route::get('/courses', [StudentController::class, 'courses'])->name('student.courses');
+    Route::get('/courses/{material}/download', [StudentController::class, 'downloadMaterial'])->name('student.courses.download');
+    Route::get('/courses/{material}/preview', [StudentController::class, 'previewMaterial'])->name('student.courses.preview');
     Route::get('/schedule', [StudentController::class, 'schedule'])->name('student.schedule');
     Route::get('/notes', [StudentController::class, 'notes'])->name('student.notes');
     Route::get('/attendance', [StudentController::class, 'attendance'])->name('student.attendance');
@@ -98,6 +101,10 @@ Route::prefix('student')->middleware(['auth', 'student'])->group(function () {
 Route::prefix('teacher')->middleware(['auth', 'teacher'])->group(function () {
     Route::get('/', [TeacherController::class, 'dashboard'])->name('teacher.dashboard');
     Route::get('/courses', [TeacherController::class, 'courses'])->name('teacher.courses');
+    Route::post('/courses/materials', [TeacherController::class, 'uploadMaterial'])->name('teacher.courses.materials.upload');
+    Route::delete('/courses/materials/{material}', [TeacherController::class, 'deleteMaterial'])->name('teacher.courses.materials.delete');
+    Route::get('/courses/materials/{material}/download', [TeacherController::class, 'downloadMaterial'])->name('teacher.courses.materials.download');
+    Route::get('/courses/materials/{material}/preview', [TeacherController::class, 'previewMaterial'])->name('teacher.courses.materials.preview');
     Route::get('/schedule', [TeacherController::class, 'schedule'])->name('teacher.schedule');
     Route::get('/grades', [TeacherController::class, 'grades'])->name('teacher.grades');
     Route::post('/grades', [TeacherController::class, 'saveGrade'])->name('teacher.grades.save');

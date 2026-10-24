@@ -11,8 +11,12 @@ use App\Models\Semester;
 use App\Models\Grade;
 use App\Models\ExamsSchedule;
 use App\Models\Schedule;
+use App\Models\Lecture;
 use App\Models\Attendance;
+use App\Models\CourseMaterial;
+use App\Models\Subject;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class StudentController extends Controller
 {
@@ -74,11 +78,33 @@ class StudentController extends Controller
             return redirect('/')->with('error', 'No student record found for this user.');
         }
 
-        $schedule = Schedule::with(['subject', 'classRoom', 'teacher.user'])
+        // Group TD/TP sessions
+        $groupSchedules = Schedule::with(['subject', 'classRoom', 'teacher.user'])
             ->where('group_id', $student->group_id)
-            ->orderBy('day_of_week')
-            ->orderBy('class_index')
-            ->get();
+            ->get()
+            ->map(function ($item) {
+                $item->is_lecture = false;
+                $item->session_type = 'TD / TP';
+                return $item;
+            });
+
+        $academicLevelId = $student->academic_level_id ?? $student->group?->academic_level_id;
+
+        // Cohort Amphitheater Lectures
+        $lectures = collect();
+        if ($academicLevelId) {
+            $lectures = Lecture::with(['subject', 'classRoom', 'teacher.user'])
+                ->where('academic_level_id', $academicLevelId)
+                ->get()
+                ->map(function ($item) {
+                    $item->is_lecture = true;
+                    $item->session_type = 'Cours';
+                    return $item;
+                });
+        }
+
+        // Merge both into unified schedule
+        $schedule = $groupSchedules->concat($lectures);
         
         $settings = \App\Models\SchedulerSetting::first();
         return Inertia::render('student/Schedule', [
@@ -174,6 +200,72 @@ class StudentController extends Controller
             'student' => $student,
             'exams' => $exams,
             'settings' => $settings,
+        ]);
+    }
+
+    public function courses(Request $request)
+    {
+        $user = Auth::user();
+        $student = $this->getStudentForUser($user);
+
+        if (!$student) {
+            return redirect('/')->with('error', 'No student record found for this user.');
+        }
+
+        $semester = Semester::whereRaw('CURRENT_DATE BETWEEN start_at AND end_at')->first() ?: Semester::latest()->first();
+
+        $materials = CourseMaterial::forStudent($student)
+            ->with(['subject', 'teacher.user', 'academicLevel.speciality', 'group'])
+            ->latest()
+            ->get();
+
+        $scheduleSubjects = Schedule::where('group_id', $student->group_id)->with('subject')->get()->pluck('subject');
+        $materialSubjects = $materials->pluck('subject');
+        $allSubjects = Subject::orderBy('subject_name')->get();
+        $subjects = $scheduleSubjects->concat($materialSubjects)->concat($allSubjects)->filter()->unique('id')->values();
+
+        return Inertia::render('student/Courses', [
+            'student' => $student,
+            'semester' => $semester,
+            'materials' => $materials,
+            'subjects' => $subjects,
+        ]);
+    }
+
+    public function downloadMaterial(CourseMaterial $material)
+    {
+        $user = Auth::user();
+        $student = $this->getStudentForUser($user);
+
+        if ($material->academic_level_id && $student->academic_level_id && $material->academic_level_id !== $student->academic_level_id) {
+            abort(403, 'Unauthorized access to this course material.');
+        }
+
+        if (!Storage::disk('local')->exists($material->file_path)) {
+            abort(404, 'Material file not found.');
+        }
+
+        $material->increment('download_count');
+
+        return Storage::disk('local')->download($material->file_path, $material->file_name);
+    }
+
+    public function previewMaterial(CourseMaterial $material)
+    {
+        $user = Auth::user();
+        $student = $this->getStudentForUser($user);
+
+        if ($material->academic_level_id && $student->academic_level_id && $material->academic_level_id !== $student->academic_level_id) {
+            abort(403, 'Unauthorized access to this course material.');
+        }
+
+        if (!Storage::disk('local')->exists($material->file_path)) {
+            abort(404, 'Material file not found.');
+        }
+
+        return Storage::disk('local')->response($material->file_path, $material->file_name, [
+            'Content-Type' => $material->file_mime ?: 'application/pdf',
+            'Content-Disposition' => 'inline; filename="' . $material->file_name . '"',
         ]);
     }
 } 

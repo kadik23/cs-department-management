@@ -11,11 +11,15 @@ use App\Models\Grade;
 use App\Models\Attendance;
 use App\Models\Semester;
 use App\Models\Student;
+use App\Models\CourseMaterial;
+use App\Models\AcademicLevel;
+use App\Models\Group;
 use App\Repositories\TeacherRepository;
 use App\Repositories\ScheduleRepository;
 use App\Repositories\LectureRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class TeacherController extends Controller
 {
@@ -127,10 +131,24 @@ class TeacherController extends Controller
         // Get teacher's lectures with subjects, academic levels, and classrooms
         $lectures = $this->teacherRepository->getTeacherLectures($teacher->id);
 
+        $context = $this->getTeacherContextData($teacher);
+
+        $materials = CourseMaterial::where('teacher_id', $teacher->id)
+            ->with(['subject', 'academicLevel.speciality', 'group'])
+            ->latest()
+            ->get();
+
+        $academicLevels = AcademicLevel::with('speciality')->get();
+        $groups = Group::with('academicLevel.speciality')->get();
+
         return Inertia::render('teacher/Courses', [
             'teacher' => $teacher,
             'schedules' => $schedules,
             'lectures' => $lectures,
+            'materials' => $materials,
+            'teacherSubjects' => $context['subjects'],
+            'academicLevels' => $academicLevels,
+            'groups' => $groups,
         ]);
     }
 
@@ -143,7 +161,19 @@ class TeacherController extends Controller
             return redirect('/')->with('error', 'No teacher record found for this user.');
         }
 
-        $schedule = $this->teacherRepository->getTeacherSchedules($teacher->id);
+        $schedules = $this->teacherRepository->getTeacherSchedules($teacher->id)->map(function ($item) {
+            $item->is_lecture = false;
+            $item->session_type = 'TD / TP';
+            return $item;
+        });
+
+        $lectures = $this->teacherRepository->getTeacherLectures($teacher->id)->map(function ($item) {
+            $item->is_lecture = true;
+            $item->session_type = 'Cours';
+            return $item;
+        });
+
+        $schedule = $schedules->concat($lectures);
         $settings = $this->scheduleRepository->getSchedulerSettings();
         
         return Inertia::render('teacher/Schedule', [
@@ -303,5 +333,95 @@ class TeacherController extends Controller
         }
 
         return redirect()->back()->with('success', 'Attendance recorded successfully!');
+    }
+
+    public function uploadMaterial(Request $request)
+    {
+        $user = Auth::user();
+        $teacher = $this->getTeacherForUser($user);
+
+        if (!$teacher) {
+            return redirect()->back()->with('error', 'Teacher account not found.');
+        }
+
+        if ($request->hasFile('file') && !$request->file('file')->isValid()) {
+            $errorCode = $request->file('file')->getError();
+            if ($errorCode === UPLOAD_ERR_INI_SIZE || $errorCode === UPLOAD_ERR_FORM_SIZE) {
+                return redirect()->back()->withErrors([
+                    'file' => 'The file exceeds the PHP server upload limit (' . ini_get('upload_max_filesize') . '). If running artisan serve, run: php -d upload_max_filesize=50M -d post_max_size=50M artisan serve',
+                ]);
+            }
+        }
+
+        $request->validate([
+            'subject_id' => 'required|exists:subjects,id',
+            'type' => 'required|in:cours,td,tp,exam',
+            'chapter_title' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000',
+            'academic_level_id' => 'nullable|exists:academic_levels,id',
+            'group_id' => 'nullable|exists:groups,id',
+            'file' => 'required|file|max:51200', // 50MB max
+        ]);
+
+        $file = $request->file('file');
+        $originalName = $file->getClientOriginalName();
+        $size = $file->getSize();
+        $mime = $file->getClientMimeType() ?: $file->getMimeType();
+        $path = $file->store('course_materials', 'local');
+
+        CourseMaterial::create([
+            'subject_id' => $request->subject_id,
+            'teacher_id' => $teacher->id,
+            'academic_level_id' => $request->academic_level_id ?: null,
+            'group_id' => $request->group_id ?: null,
+            'type' => $request->type,
+            'chapter_title' => $request->chapter_title,
+            'description' => $request->description,
+            'file_path' => $path,
+            'file_name' => $originalName,
+            'file_size' => $size,
+            'file_mime' => $mime,
+        ]);
+
+        return redirect()->back()->with('message', 'Course material uploaded successfully!');
+    }
+
+    public function deleteMaterial(CourseMaterial $material)
+    {
+        $user = Auth::user();
+        $teacher = $this->getTeacherForUser($user);
+
+        if ($material->teacher_id !== $teacher->id) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        if (Storage::disk('local')->exists($material->file_path)) {
+            Storage::disk('local')->delete($material->file_path);
+        }
+
+        $material->delete();
+
+        return redirect()->back()->with('message', 'Course material deleted successfully.');
+    }
+
+    public function downloadMaterial(CourseMaterial $material)
+    {
+        if (!Storage::disk('local')->exists($material->file_path)) {
+            abort(404, 'Material file not found on disk.');
+        }
+
+        return Storage::disk('local')->download($material->file_path, $material->file_name);
+    }
+
+    public function previewMaterial(CourseMaterial $material)
+    {
+        if (!Storage::disk('local')->exists($material->file_path)) {
+            abort(404, 'Material file not found on disk.');
+        }
+
+        return Storage::disk('local')->response($material->file_path, $material->file_name, [
+            'Content-Type' => $material->file_mime ?: 'application/pdf',
+            'Content-Disposition' => 'inline; filename="' . $material->file_name . '"',
+        ]);
     }
 } 
