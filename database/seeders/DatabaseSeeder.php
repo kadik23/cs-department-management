@@ -36,6 +36,8 @@ class DatabaseSeeder extends Seeder
             SchedulerSettingSeeder::class,
             ExamSchedulerSettingSeeder::class,
             ExamsScheduleSeeder::class,
+            AnnouncementSeeder::class,
+            AssignmentSubmissionSeeder::class,
         ]);
     }
 }

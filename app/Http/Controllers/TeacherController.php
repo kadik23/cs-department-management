@@ -15,6 +15,7 @@ use App\Models\CourseMaterial;
 use App\Models\Announcement;
 use App\Models\AcademicLevel;
 use App\Models\Group;
+use App\Models\AssignmentSubmission;
 use App\Repositories\TeacherRepository;
 use App\Repositories\ScheduleRepository;
 use App\Repositories\LectureRepository;
@@ -494,6 +495,133 @@ class TeacherController extends Controller
         return response()->file($filePath, [
             'Content-Type' => $announcement->attachment_mime ?? 'application/pdf',
             'Content-Disposition' => 'inline; filename="' . $announcement->attachment_name . '"',
+        ]);
+    }
+
+    public function submissions(Request $request)
+    {
+        $user = Auth::user();
+        $teacher = $this->getTeacherForUser($user);
+
+        if (!$teacher) {
+            return redirect('/')->with('error', 'Teacher account not found.');
+        }
+
+        $query = AssignmentSubmission::with([
+            'student.user',
+            'student.group.academicLevel.speciality',
+            'student.academicLevel',
+            'subject',
+            'group'
+        ])->where('teacher_id', $teacher->id);
+
+        if ($request->filled('subject_id') && $request->subject_id !== 'all') {
+            $query->where('subject_id', $request->subject_id);
+        }
+
+        if ($request->filled('group_id') && $request->group_id !== 'all') {
+            $query->where('group_id', $request->group_id);
+        }
+
+        if ($request->filled('type') && $request->type !== 'all') {
+            $query->where('type', $request->type);
+        }
+
+        if ($request->filled('status') && $request->status !== 'all') {
+            if ($request->status === 'unread') {
+                $query->where('is_read', false);
+            } elseif ($request->status === 'read') {
+                $query->where('is_read', true);
+            }
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhereHas('student.user', function ($uq) use ($search) {
+                      $uq->where('first_name', 'like', "%{$search}%")
+                         ->orWhere('last_name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $submissions = $query->latestFirst()->get();
+
+        $totalCount = AssignmentSubmission::where('teacher_id', $teacher->id)->count();
+        $unreadCount = AssignmentSubmission::where('teacher_id', $teacher->id)->where('is_read', false)->count();
+        $readCount = AssignmentSubmission::where('teacher_id', $teacher->id)->where('is_read', true)->count();
+        $tdCount = AssignmentSubmission::where('teacher_id', $teacher->id)->where('type', 'td')->count();
+        $tpCount = AssignmentSubmission::where('teacher_id', $teacher->id)->where('type', 'tp')->count();
+
+        $context = $this->getTeacherContextData($teacher);
+
+        return Inertia::render('teacher/Submissions', [
+            'teacher' => $teacher,
+            'submissions' => $submissions,
+            'stats' => [
+                'total' => $totalCount,
+                'unread' => $unreadCount,
+                'read' => $readCount,
+                'td' => $tdCount,
+                'tp' => $tpCount,
+            ],
+            'filters' => $request->only(['subject_id', 'group_id', 'type', 'status', 'search']),
+            'teacherSubjects' => $context['subjects'],
+            'teacherGroups' => $context['groups'],
+        ]);
+    }
+
+    public function toggleSubmissionRead(AssignmentSubmission $submission)
+    {
+        $user = Auth::user();
+        $teacher = $this->getTeacherForUser($user);
+
+        if ($submission->teacher_id !== $teacher->id) {
+            abort(403, 'Unauthorized.');
+        }
+
+        $submission->update([
+            'is_read' => !$submission->is_read
+        ]);
+
+        return redirect()->back()->with('message', $submission->is_read ? 'Deliverable marked as read.' : 'Deliverable marked as unread.');
+    }
+
+    public function downloadSubmission(AssignmentSubmission $submission)
+    {
+        $user = Auth::user();
+        $teacher = $this->getTeacherForUser($user);
+
+        if ($submission->teacher_id !== $teacher->id) {
+            abort(403, 'Unauthorized.');
+        }
+
+        if (!Storage::disk('local')->exists($submission->file_path)) {
+            abort(404, 'Submission file not found.');
+        }
+
+        return Storage::disk('local')->download($submission->file_path, $submission->file_name);
+    }
+
+    public function previewSubmission(AssignmentSubmission $submission)
+    {
+        $user = Auth::user();
+        $teacher = $this->getTeacherForUser($user);
+
+        if ($submission->teacher_id !== $teacher->id) {
+            abort(403, 'Unauthorized.');
+        }
+
+        if (!Storage::disk('local')->exists($submission->file_path)) {
+            abort(404, 'Submission file not found.');
+        }
+
+        $filePath = Storage::disk('local')->path($submission->file_path);
+        return response()->file($filePath, [
+            'Content-Type' => $submission->file_mime ?: 'application/pdf',
+            'Content-Disposition' => 'inline; filename="' . $submission->file_name . '"',
         ]);
     }
 } 

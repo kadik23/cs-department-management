@@ -16,6 +16,7 @@ use App\Models\Attendance;
 use App\Models\CourseMaterial;
 use App\Models\Announcement;
 use App\Models\Subject;
+use App\Models\AssignmentSubmission;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
@@ -343,6 +344,149 @@ class StudentController extends Controller
         return response()->file($filePath, [
             'Content-Type' => $announcement->attachment_mime ?? 'application/pdf',
             'Content-Disposition' => 'inline; filename="' . $announcement->attachment_name . '"',
+        ]);
+    }
+
+    public function submissions(Request $request)
+    {
+        $user = Auth::user();
+        $student = $this->getStudentForUser($user);
+
+        if (!$student) {
+            return redirect('/')->with('error', 'No student record found for this user.');
+        }
+
+        $submissions = AssignmentSubmission::with(['subject', 'teacher.user'])
+            ->forStudent($student->id)
+            ->latestFirst()
+            ->get();
+
+        // Get student's schedules (TD and TP sessions for their group)
+        $schedules = Schedule::where('group_id', $student->group_id)
+            ->with(['subject', 'teacher.user'])
+            ->get();
+
+        // Create curated options for the submission form
+        $sessionOptions = collect();
+        foreach ($schedules as $sched) {
+            if ($sched->subject && $sched->teacher) {
+                $sessionOptions->push([
+                    'subject_id' => $sched->subject_id,
+                    'subject_name' => $sched->subject->subject_name,
+                    'teacher_id' => $sched->teacher_id,
+                    'teacher_name' => 'Pr. ' . ($sched->teacher->user ? $sched->teacher->user->first_name . ' ' . $sched->teacher->user->last_name : 'Teacher #' . $sched->teacher_id),
+                ]);
+            }
+        }
+        $sessionOptions = $sessionOptions->unique(function ($item) {
+            return $item['subject_id'] . '-' . $item['teacher_id'];
+        })->values();
+
+        // Fallbacks if schedule not yet populated
+        $allSubjects = Subject::orderBy('subject_name')->get(['id', 'subject_name']);
+        $allTeachers = \App\Models\Teacher::with('user')->get()->map(function ($t) {
+            return [
+                'id' => $t->id,
+                'name' => 'Pr. ' . ($t->user ? $t->user->first_name . ' ' . $t->user->last_name : 'Teacher #' . $t->id),
+            ];
+        });
+
+        return Inertia::render('student/Submissions', [
+            'student' => $student,
+            'submissions' => $submissions,
+            'sessionOptions' => $sessionOptions,
+            'allSubjects' => $allSubjects,
+            'allTeachers' => $allTeachers,
+        ]);
+    }
+
+    public function storeSubmission(Request $request)
+    {
+        $user = Auth::user();
+        $student = $this->getStudentForUser($user);
+
+        if (!$student) {
+            return redirect()->back()->with('error', 'Student record not found.');
+        }
+
+        if ($request->hasFile('file') && !$request->file('file')->isValid()) {
+            $errorCode = $request->file('file')->getError();
+            if ($errorCode === UPLOAD_ERR_INI_SIZE || $errorCode === UPLOAD_ERR_FORM_SIZE) {
+                return redirect()->back()->withErrors([
+                    'file' => 'The file exceeds the upload limit (' . ini_get('upload_max_filesize') . ').',
+                ]);
+            }
+        }
+
+        $request->validate([
+            'subject_id' => 'required|exists:subjects,id',
+            'teacher_id' => 'required|exists:teachers,id',
+            'type' => 'required|in:td,tp',
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string|max:2000',
+            'file' => 'required|file|mimes:pdf|max:25600', // 25MB max PDF
+        ], [
+            'file.mimes' => 'The deliverable must be a PDF file.',
+            'file.max' => 'The deliverable may not be greater than 25MB.',
+        ]);
+
+        $file = $request->file('file');
+        $originalName = $file->getClientOriginalName();
+        $size = $file->getSize();
+        $mime = $file->getClientMimeType() ?: 'application/pdf';
+        $path = $file->store('submissions', 'local');
+
+        AssignmentSubmission::create([
+            'student_id' => $student->id,
+            'teacher_id' => $request->teacher_id,
+            'subject_id' => $request->subject_id,
+            'group_id' => $student->group_id,
+            'type' => strtolower($request->type),
+            'title' => $request->title,
+            'description' => $request->description,
+            'file_path' => $path,
+            'file_name' => $originalName,
+            'file_size' => $size,
+            'file_mime' => $mime,
+            'is_read' => false,
+        ]);
+
+        return redirect()->back()->with('message', 'Assignment deliverable submitted successfully.');
+    }
+
+    public function downloadSubmission(AssignmentSubmission $submission)
+    {
+        $user = Auth::user();
+        $student = $this->getStudentForUser($user);
+
+        if ($submission->student_id !== $student->id) {
+            abort(403, 'Unauthorized access to this submission.');
+        }
+
+        if (!Storage::disk('local')->exists($submission->file_path)) {
+            abort(404, 'Submission file not found.');
+        }
+
+        return Storage::disk('local')->download($submission->file_path, $submission->file_name);
+    }
+
+    public function previewSubmission(AssignmentSubmission $submission)
+    {
+        $user = Auth::user();
+        $student = $this->getStudentForUser($user);
+
+        if ($submission->student_id !== $student->id) {
+            abort(403, 'Unauthorized access to this submission.');
+        }
+
+        if (!Storage::disk('local')->exists($submission->file_path)) {
+            abort(404, 'Submission file not found.');
+        }
+
+        $filePath = Storage::disk('local')->path($submission->file_path);
+        return response()->file($filePath, [
+            'Content-Type' => $submission->file_mime ?: 'application/pdf',
+            'Content-Disposition' => 'inline; filename="' . $submission->file_name . '"',
         ]);
     }
 } 

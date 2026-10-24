@@ -106,6 +106,10 @@ Route::prefix('student')->middleware(['auth', 'student'])->group(function () {
     Route::get('/notes', [StudentController::class, 'notes'])->name('student.notes');
     Route::get('/attendance', [StudentController::class, 'attendance'])->name('student.attendance');
     Route::get('/exams', [StudentController::class, 'exams'])->name('student.exams');
+    Route::get('/submissions', [StudentController::class, 'submissions'])->name('student.submissions');
+    Route::post('/submissions', [StudentController::class, 'storeSubmission'])->name('student.submissions.store');
+    Route::get('/submissions/{submission}/download', [StudentController::class, 'downloadSubmission'])->name('student.submissions.download');
+    Route::get('/submissions/{submission}/preview', [StudentController::class, 'previewSubmission'])->name('student.submissions.preview');
 });
 
 // Teacher routes
@@ -120,6 +124,10 @@ Route::prefix('teacher')->middleware(['auth', 'teacher'])->group(function () {
     Route::get('/courses/materials/{material}/download', [TeacherController::class, 'downloadMaterial'])->name('teacher.courses.materials.download');
     Route::get('/courses/materials/{material}/preview', [TeacherController::class, 'previewMaterial'])->name('teacher.courses.materials.preview');
     Route::get('/schedule', [TeacherController::class, 'schedule'])->name('teacher.schedule');
+    Route::get('/submissions', [TeacherController::class, 'submissions'])->name('teacher.submissions');
+    Route::post('/submissions/{submission}/toggle-read', [TeacherController::class, 'toggleSubmissionRead'])->name('teacher.submissions.toggle_read');
+    Route::get('/submissions/{submission}/download', [TeacherController::class, 'downloadSubmission'])->name('teacher.submissions.download');
+    Route::get('/submissions/{submission}/preview', [TeacherController::class, 'previewSubmission'])->name('teacher.submissions.preview');
     Route::get('/grades', [TeacherController::class, 'grades'])->name('teacher.grades');
     Route::post('/grades', [TeacherController::class, 'saveGrade'])->name('teacher.grades.save');
     Route::get('/attendance', [TeacherController::class, 'attendance'])->name('teacher.attendance');

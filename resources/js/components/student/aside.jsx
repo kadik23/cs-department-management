@@ -30,6 +30,10 @@ function Aside() {
             title: "Schedule",
         },
         {
+            path: "/student/submissions",
+            title: "Submissions",
+        },
+        {
             path: "/student/notes",
             title: "Notes",
         },
