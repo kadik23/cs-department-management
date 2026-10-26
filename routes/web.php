@@ -34,6 +34,11 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/accounts', [App\Http\Controllers\AdminAccountsController::class, 'index'])->name('admin.accounts');
     Route::post('/accounts', [App\Http\Controllers\AdminAccountsController::class, 'store'])->name('admin.accounts.store');
     Route::delete('/accounts/{id}', [App\Http\Controllers\AdminAccountsController::class, 'destroy'])->name('admin.accounts.destroy');
+    Route::post('/accounts/{id}/reset-password', [App\Http\Controllers\AdminAccountsController::class, 'resetPassword'])->name('admin.accounts.reset-password');
+    
+    Route::get('/profile', [App\Http\Controllers\AdminProfileController::class, 'show'])->name('admin.profile');
+    Route::put('/profile', [App\Http\Controllers\AdminProfileController::class, 'update'])->name('admin.profile.update');
+    Route::put('/profile/password', [App\Http\Controllers\AdminProfileController::class, 'updatePassword'])->name('admin.profile.password');
     
     Route::get('/students', [App\Http\Controllers\AdminStudentsController::class, 'index'])->name('admin.students');
     Route::get('/students/groups', [App\Http\Controllers\AdminStudentsController::class, 'getGroups'])->name('admin.students.groups');
@@ -110,6 +115,7 @@ Route::prefix('student')->middleware(['auth', 'student'])->group(function () {
     Route::post('/submissions', [StudentController::class, 'storeSubmission'])->name('student.submissions.store');
     Route::get('/submissions/{submission}/download', [StudentController::class, 'downloadSubmission'])->name('student.submissions.download');
     Route::get('/submissions/{submission}/preview', [StudentController::class, 'previewSubmission'])->name('student.submissions.preview');
+    Route::get('/profile', [StudentController::class, 'profile'])->name('student.profile');
 });
 
 // Teacher routes
@@ -132,6 +138,7 @@ Route::prefix('teacher')->middleware(['auth', 'teacher'])->group(function () {
     Route::post('/grades', [TeacherController::class, 'saveGrade'])->name('teacher.grades.save');
     Route::get('/attendance', [TeacherController::class, 'attendance'])->name('teacher.attendance');
     Route::post('/attendance', [TeacherController::class, 'saveAttendance'])->name('teacher.attendance.save');
+    Route::get('/profile', [TeacherController::class, 'profile'])->name('teacher.profile');
 });
 
 // Auth routes

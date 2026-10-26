@@ -624,4 +624,37 @@ class TeacherController extends Controller
             'Content-Disposition' => 'inline; filename="' . $submission->file_name . '"',
         ]);
     }
+
+    public function profile(Request $request)
+    {
+        $user = Auth::user();
+        $teacher = $this->getTeacherForUser($user);
+
+        if (!$teacher) {
+            return redirect('/')->with('error', 'No teacher record found for this user.');
+        }
+
+        $context = $this->getTeacherContextData($teacher);
+
+        $weeklyClassesCount = Schedule::where('teacher_id', $teacher->id)->count() +
+            Lecture::where('teacher_id', $teacher->id)->count();
+
+        return Inertia::render('teacher/Profile', [
+            'teacher' => $teacher,
+            'user' => [
+                'id' => $user->id,
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
+                'username' => $user->username,
+                'email' => $user->email,
+                'phone_number' => $user->phone_number,
+                'location' => $user->location,
+                'role' => 'Faculty Member / Instructor',
+                'created_at' => $user->created_at ? $user->created_at->format('F d, Y') : null,
+            ],
+            'subjects' => $context['subjects'],
+            'groups' => $context['groups'],
+            'weeklyClassesCount' => $weeklyClassesCount,
+        ]);
+    }
 } 

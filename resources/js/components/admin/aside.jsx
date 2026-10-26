@@ -4,7 +4,8 @@ import { useDispatch } from "react-redux";
 import { logout as logoutAction } from "../../state/auth/authSlice"; // adjust path if needed
 
 function Aside() {
-    const { url } = usePage();
+    const { url, props } = usePage();
+    const auth = props?.auth;
     const dispatch = useDispatch();
     function getCsrfToken() {
         const meta = document.querySelector('meta[name="csrf-token"]');
@@ -63,6 +64,10 @@ function Aside() {
         {
             path: "/admin/specialities",
             title: "Specialities"
+        },
+        {
+            path: "/admin/profile",
+            title: "Profile Settings"
         }
     ];
 
@@ -78,12 +83,16 @@ function Aside() {
         window.location.href = "/";
     };
 
+    const adminName = auth?.user?.first_name ? `${auth.user.first_name} ${auth.user.last_name}` : "Admin User";
+
     return (
         <aside>
-            <div className="user-profile-pic">
-                <img src={'/assets/images/student.jpg'} alt="profile picture"/>
-            </div>
-            <div className="user-name">Admin User</div>
+            <Link href="/admin/profile" style={{ textDecoration: 'none', color: 'inherit' }}>
+                <div className="user-profile-pic">
+                    <img src={'/assets/images/student.jpg'} alt="profile picture"/>
+                </div>
+                <div className="user-name">{adminName}</div>
+            </Link>
             <nav>
                 {aside_links.map((link, index) => (
                     <Link 

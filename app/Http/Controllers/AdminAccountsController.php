@@ -33,6 +33,8 @@ class AdminAccountsController extends Controller
             
             return [
                 'id' => $user->id,
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
                 'username' => $user->username,
                 'email' => $user->email,
                 'role' => $role,
@@ -119,5 +121,19 @@ class AdminAccountsController extends Controller
         $user->delete();
 
         return redirect()->back()->with('success', 'Account deleted successfully');
+    }
+
+    public function resetPassword(Request $request, $id)
+    {
+        $request->validate([
+            'password' => 'required|string|min:6',
+        ]);
+
+        $user = User::findOrFail($id);
+        $user->update([
+            'password' => Hash::make($request->password),
+        ]);
+
+        return redirect()->back()->with('success', "Password for {$user->username} ({$user->first_name} {$user->last_name}) was reset successfully.");
     }
 } 

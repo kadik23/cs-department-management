@@ -64,14 +64,14 @@ body {
     justify-content: center;
 }
 
-form {
+.right-side form {
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-form input {
+.right-side form input {
     width: calc(4/5*100%);
     padding: 10px 20px 10px 20px;
     margin-bottom: 20px;
@@ -83,11 +83,11 @@ form input {
     border-radius: 5px;
 }
 
-form input::placeholder {
+.right-side form input::placeholder {
     color: #0369a1;
 }
 
-form label {
+.right-side form label {
     color: #075985;
     width: calc(4/5*100%);
     padding: 10px 20px 10px 20px;

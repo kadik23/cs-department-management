@@ -4,7 +4,8 @@ import { useDispatch } from "react-redux";
 import { logout as logoutAction } from "../../state/auth/authSlice";
 
 function Aside() {
-    const { url } = usePage();
+    const { url, props } = usePage();
+    const auth = props?.auth;
     const dispatch = useDispatch();
     
     function getCsrfToken() {
@@ -40,6 +41,10 @@ function Aside() {
         {
             path: "/teacher/attendance",
             title: "Attendance",
+        },
+        {
+            path: "/teacher/profile",
+            title: "My Profile",
         }
     ];
 
@@ -55,12 +60,16 @@ function Aside() {
         window.location.href = "/";
     };
 
+    const teacherName = auth?.user?.first_name ? `Pr. ${auth.user.first_name} ${auth.user.last_name}` : "Teacher";
+
     return (
         <aside>
-            <div className="user-profile-pic">
-                <img src={'/assets/images/teacher.png'} alt="profile picture"/>
-            </div>
-            <div className="user-name">Teacher</div>
+            <Link href="/teacher/profile" style={{ textDecoration: 'none', color: 'inherit' }}>
+                <div className="user-profile-pic">
+                    <img src={'/assets/images/teacher.png'} alt="profile picture"/>
+                </div>
+                <div className="user-name">{teacherName}</div>
+            </Link>
             <nav>
                 {aside_links.map((link, index) => (
                     <Link 

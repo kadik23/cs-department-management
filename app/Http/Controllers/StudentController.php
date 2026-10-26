@@ -489,4 +489,37 @@ class StudentController extends Controller
             'Content-Disposition' => 'inline; filename="' . $submission->file_name . '"',
         ]);
     }
+
+    public function profile(Request $request)
+    {
+        $user = Auth::user();
+        $student = $this->getStudentForUser($user);
+
+        if (!$student) {
+            return redirect('/')->with('error', 'No student record found for this user.');
+        }
+
+        $student->load(['group.academicLevel.speciality', 'academicLevel.speciality']);
+
+        $schedules = Schedule::where('group_id', $student->group_id)->with(['subject', 'teacher.user'])->get();
+        $enrolledSubjects = $schedules->pluck('subject')->filter()->unique('id')->values();
+
+        return Inertia::render('student/Profile', [
+            'student' => $student,
+            'user' => [
+                'id' => $user->id,
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
+                'username' => $user->username,
+                'email' => $user->email,
+                'phone_number' => $user->phone_number,
+                'location' => $user->location,
+                'role' => 'Student',
+                'created_at' => $user->created_at ? $user->created_at->format('F d, Y') : null,
+            ],
+            'enrolledSubjects' => $enrolledSubjects,
+            'group' => $student->group,
+            'academicLevel' => $student->academicLevel ?: $student->group?->academicLevel,
+        ]);
+    }
 } 
