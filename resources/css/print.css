@@ -1,0 +1,298 @@
+/* Print Stylesheet for CS Department Management System */
+
+@media screen {
+    .print-only {
+        display: none !important;
+    }
+}
+
+@media print {
+    /* Hide navigation, sidebars, buttons, alerts, and non-printable elements */
+    aside,
+    nav,
+    .no-print,
+    .search,
+    .list-control,
+    .dialogue-wrapper,
+    .cancel-btn,
+    .alert-wrapper,
+    button:not(.allow-print),
+    .btn:not(.allow-print) {
+        display: none !important;
+    }
+
+    /* Reset root containers for full-width print layout */
+    html, body {
+        background: #ffffff !important;
+        color: #0f172a !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        min-height: auto !important;
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .container,
+    .page-content,
+    .section-wrapper,
+    .section-content {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-shadow: none !important;
+        border: none !important;
+        background: transparent !important;
+        overflow: visible !important;
+    }
+
+    .print-only {
+        display: block !important;
+    }
+
+    .print-only-flex {
+        display: flex !important;
+    }
+
+    .screen-only {
+        display: none !important;
+    }
+
+    /* Timetable printing grid */
+    .timetable-print-wrapper {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .timetable-print-wrapper .table-head,
+    .timetable-print-wrapper .table-body {
+        width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        border-radius: 4px !important;
+        overflow: visible !important;
+    }
+
+    .timetable-print-wrapper .table-head {
+        background-color: #f1f5f9 !important;
+        border: 1.5px solid #64748b !important;
+        border-bottom: 2px solid #334155 !important;
+    }
+
+    .timetable-print-wrapper .table-head-item {
+        color: #0f172a !important;
+        font-weight: 700 !important;
+        font-size: 11px !important;
+        padding: 6px 4px !important;
+        min-height: 36px !important;
+        border-right: 1px solid #cbd5e1 !important;
+        text-align: center !important;
+    }
+    .timetable-print-wrapper .table-head-item:last-child {
+        border-right: none !important;
+    }
+
+    .timetable-print-wrapper .table-body {
+        background-color: #ffffff !important;
+        border: 1.5px solid #64748b !important;
+        border-top: none !important;
+    }
+
+    .timetable-print-wrapper .table-row {
+        border-bottom: 1px solid #cbd5e1 !important;
+        page-break-inside: avoid !important;
+    }
+    .timetable-print-wrapper .table-row:last-child {
+        border-bottom: none !important;
+    }
+
+    .timetable-print-wrapper .table-item {
+        color: #1e293b !important;
+        font-size: 11px !important;
+        padding: 6px 4px !important;
+        min-height: 80px !important;
+        border-right: 1px solid #cbd5e1 !important;
+        text-align: center !important;
+        vertical-align: middle !important;
+    }
+    .timetable-print-wrapper .table-item:last-child {
+        border-right: none !important;
+    }
+
+    .timetable-print-wrapper .table-item:first-child {
+        background-color: #f8fafc !important;
+        color: #0f172a !important;
+        font-weight: 700 !important;
+        font-size: 12px !important;
+    }
+
+    /* Print header layout */
+    .official-print-header {
+        border-bottom: 2px solid #0c4a6e;
+        padding-bottom: 10px;
+        margin-bottom: 14px;
+        page-break-inside: avoid;
+    }
+
+    .official-print-header .ministry-block {
+        text-align: center;
+        line-height: 1.35;
+        margin-bottom: 8px;
+    }
+
+    .official-print-header .republic-title {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #334155;
+    }
+
+    .official-print-header .dept-title {
+        font-size: 14px;
+        font-weight: 800;
+        color: #0c4a6e;
+        margin-top: 2px;
+        letter-spacing: 0.3px;
+    }
+
+    .official-print-header .doc-banner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #f0f9ff;
+        border: 1px solid #bae6fd;
+        border-radius: 6px;
+        padding: 6px 14px;
+        margin-top: 6px;
+    }
+
+    .official-print-header .doc-name {
+        font-size: 14px;
+        font-weight: 800;
+        color: #0369a1;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+
+    .official-print-header .doc-meta {
+        font-size: 11px;
+        color: #475569;
+        text-align: right;
+        line-height: 1.35;
+    }
+
+    /* Identity details grid */
+    .print-info-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        padding: 8px 12px;
+        margin-bottom: 12px;
+        page-break-inside: avoid;
+    }
+
+    .print-info-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .print-info-label {
+        font-size: 9px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #64748b;
+        letter-spacing: 0.4px;
+    }
+
+    .print-info-val {
+        font-size: 12px;
+        font-weight: 700;
+        color: #0f172a;
+        margin-top: 1px;
+    }
+
+    /* Convocation specific styles */
+    .convocation-table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        margin: 14px 0 !important;
+        page-break-inside: avoid;
+    }
+
+    .convocation-table th,
+    .convocation-table td {
+        border: 1.5px solid #64748b !important;
+        padding: 8px 10px !important;
+        font-size: 11px !important;
+        text-align: left !important;
+    }
+
+    .convocation-table th {
+        background-color: #f1f5f9 !important;
+        color: #0f172a !important;
+        font-weight: 700 !important;
+        text-transform: uppercase;
+        font-size: 10px !important;
+        letter-spacing: 0.5px;
+    }
+
+    .convocation-rules {
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        background-color: #f8fafc;
+        padding: 10px 14px;
+        margin-top: 14px;
+        font-size: 10px;
+        color: #334155;
+        line-height: 1.5;
+        page-break-inside: avoid;
+    }
+
+    .convocation-rules-title {
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #0c4a6e;
+        margin-bottom: 4px;
+    }
+
+    .convocation-signatures {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+        padding-top: 10px;
+        page-break-inside: avoid;
+    }
+
+    .convocation-sig-box {
+        width: 220px;
+        border: 1px dashed #94a3b8;
+        border-radius: 6px;
+        padding: 8px 10px;
+        min-height: 75px;
+        text-align: center;
+        font-size: 11px;
+        font-weight: 600;
+        color: #475569;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .official-print-footer {
+        display: flex;
+        justify-content: space-between;
+        font-size: 9px;
+        color: #94a3b8;
+        border-top: 1px solid #e2e8f0;
+        padding-top: 6px;
+        margin-top: 16px;
+        page-break-inside: avoid;
+    }
+}

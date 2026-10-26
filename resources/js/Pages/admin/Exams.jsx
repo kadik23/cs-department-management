@@ -101,9 +101,73 @@ function Exams({ exams, subjects, groups, settings, search, classRooms = [] }) {
             <Alert type="error" message={flash.error} />
             <Alert type={alert.type} message={alert.message} onClose={() => setAlert({})} />
             <div className="page-content">
-                <div className="page-header">
+                <style>{`
+                    @media print {
+                        @page {
+                            size: landscape;
+                            margin: 8mm;
+                        }
+                    }
+                `}</style>
+
+                {/* Official Print Header */}
+                <div className="official-print-header print-only">
+                    <div className="ministry-block" style={{ textAlign: "center" }}>
+                        <div className="republic-title">People's Democratic Republic of Algeria</div>
+                        <div style={{ fontSize: "11px", color: "#475569", fontWeight: 600 }}>
+                            Ministry of Higher Education and Scientific Research
+                        </div>
+                        <div className="dept-title">
+                            Faculty of Exact Sciences • Department of Computer Science
+                        </div>
+                    </div>
+
+                    <div className="doc-banner">
+                        <div>
+                            <div className="doc-name">Master Examination Timetable</div>
+                            <div style={{ fontSize: "10px", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.4px" }}>
+                                Calendrier général des examens semestriels
+                            </div>
+                        </div>
+                        <div className="doc-meta">
+                            <div><strong>Academic Year:</strong> 2025 / 2026</div>
+                            <div><strong>Generated:</strong> {new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="page-header" style={{ justifyContent: "space-between", alignItems: "center" }}>
                     <div className="page-title">Exams Schedules</div>
-                    <div className="page-actions">
+                    <div className="page-actions" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                        <button
+                            type="button"
+                            onClick={() => window.print()}
+                            className="btn"
+                            style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "8px",
+                                backgroundColor: "#0284c7",
+                                color: "#ffffff",
+                                border: "none",
+                                padding: "8px 16px",
+                                borderRadius: "8px",
+                                fontWeight: "700",
+                                fontSize: "13px",
+                                cursor: "pointer",
+                                transition: "background-color 0.2s ease",
+                            }}
+                            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#0369a1")}
+                            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#0284c7")}
+                            title="Print or Export Exam Timetable to PDF"
+                        >
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="6 9 6 2 18 2 18 9" />
+                                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                                <rect x="6" y="14" width="12" height="8" />
+                            </svg>
+                            <span>Print Schedule</span>
+                        </button>
                         <button
                             id="open_create_spec"
                             className="btn"
@@ -261,7 +325,7 @@ function Exams({ exams, subjects, groups, settings, search, classRooms = [] }) {
                                 <div className="list-header-item">End At</div>
                                 <div className="list-header-item" style={{ flex: 2 }}>Subject</div>
                                 <div className="list-header-item">Group</div>
-                                <div className="list-header-item">Actions</div>
+                                <div className="list-header-item no-print">Actions</div>
                             </div>
                             <div className="list-body">
                                 {exams.map((exam) => (
@@ -271,7 +335,7 @@ function Exams({ exams, subjects, groups, settings, search, classRooms = [] }) {
                                         <div className="list-item">{exam.end_time}</div>
                                         <div className="list-item" style={{ flex: 2 }}>{exam.subject_name}</div>
                                         <div className="list-item">Group {exam.group_number}</div>
-                                        <div className="list-item">
+                                        <div className="list-item no-print">
                                             <button
                                                 className="btn btn-secondary"
                                                 onClick={() => handleEdit(exam)}

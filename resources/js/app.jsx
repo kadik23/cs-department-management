@@ -20,6 +20,7 @@ import "@css/tabs.css";
 import "@css/forms.css";
 import "@css/buttons.css";
 import "@css/card-box.css";
+import "@css/print.css";
 
 createInertiaApp({
     title: (title) => (title ? `${title} - CS Department Management` : "CS Department Management"),

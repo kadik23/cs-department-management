@@ -21,23 +21,115 @@ export default function Schedule({ student, schedule = [], settings = { class_du
         }
     });
 
+    const levelNumber = student?.group?.academic_level?.level || student?.academic_level?.level || student?.group?.academicLevel?.level || student?.academicLevel?.level || "1";
+    const specialityName = student?.group?.academic_level?.speciality?.speciality_name || student?.academic_level?.speciality?.speciality_name || student?.group?.academicLevel?.speciality?.speciality_name || student?.academicLevel?.speciality?.speciality_name || "Computer Science";
+    const groupNumber = student?.group?.group_number || "N/A";
+    const studentName = student?.user ? `${student.user.first_name} ${student.user.last_name}` : "Student";
+    const studentId = student?.id ? `STD-${String(student.id).padStart(6, "0")}` : "N/A";
+
     return (
         <div className="page-content">
-            <div className="page-header" style={{ justifyContent: "space-between" }}>
+            <style>{`
+                @media print {
+                    @page {
+                        size: landscape;
+                        margin: 8mm;
+                    }
+                }
+            `}</style>
+
+            {/* Official Print Header - Displays ONLY during print/PDF export */}
+            <div className="official-print-header print-only">
+                <div className="ministry-block">
+                    <div className="republic-title">People's Democratic Republic of Algeria</div>
+                    <div style={{ fontSize: "11px", color: "#475569", fontWeight: 600 }}>
+                        Ministry of Higher Education and Scientific Research
+                    </div>
+                    <div className="dept-title">
+                        Faculty of Exact Sciences • Department of Computer Science
+                    </div>
+                </div>
+
+                <div className="doc-banner">
+                    <div>
+                        <div className="doc-name">Student Weekly Timetable</div>
+                        <div style={{ fontSize: "10px", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.4px" }}>
+                            Emploi du temps hebdomadaire de l'étudiant
+                        </div>
+                    </div>
+                    <div className="doc-meta">
+                        <div><strong>Academic Year:</strong> 2025 / 2026</div>
+                        <div><strong>Generated:</strong> {new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</div>
+                    </div>
+                </div>
+
+                <div className="print-info-grid" style={{ marginTop: "10px" }}>
+                    <div className="print-info-item">
+                        <span className="print-info-label">Student Name</span>
+                        <span className="print-info-val">{studentName}</span>
+                    </div>
+                    <div className="print-info-item">
+                        <span className="print-info-label">Registration ID</span>
+                        <span className="print-info-val">{studentId}</span>
+                    </div>
+                    <div className="print-info-item">
+                        <span className="print-info-label">Level & Speciality</span>
+                        <span className="print-info-val">L{levelNumber} {specialityName}</span>
+                    </div>
+                    <div className="print-info-item">
+                        <span className="print-info-label">Assigned Cohort</span>
+                        <span className="print-info-val">{groupNumber !== "N/A" ? `Group ${groupNumber}` : "Unassigned"}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div className="page-header" style={{ justifyContent: "space-between", alignItems: "center" }}>
                 <div>
                     <div className="page-title">My Schedule</div>
                     <div style={{ fontSize: "12px", color: "#64748b", marginTop: "2px" }}>
                         Weekly Timetable: Lectures (Cours) & Group Sessions (TD / TP)
                     </div>
                 </div>
-                {student?.group && (
-                    <div style={{ fontSize: "13px", fontWeight: 700, color: "#0c4a6e" }}>
-                        Group {student.group.group_number}
-                    </div>
-                )}
+                <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+                    {student?.group && (
+                        <div style={{ fontSize: "13px", fontWeight: 700, color: "#0c4a6e", backgroundColor: "#e0f2fe", padding: "6px 12px", borderRadius: "6px", border: "1px solid #bae6fd" }}>
+                            Group {student.group.group_number}
+                        </div>
+                    )}
+                    <button
+                        type="button"
+                        onClick={() => window.print()}
+                        className="btn"
+                        style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "8px",
+                            backgroundColor: "#0284c7",
+                            color: "#ffffff",
+                            border: "none",
+                            padding: "8px 18px",
+                            borderRadius: "8px",
+                            fontWeight: "700",
+                            fontSize: "13px",
+                            cursor: "pointer",
+                            transition: "background-color 0.2s ease",
+                            boxShadow: "0 1px 3px rgba(2, 132, 199, 0.25)",
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#0369a1")}
+                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#0284c7")}
+                        title="Print or Export Timetable to PDF"
+                    >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="6 9 6 2 18 2 18 9" />
+                            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                            <rect x="6" y="14" width="12" height="8" />
+                        </svg>
+                        <span>Print Timetable</span>
+                    </button>
+                </div>
             </div>
 
-            <div className="section-wrapper">
+            <div className="section-wrapper timetable-print-wrapper">
                 <div className="section-content">
                     <div className="table-head">
                         <div className="table-head-item">Days</div>
@@ -97,6 +189,13 @@ export default function Schedule({ student, schedule = [], settings = { class_du
                         ))}
                     </div>
                 </div>
+            </div>
+
+            {/* Official Print Footer - Displays ONLY during print/PDF export */}
+            <div className="official-print-footer print-only" style={{ marginTop: "14px", paddingTop: "8px", borderTop: "1px solid #cbd5e1", display: "flex", justifyContent: "space-between", fontSize: "10px", color: "#64748b" }}>
+                <div>Computer Science Department Management System • Academic Year 2025/2026</div>
+                <div>Department Administration Validation & Stamp Zone</div>
+                <div>Official Weekly Timetable</div>
             </div>
         </div>
     );
