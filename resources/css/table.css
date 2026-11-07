@@ -30,7 +30,7 @@
     color: #3b82f6;
     font-size: 12px;
     font-weight: 400;
-    font-family: monospace;
+    font-family: inherit;
     line-height: 18px;
     background-color: none;
     text-align: center;
