@@ -27,18 +27,14 @@ if [ "$APP_ENV" = "production" ]; then
     php artisan config:set scribe.force_https=true
 fi
 
-# Simple PostgreSQL reset - separate statements
-echo "# Resetting database completely..."
-php artisan tinker --execute="DB::statement('DROP SCHEMA public CASCADE');" || true
-php artisan tinker --execute="DB::statement('CREATE SCHEMA public');" || true
-
-# Reconnect to database to clear aborted transaction state
-echo "# Reconnecting to database..."
-php artisan tinker --execute="DB::disconnect(); DB::reconnect();" || true
-
-# Run migrations without transactions
-echo "# Running migrations..."
-php artisan migrate --force --no-interaction
+# Optional fresh migration if requested
+if [ "$RESET_DATABASE" = "true" ]; then
+    echo "# Fresh migration requested..."
+    php artisan migrate:fresh --force --no-interaction
+else
+    echo "# Running migrations..."
+    php artisan migrate --force --no-interaction
+fi
 
 # Seed the database
 echo "# Seeding database..."
